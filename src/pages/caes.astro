@@ -1,0 +1,34 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import DogListings from '../components/DogListings';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Os Nossos Cães — CAPA Póvoa de Lanhoso"
+  description="Conhece os cães disponíveis para adoção no abrigo CAPA de Póvoa de Lanhoso. Encontra o teu novo melhor amigo."
+>
+  <Nav />
+  <main>
+    {/* Hero section */}
+    <section class="bg-gradient-to-b from-warm-100 to-warm-50 pt-16 pb-14 px-4 sm:px-6 lg:px-8 text-center">
+      <div class="max-w-3xl mx-auto">
+        <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-4">
+          Prontos para adoção
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-bold text-warm-900 mb-5 leading-tight">
+          Os Nossos Cães
+        </h1>
+        <p class="text-warm-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
+          Cada um deles tem uma história, uma personalidade única e muito amor para dar.
+          Poderá o próximo lar ser o teu?
+        </p>
+      </div>
+    </section>
+
+    {/* Dog listings — interactive React island */}
+    <DogListings client:load />
+  </main>
+  <Footer />
+</Layout>

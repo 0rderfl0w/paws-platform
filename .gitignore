@@ -17,6 +17,16 @@ pnpm-debug.log*
 .env
 .env.production
 
+# scraped dog photos (local reference only, not in repo)
+dogs/
+
+# scraped content (reference only)
+content/
+
+# scrape artifacts
+scrape-notes.md
+all-dogs.json
+
 # macOS-specific files
 .DS_Store
 

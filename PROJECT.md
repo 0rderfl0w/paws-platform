@@ -9,7 +9,7 @@ Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteç�
 ## Stack
 
 - **Framework:** Astro 5 + React 19 islands
-- **Styling:** Tailwind CSS 3
+- **Styling:** Tailwind CSS 4 (CSS-first config, @theme blocks)
 - **Runtime:** Bun
 - **Backend:** Supabase (Auth, Database, Storage)
   - Auth: admin login for shelter staff (email/password)
@@ -56,6 +56,25 @@ Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteç�
 - Hostinger is static-only — no SSR, all dynamic content via client-side React + Supabase
 - Dog photos need optimization before upload (or use Supabase transforms)
 
+## Design Direction (Z-Approved)
+
+**Z loves the current design. Use this style for ALL remaining pages.**
+
+- **Palette:** Warm earth tones — primary (orange), warm (brown), nature (green)
+  - Defined in `src/styles/global.css` via `@theme` blocks
+  - Primary: `primary-50` through `primary-900` (orange spectrum)
+  - Warm: `warm-50` through `warm-900` (brown/cream spectrum)
+  - Nature: `nature-50` through `nature-900` (green spectrum)
+- **Vibe:** Warm, inviting, emotional — charity energy, not tech startup
+- **Backgrounds:** White/cream alternating sections (`warm-50`, `warm-100`, white)
+- **Cards:** Rounded corners (`rounded-2xl`), soft shadows, warm borders
+- **Typography:** Inter font family, bold headings in `warm-900`
+- **Buttons:** Primary orange (`primary-500`), rounded (`rounded-xl`), with hover transitions
+- **Size badges:** Green for Pequeno, orange for Médio, brown for Grande
+- **Mobile-first:** Always responsive, hamburger nav on mobile
+- **Accessibility:** Semantic HTML, ARIA labels, good contrast, alt text
+
 ## Decision Log
 
+- 2025-07-26: Z approved landing page design — warm earth tones, soft palette. Carry this style forward to all pages. (Crash & Burn)
 - 2026-02-24: Chose Astro + React + Supabase + Hostinger stack. Matches existing project patterns (Build to Own Club uses same stack). Admin panel is a React island behind Supabase auth, not a separate app. (Crash & Burn)
