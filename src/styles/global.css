@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  /* Warm earth tone palette for a dog shelter charity */
+  --color-primary-50: #fef7ed;
+  --color-primary-100: #fdecd4;
+  --color-primary-200: #fbd5a8;
+  --color-primary-300: #f8b871;
+  --color-primary-400: #f49338;
+  --color-primary-500: #f17a13;
+  --color-primary-600: #e26009;
+  --color-primary-700: #bb4809;
+  --color-primary-800: #95390f;
+  --color-primary-900: #793110;
+
+  --color-warm-50: #faf6f2;
+  --color-warm-100: #f3ebe0;
+  --color-warm-200: #e6d4be;
+  --color-warm-300: #d6b896;
+  --color-warm-400: #c59a6e;
+  --color-warm-500: #b98352;
+  --color-warm-600: #ab7047;
+  --color-warm-700: #8f5a3c;
+  --color-warm-800: #754a35;
+  --color-warm-900: #603e2e;
+
+  --color-nature-50: #f4f9f0;
+  --color-nature-100: #e6f2dd;
+  --color-nature-200: #cde5bc;
+  --color-nature-300: #a8d28f;
+  --color-nature-400: #82ba64;
+  --color-nature-500: #639e43;
+  --color-nature-600: #4c7e32;
+  --color-nature-700: #3c632a;
+  --color-nature-800: #334f26;
+  --color-nature-900: #2b4322;
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Counter animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
