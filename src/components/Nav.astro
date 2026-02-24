@@ -1,0 +1,120 @@
+---
+const navLinks = [
+  { href: '/', label: 'Início' },
+  { href: '/caes', label: 'Os Nossos Cães' },
+  { href: '/sobre-nos', label: 'Sobre Nós' },
+  { href: '/ajudar', label: 'Ajudar' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-warm-200 shadow-sm">
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navegação principal">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo + Name -->
+      <a href="/" class="flex items-center gap-3 group" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
+        <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary-600 transition-colors">
+          <!-- Paw icon SVG -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-6 h-6" aria-hidden="true">
+            <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+          </svg>
+        </div>
+        <div class="leading-tight">
+          <span class="block text-lg font-bold text-warm-900 group-hover:text-primary-600 transition-colors">CAPA</span>
+          <span class="block text-xs text-warm-500 font-medium">Póvoa de Lanhoso</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="hidden md:flex items-center gap-1" role="list">
+        {navLinks.map(({ href, label }) => (
+          <li>
+            <a
+              href={href}
+              class={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                currentPath === href
+                  ? 'bg-primary-50 text-primary-700'
+                  : 'text-warm-700 hover:bg-warm-100 hover:text-warm-900'
+              }`}
+              aria-current={currentPath === href ? 'page' : undefined}
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Desktop CTA -->
+      <a
+        href="/ajudar"
+        class="hidden md:inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
+      >
+        Ajudar Agora
+      </a>
+
+      <!-- Mobile Hamburger -->
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="md:hidden p-2 rounded-lg text-warm-600 hover:bg-warm-100 hover:text-warm-900 transition-colors"
+        aria-label="Abrir menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+        <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 hidden" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-warm-200 py-3 pb-4">
+      <ul class="flex flex-col gap-1" role="list">
+        {navLinks.map(({ href, label }) => (
+          <li>
+            <a
+              href={href}
+              class={`block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                currentPath === href
+                  ? 'bg-primary-50 text-primary-700'
+                  : 'text-warm-700 hover:bg-warm-100 hover:text-warm-900'
+              }`}
+              aria-current={currentPath === href ? 'page' : undefined}
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+        <li class="pt-2 border-t border-warm-200 mt-2">
+          <a
+            href="/ajudar"
+            class="block px-4 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg text-center transition-colors"
+          >
+            Ajudar Agora
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  if (btn && menu && hamburgerIcon && closeIcon) {
+    btn.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('hidden') === false;
+      btn.setAttribute('aria-expanded', String(isOpen));
+      hamburgerIcon.classList.toggle('hidden', isOpen);
+      closeIcon.classList.toggle('hidden', !isOpen);
+    });
+  }
+</script>

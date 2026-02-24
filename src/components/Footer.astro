@@ -1,0 +1,132 @@
+---
+const quickLinks = [
+  { href: '/', label: 'Início' },
+  { href: '/caes', label: 'Os Nossos Cães' },
+  { href: '/sobre-nos', label: 'Sobre Nós' },
+  { href: '/ajudar', label: 'Como Ajudar' },
+];
+
+const helpLinks = [
+  { href: '/ajudar#adotar', label: 'Adotar um Cão' },
+  { href: '/ajudar#apadrinhar', label: 'Apadrinhar' },
+  { href: '/ajudar#voluntariado', label: 'Voluntariado' },
+  { href: '/ajudar#doacao', label: 'Fazer Donativo' },
+];
+---
+
+<footer class="bg-warm-900 text-warm-200" aria-label="Rodapé">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+      <!-- Brand column -->
+      <div class="lg:col-span-1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-6 h-6" aria-hidden="true">
+              <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="text-white font-bold text-lg leading-tight">CAPA</div>
+            <div class="text-warm-400 text-xs">Póvoa de Lanhoso</div>
+          </div>
+        </div>
+        <p class="text-warm-400 text-sm leading-relaxed mb-6">
+          Associação de voluntários dedicados ao bem-estar e proteção animal no município de Póvoa de Lanhoso.
+        </p>
+        <!-- Social links -->
+        <div class="flex gap-3">
+          <a
+            href="https://facebook.com/capapvl"
+            class="w-10 h-10 bg-warm-800 hover:bg-primary-600 rounded-lg flex items-center justify-center transition-colors"
+            aria-label="CAPA no Facebook"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          <a
+            href="https://instagram.com/capapvl"
+            class="w-10 h-10 bg-warm-800 hover:bg-primary-600 rounded-lg flex items-center justify-center transition-colors"
+            aria-label="CAPA no Instagram"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick links -->
+      <div>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Navegação</h3>
+        <ul class="space-y-2" role="list">
+          {quickLinks.map(({ href, label }) => (
+            <li>
+              <a href={href} class="text-warm-400 hover:text-white text-sm transition-colors hover:translate-x-0.5 inline-block">
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Help links -->
+      <div>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Como Ajudar</h3>
+        <ul class="space-y-2" role="list">
+          {helpLinks.map(({ href, label }) => (
+            <li>
+              <a href={href} class="text-warm-400 hover:text-white text-sm transition-colors hover:translate-x-0.5 inline-block">
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contacto</h3>
+        <ul class="space-y-3" role="list">
+          <li class="flex items-start gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" aria-hidden="true">
+              <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-warm-400 text-sm">Póvoa de Lanhoso, Braga<br />Portugal</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0" aria-hidden="true">
+              <path fill-rule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clip-rule="evenodd" />
+            </svg>
+            <a href="tel:+351253690000" class="text-warm-400 hover:text-white text-sm transition-colors">+351 253 690 000</a>
+          </li>
+          <li class="flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0" aria-hidden="true">
+              <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+              <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+            </svg>
+            <a href="mailto:geral@capapvl.pt" class="text-warm-400 hover:text-white text-sm transition-colors">geral@capapvl.pt</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="border-t border-warm-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-warm-500 text-sm">
+        © 2026 CAPA Póvoa de Lanhoso. Todos os direitos reservados.
+      </p>
+      <p class="text-warm-600 text-xs">
+        Feito com ❤️ por voluntários que amam animais
+      </p>
+    </div>
+
+  </div>
+</footer>
