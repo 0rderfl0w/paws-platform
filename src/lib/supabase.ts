@@ -11,6 +11,7 @@ export type Dog = {
   id: string;
   name: string;
   size: 'small' | 'medium' | 'large';
+  sex: 'male' | 'female' | null;
   age: string;
   description: string;
   photo_url: string;

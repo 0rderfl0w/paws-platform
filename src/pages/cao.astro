@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import DogProfile from '../components/DogProfile';
+---
+
+<Layout title="Conhecer Cão — CAPA Póvoa de Lanhoso">
+  <Nav />
+  <main class="px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+    <DogProfile client:load />
+  </main>
+  <Footer />
+</Layout>

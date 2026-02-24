@@ -4,11 +4,17 @@ import { seedDogs } from '../data/seedDogs';
 import type { Dog } from '../lib/supabase';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
+type SexFilter = 'all' | 'male' | 'female';
 
 const SIZE_LABELS: Record<string, string> = {
   small: 'Pequeno',
   medium: 'Médio',
   large: 'Grande',
+};
+
+const SEX_LABELS: Record<string, string> = {
+  male: 'Macho',
+  female: 'Fêmea',
 };
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
@@ -29,7 +35,7 @@ function DogCard({ dog }: { dog: Dog }) {
   const sizeLabel = SIZE_LABELS[dog.size] ?? dog.size;
 
   return (
-    <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group">
+    <a href={`/cao?id=${dog.id}`} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
       {/* Photo */}
       <div className="relative aspect-square overflow-hidden bg-warm-100">
         {dog.photo_url ? (
@@ -65,23 +71,15 @@ function DogCard({ dog }: { dog: Dog }) {
         <p className="text-warm-600 text-sm leading-relaxed line-clamp-3">
           {dog.description}
         </p>
-        <a
-          href={`/caes/${dog.id}`}
-          className="mt-4 inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 text-sm font-semibold group/link"
-        >
-          Conhecer {dog.name}
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">
-            <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
-          </svg>
-        </a>
       </div>
-    </article>
+    </a>
   );
 }
 
 export default function DogListings() {
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [filter, setFilter] = useState<SizeFilter>('all');
+  const [sexFilter, setSexFilter] = useState<SexFilter>('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -119,6 +117,9 @@ export default function DogListings() {
     if (filter !== 'all') {
       result = result.filter((d) => d.size === filter);
     }
+    if (sexFilter !== 'all') {
+      result = result.filter((d) => d.sex === sexFilter);
+    }
     if (search.trim()) {
       const term = search.trim().toLowerCase();
       result = result.filter((d) => d.name.toLowerCase().includes(term));
@@ -128,6 +129,7 @@ export default function DogListings() {
 
   function resetFilters() {
     setFilter('all');
+    setSexFilter('all');
     setSearch('');
   }
 
@@ -165,6 +167,29 @@ export default function DogListings() {
                 className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   filter === id
                     ? 'bg-primary-500 text-white shadow-sm'
+                    : 'bg-white text-warm-700 border border-warm-200 hover:bg-warm-100 hover:border-warm-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Sex filter tabs */}
+          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filtrar por sexo">
+            {([
+              { id: 'all' as SexFilter, label: 'Todos' },
+              { id: 'female' as SexFilter, label: '♀ Fêmea' },
+              { id: 'male' as SexFilter, label: '♂ Macho' },
+            ]).map(({ id, label }) => (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={sexFilter === id}
+                onClick={() => setSexFilter(id)}
+                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                  sexFilter === id
+                    ? 'bg-warm-700 text-white shadow-sm'
                     : 'bg-white text-warm-700 border border-warm-200 hover:bg-warm-100 hover:border-warm-300'
                 }`}
               >

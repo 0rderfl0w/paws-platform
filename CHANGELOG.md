@@ -1,6 +1,21 @@
 # CHANGELOG — capapvl.pt
 
-## 2026-02-24
+## 2026-02-24 (Session 2)
+- Connected Supabase project (amkwoeepuhlnjmybbnbo), applied migration via SQL Editor: dogs table, RLS policies, dog-photos storage bucket (Crash & Burn)
+- Uploaded all 104 dogs + ~980 photos to Supabase (resized 1200px/80% JPEG via sharp). Scripts: upload-dogs.ts, upload-missing.ts (Crash & Burn)
+- Scraped descriptions from all 104 dog pages on original site → dogs-descriptions.json (99 with content, 5 empty) (Crash & Burn)
+- Pushed descriptions to Supabase dogs table (Crash & Burn)
+- Added `sex` column to dogs table, populated from descriptions (44 male, 55 female, 5 unknown) (Crash & Burn)
+- Deleted 104 CAPA logo images from storage (were scraped as photo-02 in every dog folder, ~10KB each) (Crash & Burn)
+- Built `/cao` dog profile page: full-width photo gallery with thumbnails, parsed structured description (story, info grid, sociability tags), adoption CTA with email link (Crash & Burn)
+- Redesigned dog profile layout: photos on top, big name, personality quote, "A Minha História" card, "Sobre Mim" grid, "Compatibilidade" tags (Crash & Burn)
+- Added sex filter to `/caes`: ♀ Fêmea / ♂ Macho, works in conjunction with size filter (Crash & Burn)
+- Made dog cards fully clickable (removed separate "Conhecer" link) on both `/caes` and homepage (Crash & Burn)
+- Updated Dog type with `sex` field (Crash & Burn)
+- Updated PROJECT.md with full current state: Supabase schema, data stats, gotchas, env vars, remaining work (Crash & Burn)
+- 6 pages build clean: `bun run build` — 842ms (Crash & Burn)
+
+## 2026-02-24 (Session 1)
 - Built `/caes` page: DogListings React island with size filter tabs, name search, results count, responsive grid, loading skeletons, seed data fallback (Crash & Burn)
 - Built `/sobre-nos` page: hero, Stats reuse, 3 principles cards, community/schools, rescue & rehab, success stories CTA (Crash & Burn)
 - Built `/ajudar` page: Donativos em Género (4 cards), Doação de Tempo (4 volunteer cards), FAT foster section, Donativos Monetários with IBAN + MBWay + PayPal (Crash & Burn)

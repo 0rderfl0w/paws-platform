@@ -6,362 +6,437 @@ import Footer from '../components/Footer.astro';
 
 <Layout
   title="Adoção — CAPA Póvoa de Lanhoso"
-  description="Adota um cão no CAPA Póvoa de Lanhoso. Descobre o processo de adoção, taxas e como dar uma segunda oportunidade a um amigo de quatro patas."
+  description="Adote um cão do CAPA PVL. Descubra os benefícios da adoção responsável e conheça o processo para encontrar o seu novo melhor amigo."
 >
   <Nav />
+
   <main>
 
-    {/* ── HERO ── */}
-    <section class="bg-gradient-to-b from-warm-100 to-warm-50 pt-20 pb-16 px-4 sm:px-6 lg:px-8 text-center">
-      <div class="max-w-3xl mx-auto">
-        <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-4">
-          Adoção responsável
+    <!-- ===== HERO ===== -->
+    <section
+      class="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-600 py-20 sm:py-28"
+      aria-labelledby="hero-heading"
+    >
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-white/20 text-primary-100 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+          Adoção Responsável
         </span>
-        <h1 class="text-4xl sm:text-5xl font-bold text-warm-900 mb-6 leading-tight">
-          Ganhe um novo melhor amigo!
+        <h1
+          id="hero-heading"
+          class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
+        >
+          Ganhe um Novo <span class="text-primary-200">Melhor Amigo!</span>
         </h1>
-        <p class="text-warm-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
-          No CAPA, acreditamos no poder da adoção para mudar vidas — tanto para os cães que encontram um lar cheio de amor, quanto para as famílias que os acolhem. Ao adotar um cão, está a dar-lhe uma segunda chance, uma nova família para amar e ser amado. Junte-se a nós nesta jornada de esperança, compaixão e laços inquebráveis!
+        <p class="text-lg sm:text-xl text-primary-100 max-w-2xl mx-auto leading-relaxed mb-4">
+          A adoção é um ato de amor que transforma duas vidas: a do animal e a sua.
+          Estes patudos estão à espera de uma segunda chance e de alguém que os ame para sempre.
         </p>
-        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a
-            href="/caes"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-sm transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
-              <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
-            </svg>
-            Ver cães disponíveis
-          </a>
-          <a
-            href="#processo"
-            class="inline-flex items-center gap-2 px-6 py-3 border-2 border-warm-300 text-warm-700 hover:border-warm-400 hover:text-warm-900 font-semibold rounded-xl transition-colors"
-          >
-            Como funciona
-          </a>
-        </div>
+        <p class="text-primary-200 text-base sm:text-lg max-w-xl mx-auto">
+          Quando adopta, não está apenas a ganhar um amigo — está a salvar uma vida.
+        </p>
       </div>
     </section>
 
-    {/* ── BENEFÍCIOS ── */}
-    <section class="bg-white py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto">
+    <!-- ===== BENEFITS ===== -->
+    <section class="bg-white py-20" aria-labelledby="benefits-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
         <div class="text-center mb-14">
-          <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
-            Porquê adotar
+          <span class="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+            Por Que Adotar
           </span>
-          <h2 class="text-3xl sm:text-4xl font-bold text-warm-900">
-            Benefícios de Adotar
+          <h2 id="benefits-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-4">
+            Benefícios da Adoção
           </h2>
+          <p class="text-warm-600 text-lg max-w-xl mx-auto">
+            Adotar um cão de um abrigo é uma decisão que traz alegria e benefícios para toda a família.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-          {/* Card 1 — Heart */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-primary-500" aria-hidden="true">
+          <!-- Card 1: Uma Escolha que Muda Vidas -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-primary-100 border border-primary-300 rounded-xl mb-4 text-primary-600">
+              <!-- Heart icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
                 <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
               </svg>
             </div>
             <h3 class="text-lg font-bold text-warm-900 mb-2">Uma Escolha que Muda Vidas</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">Os cães nos abrigos estão em segurança e são bem cuidados, mas um abrigo não é o mesmo que um lar. Ao adotar, oferece-lhes a oportunidade de viver com estabilidade, rotina e ligação afetiva.</p>
-          </div>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Ao adotar, está a dar uma segunda oportunidade a um animal que foi abandonado ou rejeitado.
+              A sua escolha salva duas vidas: a do animal adotado e a do próximo que o abrigo pode acolher.
+            </p>
+          </article>
 
-          {/* Card 2 — Wellness/Brain */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-nature-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-nature-600" aria-hidden="true">
-                <path d="M11.25 4.533A9.707 9.707 0 006 3a9.735 9.735 0 00-3.25.555.75.75 0 00-.5.707v14.25a.75.75 0 001 .707A8.237 8.237 0 016 18.75c1.995 0 3.823.707 5.25 1.886V4.533zM12.75 20.636A8.214 8.214 0 0118 18.75c.966 0 1.89.166 2.75.47a.75.75 0 001-.708V4.262a.75.75 0 00-.5-.707A9.735 9.735 0 0018 3a9.707 9.707 0 00-5.25 1.533v16.103z" />
+          <!-- Card 2: Bem Estar Melhorado -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-nature-100 border border-nature-300 rounded-xl mb-4 text-nature-600">
+              <!-- Sparkle / wellness icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                <path fill-rule="evenodd" d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5z" clip-rule="evenodd" />
               </svg>
             </div>
-            <h3 class="text-lg font-bold text-warm-900 mb-2">Bem Estar Melhorado</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">Os cães trazem estrutura e equilíbrio emocional à sua vida. Promovem movimento diário, reduzem o stress e oferecem uma companhia constante.</p>
-          </div>
+            <h3 class="text-lg font-bold text-warm-900 mb-2">Bem-Estar Melhorado</h3>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Cães adotados de abrigos tendem a ser mais gratos e dedicados aos seus novos donos.
+              A sensação de ser salvo cria um vínculo único e inquebrável entre vocês.
+            </p>
+          </article>
 
-          {/* Card 3 — Globe */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-primary-500" aria-hidden="true">
-                <path d="M21.721 12.752a9.711 9.711 0 00-.945-5.003 12.754 12.754 0 01-4.339 2.708 18.991 18.991 0 01-.214 4.772 17.165 17.165 0 005.498-2.477zM14.634 15.55a17.324 17.324 0 00.332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 00.332 4.647 17.385 17.385 0 005.268 0zM9.772 17.119a18.963 18.963 0 004.456 0A17.182 17.182 0 0112 21.724a17.18 17.18 0 01-2.228-4.605zM7.777 15.23a18.87 18.87 0 01-.214-4.774 12.753 12.753 0 01-4.34-2.708 9.711 9.711 0 00-.944 5.004 17.165 17.165 0 005.498 2.477zM21.356 14.752a9.765 9.765 0 01-7.478 6.817 18.64 18.64 0 001.988-4.718 18.627 18.627 0 005.49-2.098zM2.644 14.752c1.682.971 3.53 1.688 5.49 2.099a18.64 18.64 0 001.988 4.718 9.765 9.765 0 01-7.478-6.816zM13.878 2.43a9.755 9.755 0 016.116 3.986 11.267 11.267 0 01-3.746 2.504 18.63 18.63 0 00-2.37-6.49zM12 2.276a17.152 17.152 0 012.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0112 2.276zM10.122 2.43a18.629 18.629 0 00-2.37 6.49 11.266 11.266 0 01-3.746-2.504 9.754 9.754 0 016.116-3.985z" />
+          <!-- Card 3: Comunidade Global -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-primary-100 border border-primary-300 rounded-xl mb-4 text-primary-600">
+              <!-- Globe/community icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM8.25 6.75a.75.75 0 00-.75.75v2.25c0 .414.336.75.75.75h6a.75.75 0 00.75-.75v-2.25a.75.75 0 00-.75-.75H8.25zM5.5 12a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H6.25a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
               </svg>
             </div>
-            <h3 class="text-lg font-bold text-warm-900 mb-2">Junte-se a uma Comunidade Global</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">Ao adotar, liga-se a pessoas em todo o mundo que acreditam na compaixão, na responsabilidade e em segundas oportunidades.</p>
-          </div>
+            <h3 class="text-lg font-bold text-warm-900 mb-2">Comunidade Global</h3>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Ao adotar, junta-se a uma comunidade de pessoas que partilham o mesmo amor por animais.
+              Faz novos amigos de quatro patas e conhece pessoas com valores semelhantes.
+            </p>
+          </article>
 
-          {/* Card 4 — Piggy bank / coin */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-nature-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-nature-600" aria-hidden="true">
-                <path d="M12 7.5a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
-                <path fill-rule="evenodd" d="M1.5 4.875C1.5 3.839 2.34 3 3.375 3h17.25c1.035 0 1.875.84 1.875 1.875v9.75c0 1.036-.84 1.875-1.875 1.875H3.375A1.875 1.875 0 011.5 14.625v-9.75zM8.25 9.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM18.75 9a.75.75 0 00-.75.75v.008c0 .414.336.75.75.75h.008a.75.75 0 00.75-.75V9.75a.75.75 0 00-.75-.75h-.008zM4.5 9.75A.75.75 0 015.25 9h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75H5.25a.75.75 0 01-.75-.75V9.75z" clip-rule="evenodd" />
-                <path d="M2.25 18a.75.75 0 000 1.5c5.4 0 10.63.722 15.6 2.075 1.19.324 2.4-.558 2.4-1.82V18.75a.75.75 0 00-.75-.75H2.25z" />
+          <!-- Card 4: Decisão Financeira Inteligente -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-warm-100 border border-warm-300 rounded-xl mb-4 text-warm-600">
+              <!-- Chart/money icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" />
               </svg>
             </div>
             <h3 class="text-lg font-bold text-warm-900 mb-2">Decisão Financeira Inteligente</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">Os cães adotados geralmente vêm vacinados, com microchip e esterilizados. Isto permite-lhe poupar desde o início.</p>
-          </div>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Adotar é mais económico do que comprar um cão de criador. As taxas de adoção incluem
+              vacinação, microchip e esterilização — tudo pronto para si.
+            </p>
+          </article>
 
-          {/* Card 5 — Puzzle / match */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-primary-500" aria-hidden="true">
-                <path d="M11.25 5.337c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.036 1.007-1.875 2.25-1.875S15 2.34 15 3.375c0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959 0 .332.278.598.61.578 1.91-.114 3.79-.342 5.632-.676a.75.75 0 01.878.645 49.17 49.17 0 01.376 5.452.657.657 0 01-.66.664c-.354 0-.675-.186-.958-.401a1.647 1.647 0 00-1.003-.349c-1.035 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401.31 0 .557.262.534.571a48.774 48.774 0 01-.595 4.845.75.75 0 01-.61.61c-1.82.317-3.673.533-5.555.642a.58.58 0 01-.611-.581c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.035-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959a.641.641 0 01-.658.643 49.118 49.118 0 01-4.708-.36.75.75 0 01-.645-.878c.293-1.614.504-3.257.629-4.924A.53.53 0 005.337 15c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.036 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.369 0 .713.128 1.003.349.283.215.604.401.959.401a.656.656 0 00.659-.663 47.703 47.703 0 00-.31-4.82.75.75 0 01.83-.832c1.343.155 2.703.254 4.077.294a.64.64 0 00.657-.642z" />
+          <!-- Card 5: Compatibilidade Real -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-primary-100 border border-primary-300 rounded-xl mb-4 text-primary-600">
+              <!-- Check/compatibility icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
               </svg>
             </div>
             <h3 class="text-lg font-bold text-warm-900 mb-2">Compatibilidade Real</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">Os abrigos têm cães com todas as personalidades, idades e níveis de energia. Com o apoio da equipa pode encontrar o cão ideal.</p>
-          </div>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Os nossos voluntários conhecem cada animal pessoalmente. Podemos ajudar a encontrar
+              o cão perfeito para o seu estilo de vida, família e personalidade.
+            </p>
+          </article>
 
-          {/* Card 6 — Lightbulb / example */}
-          <div class="bg-warm-50 border border-warm-200 rounded-2xl p-6 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 bg-nature-100 rounded-xl flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-nature-600" aria-hidden="true">
-                <path d="M12 .75a8.25 8.25 0 00-4.135 15.39c.686.398 1.115 1.008 1.134 1.623a.75.75 0 00.577.706c.352.083.71.148 1.074.195.323.041.6-.218.6-.544v-4.661a6.714 6.714 0 01-.937-.171.75.75 0 11.374-1.453 5.261 5.261 0 002.626 0 .75.75 0 11.374 1.452 6.712 6.712 0 01-.937.172v4.66c0 .327.277.586.6.545.364-.047.722-.112 1.074-.195a.75.75 0 00.577-.706c.02-.615.448-1.225 1.134-1.623A8.25 8.25 0 0012 .75z" />
-                <path fill-rule="evenodd" d="M9.013 19.9a.75.75 0 01.877-.575 8.26 8.26 0 002.22.301 8.26 8.26 0 002.22-.301.75.75 0 11.303 1.468 9.76 9.76 0 01-2.523.332 9.76 9.76 0 01-2.523-.332.75.75 0 01-.574-.893zM9.754 22.344a.75.75 0 01.824-.668 10.26 10.26 0 001.422.098c.48 0 .952-.033 1.422-.098a.75.75 0 11.156 1.492 11.76 11.76 0 01-1.578.106c-.527 0-1.05-.036-1.578-.106a.75.75 0 01-.668-.824z" clip-rule="evenodd" />
+          <!-- Card 6: Educação pelo Exemplo -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-nature-100 border border-nature-300 rounded-xl mb-4 text-nature-600">
+              <!-- Book/education icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM9.75 6.75a.75.75 0 01.75.75v4.5c0 .414.336.75.75.75h4.5a.75.75 0 010 1.5h-4.5A.75.75 0 019 13.5v-4.5a.75.75 0 01.75-.75zm6 4.5a.75.75 0 01.75.75v1.5c0 .414.336.75.75.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75v-1.5a.75.75 0 01.75-.75z" clip-rule="evenodd" />
               </svg>
             </div>
             <h3 class="text-lg font-bold text-warm-900 mb-2">Educação pelo Exemplo</h3>
-            <p class="text-warm-600 text-sm leading-relaxed">A sua adoção transmite uma mensagem. Mostra que adotar resulta e encoraja outros a adotar em vez de comprar.</p>
-          </div>
+            <p class="text-warm-600 text-sm leading-relaxed">
+              Adotar ensina às crianças valores importantes como responsabilidade, empatia e respeito pela vida.
+              É uma lição viva que durarà para toda a vida.
+            </p>
+          </article>
 
         </div>
+
       </div>
     </section>
 
-    {/* ── PROCESSO DE ADOÇÃO ── */}
-    <section id="processo" class="bg-warm-50 py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-3xl mx-auto">
+    <!-- ===== ADOPTION PROCESS ===== -->
+    <section class="bg-warm-50 py-20" aria-labelledby="process-heading">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
         <div class="text-center mb-14">
-          <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
-            Passo a passo
+          <span class="inline-block bg-warm-100 text-warm-700 text-sm font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+            Como Adotar
           </span>
-          <h2 class="text-3xl sm:text-4xl font-bold text-warm-900">
-            Processo de Adoção
+          <h2 id="process-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-4">
+            O Processo de Adoção
           </h2>
-        </div>
-
-        <ol class="relative" aria-label="Passos do processo de adoção">
-
-          {/* Step 1 */}
-          <li class="flex gap-6 pb-10 relative">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">1</div>
-              <div class="w-0.5 flex-1 bg-warm-200 mt-2"></div>
-            </div>
-            <div class="pb-2 pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Agende a sua visita</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Escolha um horário para visitar o abrigo e diga-nos qual o cão que gostaria de conhecer.</p>
-            </div>
-          </li>
-
-          {/* Step 2 */}
-          <li class="flex gap-6 pb-10 relative">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">2</div>
-              <div class="w-0.5 flex-1 bg-warm-200 mt-2"></div>
-            </div>
-            <div class="pb-2 pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Traga o Seu Cão</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Se já tem um cão em casa, traga-o para uma breve apresentação e avaliação de compatibilidade.</p>
-            </div>
-          </li>
-
-          {/* Step 3 */}
-          <li class="flex gap-6 pb-10 relative">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">3</div>
-              <div class="w-0.5 flex-1 bg-warm-200 mt-2"></div>
-            </div>
-            <div class="pb-2 pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Conheça e Conecte-se</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Passe algum tempo com o cão, observe a sua personalidade e fale com a nossa equipa.</p>
-            </div>
-          </li>
-
-          {/* Step 4 */}
-          <li class="flex gap-6 pb-10 relative">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">4</div>
-              <div class="w-0.5 flex-1 bg-warm-200 mt-2"></div>
-            </div>
-            <div class="pb-2 pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Reflita com Calma</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Adotar é um compromisso importante. Vá para casa, pense com tranquilidade.</p>
-            </div>
-          </li>
-
-          {/* Step 5 */}
-          <li class="flex gap-6 pb-10 relative">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">5</div>
-              <div class="w-0.5 flex-1 bg-warm-200 mt-2"></div>
-            </div>
-            <div class="pb-2 pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Prepare os Documentos</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Documento de identificação com NIF, Comprovativo de morada (se possível), Valor da taxa de adoção.</p>
-            </div>
-          </li>
-
-          {/* Step 6 — last, no vertical line */}
-          <li class="flex gap-6">
-            <div class="flex flex-col items-center">
-              <div class="w-10 h-10 rounded-full bg-primary-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0 z-10 shadow-sm">6</div>
-            </div>
-            <div class="pt-1">
-              <h3 class="text-base font-bold text-warm-900 mb-1">Venha Buscar o Seu Cão</h3>
-              <p class="text-warm-600 text-sm leading-relaxed">Volte ao abrigo para concluir o processo e levar o seu novo companheiro para casa.</p>
-            </div>
-          </li>
-
-        </ol>
-      </div>
-    </section>
-
-    {/* ── TAXA DE ADOÇÃO ── */}
-    <section class="bg-white py-20 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-14">
-          <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
-            Valores
-          </span>
-          <h2 class="text-3xl sm:text-4xl font-bold text-warm-900">
-            Taxa de Adoção
-          </h2>
-          <p class="mt-3 text-warm-500 text-base max-w-xl mx-auto">
-            Cada taxa inclui tudo o que o seu novo amigo precisa para começar a vida no seu lar.
+          <p class="text-warm-600 text-lg max-w-xl mx-auto">
+            O nosso processo de adoção foi pensado para garantir o melhor encaixe entre cão e família.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <!-- Timeline -->
+        <div class="relative">
+          <!-- Vertical line -->
+          <div class="absolute left-8 sm:left-1/2 top-0 bottom-0 w-0.5 bg-warm-300 transform sm:-translate-x-1/2"></div>
 
-          {/* Fêmea */}
-          <div class="border-2 border-warm-200 rounded-2xl p-8 flex flex-col items-center text-center hover:border-primary-300 hover:shadow-md transition-all">
-            <div class="w-14 h-14 bg-primary-100 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-primary-500" aria-hidden="true">
-                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-2.625 6c-.54 0-.828.419-.936.634a1.96 1.96 0 00-.189.866c0 .298.059.605.189.866.108.215.395.634.936.634.54 0 .828-.419.936-.634.13-.26.189-.568.189-.866 0-.298-.059-.605-.189-.866-.108-.215-.395-.634-.936-.634zm4.314.634c.108-.215.395-.634.936-.634.54 0 .828.419.936.634.13.26.189.568.189.866 0 .298-.059.605-.189.866-.108.215-.395.634-.936.634-.54 0-.828-.419-.936-.634a1.96 1.96 0 01-.189-.866c0-.298.059-.605.189-.866zm2.023 6.828a.75.75 0 10-1.06-1.06 3.75 3.75 0 01-5.304 0 .75.75 0 00-1.06 1.06 5.25 5.25 0 007.424 0z" clip-rule="evenodd" />
-              </svg>
+          <!-- Step 1 -->
+          <div class="relative flex items-center mb-10">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              1
             </div>
-            <h3 class="text-xl font-bold text-warm-900 mb-1">Fêmea</h3>
-            <div class="text-4xl font-extrabold text-primary-500 my-4">75€</div>
-            <ul class="space-y-2 text-sm text-left w-full mt-2">
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Vacinas</span>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Esterilização</span>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Microchip</span>
-              </li>
-            </ul>
+            <div class="ml-24 sm:ml-0 sm:w-1/2 sm:pr-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Escolha o SeuHorário</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Contacte-nos por email ou telefone para agendar uma visita ao abrigo.
+                  Assim podemos dedicar-lhe tempo e apresentar-lhe os animais disponíveis.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Macho — featured */}
-          <div class="border-2 border-primary-400 rounded-2xl p-8 flex flex-col items-center text-center shadow-lg bg-primary-50 relative">
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-              <span class="bg-primary-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">Mais popular</span>
+          <!-- Step 2 -->
+          <div class="relative flex items-center mb-10">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              2
             </div>
-            <div class="w-14 h-14 bg-primary-200 rounded-full flex items-center justify-center mb-4 mt-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-primary-600" aria-hidden="true">
-                <path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM9.375 8.25c-.54 0-.828.419-.936.634a1.96 1.96 0 00-.189.866c0 .298.059.605.189.866.108.215.395.634.936.634.54 0 .828-.419.936-.634.13-.26.189-.568.189-.866 0-.298-.059-.605-.189-.866-.108-.215-.395-.634-.936-.634zm4.314.634c.108-.215.395-.634.936-.634.54 0 .828.419.936.634.13.26.189.568.189.866 0 .298-.059.605-.189.866-.108.215-.395.634-.936.634-.54 0-.828-.419-.936-.634a1.96 1.96 0 01-.189-.866c0-.298.059-.605.189-.866zM8.5 14.5a.75.75 0 01.75-.75h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 01-.75-.75z" />
-              </svg>
+            <div class="ml-24 sm:ml-auto sm:w-1/2 sm:pl-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Traga o Seu Cão</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Se já tem um cão em casa, traga-o consigo! Assim podemos verificar
+                  como se adapta ao novo membro da família antes de tomar uma decisão.
+                </p>
+              </div>
             </div>
-            <h3 class="text-xl font-bold text-warm-900 mb-1">Macho</h3>
-            <div class="text-4xl font-extrabold text-primary-500 my-4">65€</div>
-            <ul class="space-y-2 text-sm text-left w-full mt-2">
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Vacinas</span>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Esterilização</span>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Microchip</span>
-              </li>
-            </ul>
           </div>
 
-          {/* Bebé */}
-          <div class="border-2 border-warm-200 rounded-2xl p-8 flex flex-col items-center text-center hover:border-primary-300 hover:shadow-md transition-all">
-            <div class="w-14 h-14 bg-nature-100 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-nature-600" aria-hidden="true">
-                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-              </svg>
+          <!-- Step 3 -->
+          <div class="relative flex items-center mb-10">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              3
             </div>
-            <h3 class="text-xl font-bold text-warm-900 mb-1">Bebé <sup class="text-primary-500 text-xs">*</sup></h3>
-            <div class="text-4xl font-extrabold text-primary-500 my-4">30€</div>
-            <ul class="space-y-2 text-sm text-left w-full mt-2">
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Vacinas</span>
-              </li>
-              <li class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500 flex-shrink-0" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-warm-700">Microchip</span>
-              </li>
-            </ul>
-            <p class="text-warm-400 text-xs mt-5 text-left leading-relaxed">
-              <sup>*</sup> Transferência de titularidade aos 6 meses mediante comprovativo de castração/esterilização.
-            </p>
+            <div class="ml-24 sm:ml-0 sm:w-1/2 sm:pr-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Conheça e Conecte-se</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Passe tempo com os animais. Brinque, caricie e sinta qual deles
+                  mais se identifica consigo e com a sua família.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="relative flex items-center mb-10">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              4
+            </div>
+            <div class="ml-24 sm:ml-auto sm:w-1/2 sm:pl-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Reflita com Calma</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Não há pressa. Leve o tempo que precisar para refletir sobre a sua escolha.
+                  Pode visitar novamente antes de decidir.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="relative flex items-center mb-10">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              5
+            </div>
+            <div class="ml-24 sm:ml-0 sm:w-1/2 sm:pr-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Prepare os Documentos</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Quando estiver pronto, prepare os documentos necessários:
+                  comprovativo de morada e documento de identificação.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="relative flex items-center">
+            <div class="absolute left-8 sm:left-1/2 w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg transform -translate-x-1/2 z-10">
+              6
+            </div>
+            <div class="ml-24 sm:ml-auto sm:w-1/2 sm:pl-12">
+              <div class="bg-white border border-warm-200 rounded-2xl p-6 shadow-sm">
+                <h3 class="text-lg font-bold text-warm-900 mb-2">Venha Buscar o Seu Cão</h3>
+                <p class="text-warm-600 text-sm leading-relaxed">
+                  Celebrate! O seu novo melhor amigo está à sua espera.
+                  Levará consigo um Histórico Veterinário completo do animal.
+                </p>
+              </div>
+            </div>
           </div>
 
         </div>
+
       </div>
     </section>
 
-    {/* ── SUCCESS STORIES / CTA ── */}
-    <section class="bg-gradient-to-b from-warm-100 to-warm-50 py-20 px-4 sm:px-6 lg:px-8 text-center">
-      <div class="max-w-3xl mx-auto">
-        <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-primary-500" aria-hidden="true">
-            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-          </svg>
+    <!-- ===== ADOPTION FEES ===== -->
+    <section class="bg-white py-20" aria-labelledby="fees-heading">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-14">
+          <span class="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+            Taxas de Adoção
+          </span>
+          <h2 id="fees-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-4">
+            Quanto Custa Adotar
+          </h2>
+          <p class="text-warm-600 text-lg max-w-xl mx-auto">
+            As taxas de adoção incluem todos os cuidados veterinários. É um investimento que salva vidas.
+          </p>
         </div>
-        <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-4">
-          Histórias de sucesso
-        </span>
-        <h2 class="text-3xl sm:text-4xl font-bold text-warm-900 mb-6">
-          Patudos que encontraram um lar
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+          <!-- Female -->
+          <article class="bg-primary-50 border-2 border-primary-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 border border-primary-300 rounded-full mb-5 text-primary-600">
+              <!-- Female symbol -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM8.25 9.75a.75.75 0 000 1.5h2.25a.75.75 0 000-1.5H8.25zm5.25 0a.75.75 0 01.75.75v2.25h2.25a.75.75 0 010 1.5H14a.75.75 0 01-.75.75h-2.25v2.25a.75.75 0 01-1.5 0v-2.25h-2.25a.75.75 0 010-1.5h2.25v-2.25a.75.75 0 01.75-.75z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-1">Fêmea</h3>
+            <p class="text-4xl font-extrabold text-primary-600 mb-6">75€</p>
+            <ul class="text-warm-600 text-sm space-y-3">
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-primary-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Vacinas em dia
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-primary-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Esterilização
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-primary-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Microchip
+              </li>
+            </ul>
+          </article>
+
+          <!-- Male -->
+          <article class="bg-nature-50 border-2 border-nature-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-nature-100 border border-nature-300 rounded-full mb-5 text-nature-600">
+              <!-- Male symbol -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path fill-rule="evenodd" d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.75.75 0 01-1.5 0v0c0 .355.186.676.401.959.221.29.349.634.349 1.003 0 1.036-1.007 1.875-2.25 1.875s-2.25-.84-2.25-1.875c0-.369.128-.713.349-1.003.215-.283.401-.604.401-.959v0a.75.75 0 011.5 0v0zM9.75 21.75a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75zM3.75 9.75a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-1">Macho</h3>
+            <p class="text-4xl font-extrabold text-nature-600 mb-6">65€</p>
+            <ul class="text-warm-600 text-sm space-y-3">
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Vacinas em dia
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Esterilização
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-nature-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Microchip
+              </li>
+            </ul>
+          </article>
+
+          <!-- Puppy -->
+          <article class="bg-warm-50 border-2 border-warm-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-all text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-warm-100 border border-warm-300 rounded-full mb-5 text-warm-600">
+              <!-- Baby icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-1">Bebé</h3>
+            <p class="text-4xl font-extrabold text-warm-600 mb-6">30€</p>
+            <ul class="text-warm-600 text-sm space-y-3">
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-warm-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Vacinas em dia
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-warm-400">
+                  <path d="M6.302 12.75a1.5 1.5 0 01-1.5-1.5 1.5 1.5 0 011.5-1.5h2.948a1.5 1.5 0 011.06.44l1.793 1.793a1.5 1.5 0 001.06.44H15.5a1.5 1.5 0 011.5 1.5v2.5a1.5 1.5 0 01-1.5 1.5H6.302z" />
+                  <path fill-rule="evenodd" d="M3.75 6.75a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H3.75zm0 3a.75.75 0 000 1.5h12.5a.75.75 0 000-1.5H3.75zm0 3a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5H3.75z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-warm-400">Esterilização*</span>
+              </li>
+              <li class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-warm-500">
+                  <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                </svg>
+                Microchip
+              </li>
+            </ul>
+            <p class="text-warm-500 text-xs mt-4">
+              * Esterilização obrigatória aos 6 meses<br/>
+              (incluída gratuitamente)
+            </p>
+          </article>
+
+        </div>
+
+        <p class="text-center text-warm-500 text-sm mt-8">
+          Para mais informações, contacte-nos em
+          <a href="mailto:capa.geralpvl@gmail.com" class="text-primary-600 hover:underline font-medium">capa.geralpvl@gmail.com</a>
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ===== SUCCESS STORIES / CTA ===== -->
+    <section class="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-600 py-20" aria-labelledby="stories-heading">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+        <!-- Decorative paw icons -->
+        <div class="flex justify-center gap-3 mb-8" aria-hidden="true">
+          {[1, 2, 3].map(() => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-primary-300">
+              <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+            </svg>
+          ))}
+        </div>
+
+        <h2 id="stories-heading" class="text-3xl sm:text-4xl font-extrabold text-white mb-6">
+          Encontre o Seu Companheiro
         </h2>
-        <p class="text-warm-600 text-lg leading-relaxed mb-10">
-          Estamos orgulhosos das nossas histórias de sucesso de Patudos que encontraram lares responsáveis e cheios de amor. Cada rabo a abanar e olhar cheio de gratidão é uma prova do poder transformador do amor.
+        <p class="text-primary-100 text-lg sm:text-xl leading-relaxed mb-4 max-w-2xl mx-auto">
+          Cada um dos nossos patudos tem uma história única para contar e muito amor para dar.
+          O seu novo melhor amigo está à sua espera.
+        </p>
+        <p class="text-primary-200 text-base sm:text-lg max-w-xl mx-auto mb-10">
+          Venha conhecer os animais que estão prontos para fazer parte da sua família.
         </p>
         <a
           href="/caes"
-          class="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white text-lg font-bold rounded-xl shadow-md transition-colors"
+          class="inline-flex items-center gap-2 bg-white hover:bg-primary-50 text-primary-700 font-bold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all text-lg"
         >
+          Ver Cães Disponíveis
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
-            <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+            <path fill-rule="evenodd" d="M12.97 3.97a.75.75 0 011.06 0l7.5 7.5a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 11-1.06-1.06l6.22-6.22H3a.75.75 0 010-1.5h16.19l-6.22-6.22a.75.75 0 010-1.06z" clip-rule="evenodd" />
           </svg>
-          Encontra o teu companheiro
         </a>
       </div>
     </section>
 
   </main>
+
   <Footer />
 </Layout>

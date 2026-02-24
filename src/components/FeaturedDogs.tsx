@@ -29,7 +29,7 @@ function DogCard({ dog }: { dog: Dog }) {
   const sizeLabel = SIZE_LABELS[dog.size] ?? dog.size;
 
   return (
-    <article className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group">
+    <a href={`/cao?id=${dog.id}`} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
       {/* Photo */}
       <div className="relative aspect-square overflow-hidden bg-warm-100">
         {dog.photo_url ? (
@@ -65,17 +65,8 @@ function DogCard({ dog }: { dog: Dog }) {
         <p className="text-warm-600 text-sm leading-relaxed line-clamp-3">
           {dog.description}
         </p>
-        <a
-          href={`/caes/${dog.id}`}
-          className="mt-4 inline-flex items-center gap-1.5 text-primary-600 hover:text-primary-700 text-sm font-semibold group/link"
-        >
-          Conhecer {dog.name}
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 group-hover/link:translate-x-0.5 transition-transform" aria-hidden="true">
-            <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
-          </svg>
-        </a>
       </div>
-    </article>
+    </a>
   );
 }
 
