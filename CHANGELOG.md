@@ -1,5 +1,15 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-02-24 (Session 3)
+- Built `/admin` page: full admin panel behind Supabase email/password auth (Crash & Burn)
+  - `src/pages/admin.astro` — Astro page wrapper
+  - `src/components/AdminPanel.tsx` — React island (client:load) with all admin functionality
+- Admin panel features: login/logout, dog dashboard (search, all dogs incl. adopted), add new dog with photo upload, edit dog with photo management (view/delete/upload), toggle adopted status inline, delete dog with confirmation dialog (Crash & Burn)
+- Photo upload convention preserved: slug from name (strip accents), photo-01 then photo-03 onwards (skip photo-02 slot) (Crash & Burn)
+- Portuguese UI labels throughout: Entrar, Sair, Adicionar Cão, Editar, Eliminar, Adotado, Disponível, etc. (Crash & Burn)
+- Design: warm earth-tone palette consistent with site, TW4 classes, rounded corners, responsive table (Crash & Burn)
+- Build: 7 pages (6 existing + admin), 0 errors, 852ms (Crash & Burn)
+
 ## 2026-02-24 (Session 2)
 - Connected Supabase project (amkwoeepuhlnjmybbnbo), applied migration via SQL Editor: dogs table, RLS policies, dog-photos storage bucket (Crash & Burn)
 - Uploaded all 104 dogs + ~980 photos to Supabase (resized 1200px/80% JPEG via sharp). Scripts: upload-dogs.ts, upload-missing.ts (Crash & Burn)

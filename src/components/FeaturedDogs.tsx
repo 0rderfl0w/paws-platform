@@ -89,8 +89,7 @@ export default function FeaturedDogs() {
           .from('dogs')
           .select('*')
           .eq('is_adopted', false)
-          .order('created_at', { ascending: false })
-          .limit(20);
+          .order('name', { ascending: true });
 
         if (error) throw error;
         setDogs(data ?? seedDogs.filter((d) => !d.is_adopted));
