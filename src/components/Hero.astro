@@ -98,22 +98,22 @@
 
   </div>
 
-  <!-- Mobile: dog photo strip -->
-  <div class="block md:hidden h-96 -mt-1" aria-hidden="false">
-    <img
-      src="/images/hero-dog.jpg"
-      alt="Cão do abrigo CAPA a receber carinho"
-      class="w-full h-full object-cover"
-      style="object-position: 40% 35%;"
-      loading="eager"
-    />
-  </div>
 
 </section>
 
-<!-- Wave divider sits OUTSIDE the hero, spans full width, overlaps the bottom edge -->
-<div class="relative z-20 -mt-6" aria-hidden="true">
-  <svg viewBox="0 0 1440 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full block" preserveAspectRatio="none">
-    <path d="M0 48L1440 48L1440 0C1200 32 960 48 720 48C480 48 240 32 0 0L0 48Z" fill="#faf6f2"/>
+<!-- Mobile: dog photo strip (outside section so overflow-hidden doesn't clip it) -->
+<div class="block md:hidden -mt-1" aria-hidden="false">
+  <img
+    src="/images/hero-dog.jpg"
+    alt="Cão do abrigo CAPA a receber carinho"
+    class="w-full"
+    loading="eager"
+  />
+</div>
+
+<!-- Simple curve divider — clean arc transition into the next section -->
+<div class="relative z-20 -mt-1 md:-mt-6" aria-hidden="true">
+  <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full block" preserveAspectRatio="none">
+    <path d="M0 60V20Q720 -20 1440 20V60H0Z" fill="#faf6f2"/>
   </svg>
 </div>
