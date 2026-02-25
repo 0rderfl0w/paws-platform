@@ -1,5 +1,13 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-02-25 (Session 6 — Admin Testing & Enhancements)
+- Admin: Added size, sex, and status (available/adopted) filter dropdowns to dashboard (Crash & Burn)
+- Admin: Replaced plain description textarea with structured form fields: subtitle/personality, breed, entry date, story, sociability (4 dropdowns), medical checkboxes (Crash & Burn)
+- Admin: Form auto-generates description in DogProfile parser format; reverse-parses on edit (Crash & Burn)
+- Admin: Moved personality field under name, relabeled as "Subtítulo (personalidade)" for shelter staff clarity (Crash & Burn)
+- Assets: Downloaded CAPA logo from original site (110px JPEG), created SVG recreation draft (Crash & Burn)
+- Task: PROMPT.md removed per Z's request, SPEC.md and AUDIT.md retained (Crash & Burn)
+
 ## 2026-02-25 (Session 5 — Polish Pass)
 - SEO: Updated `src/layouts/Layout.astro` to support `ogImage`, `ogUrl`, `noindex` props; all pages now emit full Open Graph meta tags (og:type, og:title, og:description, og:image, og:url, og:locale, og:site_name) (Crash & Burn)
 - SEO: Updated per-page descriptions to match spec on all 6 public pages (index, caes, sobre-nos, ajudar, adocao, cao) (Crash & Burn)
