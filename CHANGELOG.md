@@ -1,5 +1,13 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-02-25
+- Scraped 8 images from original https://capapvl.pt/sobre_nos into `public/images/sobre-nos/` (Crash & Burn)
+- Scraped 10 images from original https://capapvl.pt/ajudar into `public/images/ajudar/` (Crash & Burn)
+- Resized 5 images over 500KB using sharp (max 1200px wide, 80% JPEG quality) (Crash & Burn)
+- `/sobre-nos` page: replaced placeholder with real community photo, added 2 rescued-dog photos to rehab section, added Zeus success story photo with caption overlay (Crash & Burn)
+- `/ajudar` page: added 3-photo volunteer strip to volunteering section, added dog fostering photo to FAT section (Crash & Burn)
+- Build passes clean: 7 pages, 0 errors, 910ms (Crash & Burn)
+
 ## 2026-02-24 (Session 3)
 - Built `/admin` page: full admin panel behind Supabase email/password auth (Crash & Burn)
   - `src/pages/admin.astro` — Astro page wrapper
