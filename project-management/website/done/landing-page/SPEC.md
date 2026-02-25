@@ -18,7 +18,7 @@ created: "2026-02-24"
 - [ ] Bulk actions (mark adopted, delete)
 
 ### Data Cleanup
-- [ ] Add unique constraint on `dogs.name` to prevent duplicates
+- [x] Add unique constraint on `dogs.name` to prevent duplicates
 - [ ] Consider adding structured `age` field (currently embedded in description text)
 - [ ] Fill in 5 missing descriptions (Bella, Bolt, Channel, Rastas, Bailey)
 - [ ] Fill in 5 missing sex values (same 5 dogs)
