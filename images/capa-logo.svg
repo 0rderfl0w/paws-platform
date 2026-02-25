@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-labelledby="capa-logo-title">
+  <title id="capa-logo-title">CAPA Póvoa de Lanhoso</title>
+
+  <!-- Orange Heart -->
+  <path d="M250,420 C150,320 40,260 40,170 C40,100 90,50 160,50 C210,50 240,80 250,100 C260,80 290,50 340,50 C410,50 460,100 460,170 C460,260 350,320 250,420Z" fill="#FF9800"/>
+
+  <!-- White Dog Silhouette (standing, front paws up) -->
+  <g transform="translate(155, 100)" fill="#FFFFFF">
+    <!-- Body -->
+    <ellipse cx="45" cy="160" rx="30" ry="55"/>
+    <!-- Head -->
+    <circle cx="45" cy="85" r="28"/>
+    <!-- Left Ear -->
+    <ellipse cx="22" cy="62" rx="12" ry="20" transform="rotate(-15, 22, 62)"/>
+    <!-- Right Ear -->
+    <ellipse cx="68" cy="62" rx="12" ry="20" transform="rotate(15, 68, 62)"/>
+    <!-- Snout -->
+    <ellipse cx="45" cy="98" rx="14" ry="10"/>
+    <!-- Front Left Leg (raised) -->
+    <path d="M22,135 C10,145 5,175 15,195 L25,195 C25,180 28,160 30,145Z"/>
+    <!-- Front Right Leg (raised) -->
+    <path d="M68,135 C80,145 85,175 75,195 L65,195 C65,180 62,160 60,145Z"/>
+    <!-- Back Left Leg -->
+    <path d="M25,200 L20,250 L30,250 L35,205Z"/>
+    <!-- Back Right Leg -->
+    <path d="M55,200 L60,250 L70,250 L65,205Z"/>
+    <!-- Tail -->
+    <path d="M70,140 C90,120 100,100 95,80" stroke="#FFFFFF" stroke-width="8" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- CAPA Text - Dark Brown Squares with White Letters -->
+  <g>
+    <!-- Letter Squares -->
+    <rect x="135" y="310" width="50" height="50" rx="5" fill="#3E2723"/>
+    <rect x="195" y="310" width="50" height="50" rx="5" fill="#3E2723"/>
+    <rect x="255" y="310" width="50" height="50" rx="5" fill="#3E2723"/>
+    <rect x="315" y="310" width="50" height="50" rx="5" fill="#3E2723"/>
+    <!-- Letters -->
+    <text x="160" y="343" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">C</text>
+    <text x="220" y="343" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">A</text>
+    <text x="280" y="343" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">P</text>
+    <text x="340" y="343" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central">A</text>
+  </g>
+
+  <!-- Paw Print Trail (diagonal, bottom-right) -->
+  <g fill="#3E2723">
+    <!-- Paw 1 -->
+    <g transform="translate(380, 330) scale(0.8)">
+      <ellipse cx="0" cy="8" rx="8" ry="6"/>
+      <ellipse cx="-7" cy="-3" rx="4" ry="3"/>
+      <ellipse cx="0" cy="-6" rx="4" ry="3"/>
+      <ellipse cx="7" cy="-3" rx="4" ry="3"/>
+    </g>
+    <!-- Paw 2 -->
+    <g transform="translate(405, 350) scale(0.7)">
+      <ellipse cx="0" cy="8" rx="8" ry="6"/>
+      <ellipse cx="-7" cy="-3" rx="4" ry="3"/>
+      <ellipse cx="0" cy="-6" rx="4" ry="3"/>
+      <ellipse cx="7" cy="-3" rx="4" ry="3"/>
+    </g>
+    <!-- Paw 3 -->
+    <g transform="translate(428, 372) scale(0.6)">
+      <ellipse cx="0" cy="8" rx="8" ry="6"/>
+      <ellipse cx="-7" cy="-3" rx="4" ry="3"/>
+      <ellipse cx="0" cy="-6" rx="4" ry="3"/>
+      <ellipse cx="7" cy="-3" rx="4" ry="3"/>
+    </g>
+    <!-- Paw 4 -->
+    <g transform="translate(448, 392) scale(0.5)">
+      <ellipse cx="0" cy="8" rx="8" ry="6"/>
+      <ellipse cx="-7" cy="-3" rx="4" ry="3"/>
+      <ellipse cx="0" cy="-6" rx="4" ry="3"/>
+      <ellipse cx="7" cy="-3" rx="4" ry="3"/>
+    </g>
+    <!-- Paw 5 -->
+    <g transform="translate(465, 410) scale(0.4)">
+      <ellipse cx="0" cy="8" rx="8" ry="6"/>
+      <ellipse cx="-7" cy="-3" rx="4" ry="3"/>
+      <ellipse cx="0" cy="-6" rx="4" ry="3"/>
+      <ellipse cx="7" cy="-3" rx="4" ry="3"/>
+    </g>
+  </g>
+</svg>
