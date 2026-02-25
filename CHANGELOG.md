@@ -1,6 +1,11 @@
 # CHANGELOG — capapvl.pt
 
-## 2026-02-25 (Session 6 — Admin Testing & Enhancements)
+## 2026-02-25 (Session 6 — Admin Testing, Enhancements & Deploy)
+- Deploy: Site is LIVE at capapvl.pt — Hostinger Git deploy from `deploy` branch with auto-deployment enabled (Crash & Burn)
+- Deploy: Pushed `main` and `deploy` branches to https://github.com/0rderfl0w/paws-platform (Crash & Burn)
+- Git: Set repo email to zkgit.substance129@passmail.com, also set as global default on Mac (Crash & Burn)
+
+## 2026-02-25 (Session 6a — Admin Testing & Enhancements)
 - Admin: Added size, sex, and status (available/adopted) filter dropdowns to dashboard (Crash & Burn)
 - Admin: Replaced plain description textarea with structured form fields: subtitle/personality, breed, entry date, story, sociability (4 dropdowns), medical checkboxes (Crash & Burn)
 - Admin: Form auto-generates description in DogProfile parser format; reverse-parses on edit (Crash & Burn)

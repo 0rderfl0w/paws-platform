@@ -18,7 +18,7 @@ Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteç�
   - **RLS:** Public read on dogs + photos. Authenticated write for admin.
   - **Auth:** Not yet configured (planned for admin panel)
 - **Hosting:** Hostinger (static)
-- **Deploy:** Build on `main`, copy `dist/` to orphan `deploy` branch, push (not yet set up)
+- **Deploy:** Build on `main`, copy `dist/` to orphan `deploy` branch, push → Hostinger auto-deploys from Git
 
 ## Architecture
 
@@ -86,6 +86,12 @@ Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteç�
 - Impact stats counters (sterilized / adopted / in shelter)
 - Clickable dog cards (full card is a link)
 - Responsive, mobile-first
+
+## Git
+
+- **Repo:** https://github.com/0rderfl0w/paws-platform
+- **Git email:** zkgit.substance129@passmail.com
+- **Branches:** `main` (source), `deploy` (built output for static hosting)
 
 ## Env Vars
 
