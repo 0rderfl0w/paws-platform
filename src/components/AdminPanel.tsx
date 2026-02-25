@@ -48,6 +48,18 @@ interface DogForm {
   sex: 'male' | 'female' | '';
   age: string;
   description: string;
+  // Structured fields (auto-generate description)
+  personality: string;
+  story: string;
+  breed: string;
+  entryDate: string;
+  socHumans: 'yes' | 'no' | 'unknown';
+  socMales: 'yes' | 'no' | 'unknown';
+  socFemales: 'yes' | 'no' | 'unknown';
+  socCats: 'yes' | 'no' | 'unknown';
+  chipped: boolean;
+  vaccinated: boolean;
+  sterilized: boolean;
 }
 
 const EMPTY_FORM: DogForm = {
@@ -56,7 +68,116 @@ const EMPTY_FORM: DogForm = {
   sex: '',
   age: '',
   description: '',
+  personality: '',
+  story: '',
+  breed: '',
+  entryDate: '',
+  socHumans: 'unknown',
+  socMales: 'unknown',
+  socFemales: 'unknown',
+  socCats: 'unknown',
+  chipped: false,
+  vaccinated: false,
+  sterilized: false,
 };
+
+const SEX_DISPLAY: Record<string, string> = {
+  male: 'Masculino',
+  female: 'Feminino',
+};
+
+const SIZE_DISPLAY: Record<string, string> = {
+  small: 'Pequeno',
+  medium: 'Médio',
+  large: 'Grande',
+};
+
+function buildDescription(form: DogForm): string {
+  const lines: string[] = [];
+  const sexLabel = SEX_DISPLAY[form.sex];
+  if (sexLabel) lines.push(`Sexo: ${sexLabel}`);
+  if (form.age) lines.push(`Idade: ${form.age}`);
+  if (form.entryDate) lines.push(`Data de entrada: ${form.entryDate}`);
+  if (form.breed) lines.push(`Raça: ${form.breed}`);
+  lines.push(`Porte: ${SIZE_DISPLAY[form.size] ?? form.size}`);
+  if (form.personality) lines.push(`Personalidade: ${form.personality}`);
+
+  // Sociability
+  const socMap = { yes: 'Sociável com', no: 'Não sociável com', unknown: 'Não sabemos se é sociável com' };
+  if (form.socHumans === 'yes') lines.push('Sociável com humanos');
+  else if (form.socHumans === 'no') lines.push('Não sociável com humanos');
+  else lines.push('Não sabemos se é sociável com humanos');
+
+  if (form.socMales === 'yes') lines.push('Sociável com machos');
+  else if (form.socMales === 'no') lines.push('Não sociável com machos');
+  else lines.push('Não sabemos se é sociável com machos');
+
+  if (form.socFemales === 'yes') lines.push('Sociável com fêmeas');
+  else if (form.socFemales === 'no') lines.push('Não sociável com fêmeas');
+  else lines.push('Não sabemos se é sociável com fêmeas');
+
+  if (form.socCats === 'yes') lines.push('Sociável com gatos');
+  else if (form.socCats === 'no') lines.push('Não sociável com gatos');
+  else lines.push('Não sabemos se é sociável com gatos');
+
+  // Medical
+  const medical: string[] = [];
+  if (form.chipped) medical.push('Chipado');
+  if (form.vaccinated) medical.push('Vacinado');
+  if (form.sterilized) medical.push('Esterilizado');
+  if (medical.length > 0) lines.push(medical.join(', '));
+
+  if (form.story) lines.push(`História: ${form.story}`);
+
+  return lines.join('\n');
+}
+
+function parseDescriptionToForm(description: string, base: DogForm): DogForm {
+  const form = { ...base };
+  const lines = description.split('\n').filter(Boolean);
+  const unmatched: string[] = [];
+
+  for (const line of lines) {
+    const kv = line.match(/^([^:]+):\s*(.+)$/);
+    if (kv) {
+      const key = kv[1].trim().toLowerCase();
+      const val = kv[2].trim();
+      if (key === 'personalidade') form.personality = val;
+      else if (key === 'história') form.story = val;
+      else if (key === 'raça') form.breed = val;
+      else if (key === 'data de entrada') form.entryDate = val;
+      // Sexo and Idade/Porte are already DB columns, skip
+    } else {
+      const t = line.trim();
+      if (t === 'Sociável com humanos') form.socHumans = 'yes';
+      else if (t === 'Não sociável com humanos') form.socHumans = 'no';
+      else if (t === 'Não sabemos se é sociável com humanos') form.socHumans = 'unknown';
+      else if (t === 'Sociável com machos') form.socMales = 'yes';
+      else if (t === 'Não sociável com machos') form.socMales = 'no';
+      else if (t === 'Não sabemos se é sociável com machos') form.socMales = 'unknown';
+      else if (t === 'Sociável com fêmeas') form.socFemales = 'yes';
+      else if (t === 'Não sociável com fêmeas') form.socFemales = 'no';
+      else if (t === 'Não sabemos se é sociável com fêmeas') form.socFemales = 'unknown';
+      else if (t === 'Sociável com gatos') form.socCats = 'yes';
+      else if (t === 'Não sociável com gatos') form.socCats = 'no';
+      else if (t === 'Não sabemos se é sociável com gatos') form.socCats = 'unknown';
+      else if (t.match(/^(Chipado|Vacinado|Esterilizado)/)) {
+        if (t.includes('Chipado')) form.chipped = true;
+        if (t.includes('Vacinado')) form.vaccinated = true;
+        if (t.includes('Esterilizado')) form.sterilized = true;
+      } else {
+        unmatched.push(t);
+      }
+    }
+  }
+
+  // If there's unmatched text and no story, use it as story
+  if (unmatched.length > 0 && !form.story) {
+    form.story = unmatched.join(' ');
+  }
+
+  return form;
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -291,12 +412,13 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel }: DogFormPanelPr
         }
       }
 
+      const generatedDescription = buildDescription(form);
       const payload = {
         name: form.name,
         size: form.size,
         sex: form.sex || null,
         age: form.age,
-        description: form.description,
+        description: generatedDescription,
         photo_url,
         updated_at: new Date().toISOString(),
       };
@@ -344,6 +466,18 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel }: DogFormPanelPr
           />
         </div>
 
+        {/* Subtitle (Personality) */}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-semibold text-warm-700 mb-1.5">Subtítulo (personalidade)</label>
+          <input
+            type="text"
+            value={form.personality}
+            onChange={(e) => setForm({ ...form, personality: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            placeholder="Ex: Companheiro, muito meigo e ativo"
+          />
+        </div>
+
         {/* Size */}
         <div>
           <label className="block text-sm font-semibold text-warm-700 mb-1.5">Tamanho</label>
@@ -385,17 +519,89 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel }: DogFormPanelPr
         </div>
       </div>
 
-      {/* Description */}
+      {/* Breed + Entry Date */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-sm font-semibold text-warm-700 mb-1.5">Raça</label>
+          <input
+            type="text"
+            value={form.breed}
+            onChange={(e) => setForm({ ...form, breed: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            placeholder="Ex: Indefinida, Labrador, Cruzado"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-warm-700 mb-1.5">Data de entrada</label>
+          <input
+            type="text"
+            value={form.entryDate}
+            onChange={(e) => setForm({ ...form, entryDate: e.target.value })}
+            className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            placeholder="Ex: 2023, Janeiro 2024"
+          />
+        </div>
+      </div>
+
+      {/* Story */}
       <div>
-        <label className="block text-sm font-semibold text-warm-700 mb-1.5">Descrição</label>
+        <label className="block text-sm font-semibold text-warm-700 mb-1.5">História</label>
         <textarea
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          rows={5}
+          value={form.story}
+          onChange={(e) => setForm({ ...form, story: e.target.value })}
+          rows={4}
           className="w-full px-4 py-3 rounded-xl border border-warm-200 bg-warm-50 text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 resize-y"
-          placeholder="Conta a história do cão, personalidade, compatibilidades…"
+          placeholder="Conta a história do cão…"
         />
       </div>
+
+      {/* Sociability */}
+      <fieldset>
+        <legend className="text-sm font-semibold text-warm-700 mb-3">Compatibilidade</legend>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {([
+            ['socHumans', 'Humanos'],
+            ['socMales', 'Machos'],
+            ['socFemales', 'Fêmeas'],
+            ['socCats', 'Gatos'],
+          ] as const).map(([field, label]) => (
+            <div key={field} className="flex items-center gap-3">
+              <span className="text-sm text-warm-700 w-20">{label}</span>
+              <select
+                value={form[field]}
+                onChange={(e) => setForm({ ...form, [field]: e.target.value as 'yes' | 'no' | 'unknown' })}
+                className="flex-1 px-3 py-2 rounded-lg border border-warm-200 bg-warm-50 text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+              >
+                <option value="unknown">Não sabemos</option>
+                <option value="yes">Sociável</option>
+                <option value="no">Não sociável</option>
+              </select>
+            </div>
+          ))}
+        </div>
+      </fieldset>
+
+      {/* Medical */}
+      <fieldset>
+        <legend className="text-sm font-semibold text-warm-700 mb-3">Estado médico</legend>
+        <div className="flex flex-wrap gap-4">
+          {([
+            ['chipped', 'Chipado'],
+            ['vaccinated', 'Vacinado'],
+            ['sterilized', 'Esterilizado'],
+          ] as const).map(([field, label]) => (
+            <label key={field} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form[field]}
+                onChange={(e) => setForm({ ...form, [field]: e.target.checked })}
+                className="w-4 h-4 rounded border-warm-300 text-primary-500 focus:ring-primary-400"
+              />
+              <span className="text-sm text-warm-700">{label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       {/* Current photos (edit only) */}
       {isEdit && (
@@ -550,15 +756,27 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
+type SizeFilter = 'all' | 'small' | 'medium' | 'large';
+type SexFilter = 'all' | 'male' | 'female';
+type StatusFilter = 'all' | 'available' | 'adopted';
+
 function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps) {
   const [search, setSearch] = useState('');
+  const [sizeFilter, setSizeFilter] = useState<SizeFilter>('all');
+  const [sexFilter, setSexFilter] = useState<SexFilter>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Dog | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const filtered = dogs.filter((d) =>
-    d.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = dogs.filter((d) => {
+    if (sizeFilter !== 'all' && d.size !== sizeFilter) return false;
+    if (sexFilter !== 'all' && d.sex !== sexFilter) return false;
+    if (statusFilter === 'available' && d.is_adopted) return false;
+    if (statusFilter === 'adopted' && !d.is_adopted) return false;
+    if (search && !d.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   async function handleToggleAdopted(dog: Dog) {
     if (!supabase || togglingId) return;
@@ -646,18 +864,56 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
             </button>
           </div>
 
-          {/* Search */}
-          <div className="relative mb-6 max-w-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-warm-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
-              <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
-            </svg>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Pesquisar por nome…"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            />
+          {/* Search + Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="relative flex-1 max-w-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-warm-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
+              </svg>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Pesquisar por nome…"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+              />
+            </div>
+            <select
+              value={sizeFilter}
+              onChange={(e) => setSizeFilter(e.target.value as SizeFilter)}
+              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            >
+              <option value="all">Todos os tamanhos</option>
+              <option value="small">Pequeno</option>
+              <option value="medium">Médio</option>
+              <option value="large">Grande</option>
+            </select>
+            <select
+              value={sexFilter}
+              onChange={(e) => setSexFilter(e.target.value as SexFilter)}
+              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            >
+              <option value="all">Todos os sexos</option>
+              <option value="male">♂ Macho</option>
+              <option value="female">♀ Fêmea</option>
+            </select>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+            >
+              <option value="all">Todos os estados</option>
+              <option value="available">Disponível</option>
+              <option value="adopted">Adotado</option>
+            </select>
+            {(sizeFilter !== 'all' || sexFilter !== 'all' || statusFilter !== 'all') && (
+              <button
+                onClick={() => { setSizeFilter('all'); setSexFilter('all'); setStatusFilter('all'); }}
+                className="text-sm text-warm-500 hover:text-warm-700 font-medium px-3 py-2.5 rounded-xl hover:bg-warm-100 transition-colors whitespace-nowrap"
+              >
+                Limpar filtros
+              </button>
+            )}
           </div>
 
           {/* Table */}
@@ -893,13 +1149,17 @@ export default function AdminPanel() {
 
   // Edit dog view
   if (view === 'edit' && editingDog) {
-    const initial: DogForm = {
+    const base: DogForm = {
+      ...EMPTY_FORM,
       name: editingDog.name,
       size: editingDog.size,
       sex: editingDog.sex ?? '',
       age: editingDog.age ?? '',
       description: editingDog.description ?? '',
     };
+    const initial = editingDog.description
+      ? parseDescriptionToForm(editingDog.description, base)
+      : base;
     return (
       <div className="min-h-screen bg-warm-50">
         <header className="bg-white border-b border-warm-200 sticky top-0 z-40">
