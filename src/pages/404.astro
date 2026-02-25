@@ -1,0 +1,72 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout
+  title="Página Não Encontrada — CAPA Póvoa de Lanhoso"
+  description="A página que procura não existe. Volte à página inicial do CAPA Póvoa de Lanhoso."
+  ogUrl="https://capapvl.pt/404"
+>
+  <Nav />
+
+  <main class="min-h-[70vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
+    <div class="max-w-lg mx-auto text-center">
+
+      <!-- Paw print icon -->
+      <div class="flex justify-center mb-8">
+        <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" class="w-14 h-14" aria-hidden="true">
+            <!-- Paw print SVG -->
+            <ellipse cx="32" cy="44" rx="14" ry="11" fill="#f17a13" opacity="0.9"/>
+            <ellipse cx="16" cy="34" rx="6" ry="8" fill="#f17a13" opacity="0.75"/>
+            <ellipse cx="48" cy="34" rx="6" ry="8" fill="#f17a13" opacity="0.75"/>
+            <ellipse cx="23" cy="23" rx="5" ry="6.5" fill="#f17a13" opacity="0.65"/>
+            <ellipse cx="41" cy="23" rx="5" ry="6.5" fill="#f17a13" opacity="0.65"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 404 badge -->
+      <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
+        Erro 404
+      </span>
+
+      <!-- Heading -->
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-warm-900 mb-4 leading-tight">
+        Página não encontrada
+      </h1>
+
+      <!-- Friendly message -->
+      <p class="text-lg text-warm-600 mb-3 leading-relaxed">
+        Até os cães perdidos encontram o caminho de casa.
+      </p>
+      <p class="text-warm-500 mb-10">
+        A página que procura não existe ou foi movida. Não se preocupe — a nossa página inicial está mesmo aqui.
+      </p>
+
+      <!-- CTA -->
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a
+          href="/"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-base transition-colors duration-200 shadow-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+            <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clip-rule="evenodd" />
+          </svg>
+          Voltar à página inicial
+        </a>
+        <a
+          href="/caes"
+          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-warm-300 hover:border-warm-400 bg-white text-warm-800 font-semibold text-base transition-colors duration-200"
+        >
+          Ver os nossos cães
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

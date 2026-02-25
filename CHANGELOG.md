@@ -1,5 +1,13 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-02-25 (Session 5 — Polish Pass)
+- SEO: Updated `src/layouts/Layout.astro` to support `ogImage`, `ogUrl`, `noindex` props; all pages now emit full Open Graph meta tags (og:type, og:title, og:description, og:image, og:url, og:locale, og:site_name) (Crash & Burn)
+- SEO: Updated per-page descriptions to match spec on all 6 public pages (index, caes, sobre-nos, ajudar, adocao, cao) (Crash & Burn)
+- SEO: Admin page now emits `<meta name="robots" content="noindex, nofollow">` with no OG tags (Crash & Burn)
+- 404: Created `src/pages/404.astro` — friendly Portuguese "Página não encontrada" page with paw print icon, warm earth-tone palette, Nav + Footer, CTAs to homepage and dog listings (Crash & Burn)
+- Favicon: `public/favicon.svg` is the Astro default logo (not CAPA branding) — Z should provide a real CAPA logo SVG to replace it (Crash & Burn)
+- Build: 8 pages, 0 errors, 942ms (Crash & Burn)
+
 ## 2026-02-25
 - Scraped 8 images from original https://capapvl.pt/sobre_nos into `public/images/sobre-nos/` (Crash & Burn)
 - Scraped 10 images from original https://capapvl.pt/ajudar into `public/images/ajudar/` (Crash & Burn)
