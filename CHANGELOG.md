@@ -1,5 +1,8 @@
 # CHANGELOG — capapvl.pt
 
+## 2025-07-25
+- Replaced wavy SVG hero divider with a clean single-arc curve for smoother hero-to-content transition (Crash & Burn)
+
 ## 2026-02-25 (Session 6 — Admin Testing, Enhancements & Deploy)
 - Deploy: Site is LIVE at capapvl.pt — Hostinger Git deploy from `deploy` branch with auto-deployment enabled (Crash & Burn)
 - Deploy: Pushed `main` and `deploy` branches to https://github.com/0rderfl0w/paws-platform (Crash & Burn)
