@@ -768,6 +768,9 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Dog | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const activeFilterCount = (sizeFilter !== 'all' ? 1 : 0) + (sexFilter !== 'all' ? 1 : 0) + (statusFilter !== 'all' ? 1 : 0);
 
   const filtered = dogs.filter((d) => {
     if (sizeFilter !== 'all' && d.size !== sizeFilter) return false;
@@ -844,7 +847,7 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28 md:pb-8">
           {/* Stats + actions bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
@@ -853,9 +856,10 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
                 {dogs.length} total · {dogs.filter((d) => !d.is_adopted).length} disponíveis · {dogs.filter((d) => d.is_adopted).length} adotados
               </p>
             </div>
+            {/* Desktop "Adicionar Cão" button — hidden on mobile (FAB used instead) */}
             <button
               onClick={onAdd}
-              className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+              className="hidden md:flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-5 py-2.5 rounded-xl transition-colors shadow-sm"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                 <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
@@ -865,59 +869,172 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
           </div>
 
           {/* Search + Filters */}
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <div className="relative flex-1 max-w-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-warm-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
-              </svg>
-              <input
-                type="search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Pesquisar por nome…"
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-              />
-            </div>
-            <select
-              value={sizeFilter}
-              onChange={(e) => setSizeFilter(e.target.value as SizeFilter)}
-              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            >
-              <option value="all">Todos os tamanhos</option>
-              <option value="small">Pequeno</option>
-              <option value="medium">Médio</option>
-              <option value="large">Grande</option>
-            </select>
-            <select
-              value={sexFilter}
-              onChange={(e) => setSexFilter(e.target.value as SexFilter)}
-              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            >
-              <option value="all">Todos os sexos</option>
-              <option value="male">♂ Macho</option>
-              <option value="female">♀ Fêmea</option>
-            </select>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-              className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
-            >
-              <option value="all">Todos os estados</option>
-              <option value="available">Disponível</option>
-              <option value="adopted">Adotado</option>
-            </select>
-            {(sizeFilter !== 'all' || sexFilter !== 'all' || statusFilter !== 'all') && (
+          <div className="mb-6 space-y-3">
+            {/* Always-visible row: search + mobile filter toggle */}
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 text-warm-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
+                </svg>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Pesquisar por nome…"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 placeholder-warm-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                />
+              </div>
+              {/* Mobile filter toggle button */}
               <button
-                onClick={() => { setSizeFilter('all'); setSexFilter('all'); setStatusFilter('all'); }}
-                className="text-sm text-warm-500 hover:text-warm-700 font-medium px-3 py-2.5 rounded-xl hover:bg-warm-100 transition-colors whitespace-nowrap"
+                onClick={() => setFiltersOpen((o) => !o)}
+                className={`sm:hidden flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors min-h-[44px] ${
+                  filtersOpen || activeFilterCount > 0
+                    ? 'border-primary-400 bg-primary-50 text-primary-700'
+                    : 'border-warm-200 bg-white text-warm-700 hover:bg-warm-50'
+                }`}
               >
-                Limpar filtros
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                  <path fillRule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clipRule="evenodd" />
+                </svg>
+                Filtros
+                {activeFilterCount > 0 && (
+                  <span className="flex items-center justify-center w-5 h-5 bg-primary-500 text-white text-xs font-bold rounded-full">
+                    {activeFilterCount}
+                  </span>
+                )}
               </button>
+            </div>
+
+            {/* Filter dropdowns — collapsible on mobile, always visible on sm+ */}
+            <div className={`${filtersOpen ? 'flex' : 'hidden'} sm:flex flex-col sm:flex-row gap-3`}>
+              <select
+                value={sizeFilter}
+                onChange={(e) => setSizeFilter(e.target.value as SizeFilter)}
+                className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 min-h-[44px]"
+              >
+                <option value="all">Todos os tamanhos</option>
+                <option value="small">Pequeno</option>
+                <option value="medium">Médio</option>
+                <option value="large">Grande</option>
+              </select>
+              <select
+                value={sexFilter}
+                onChange={(e) => setSexFilter(e.target.value as SexFilter)}
+                className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 min-h-[44px]"
+              >
+                <option value="all">Todos os sexos</option>
+                <option value="male">♂ Macho</option>
+                <option value="female">♀ Fêmea</option>
+              </select>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                className="px-4 py-2.5 rounded-xl border border-warm-200 bg-white text-warm-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 min-h-[44px]"
+              >
+                <option value="all">Todos os estados</option>
+                <option value="available">Disponível</option>
+                <option value="adopted">Adotado</option>
+              </select>
+              {activeFilterCount > 0 && (
+                <button
+                  onClick={() => { setSizeFilter('all'); setSexFilter('all'); setStatusFilter('all'); }}
+                  className="text-sm text-warm-500 hover:text-warm-700 font-medium px-3 py-2.5 rounded-xl hover:bg-warm-100 transition-colors whitespace-nowrap min-h-[44px]"
+                >
+                  Limpar filtros
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── Mobile cards (below md) ── */}
+          <div className="md:hidden">
+            {filtered.length === 0 ? (
+              <div className="py-20 text-center">
+                <div className="text-4xl mb-3">🐾</div>
+                <p className="text-warm-500 font-medium">Nenhum cão encontrado</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filtered.map((dog) => (
+                  <div
+                    key={dog.id}
+                    className={`bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden transition-opacity ${dog.is_adopted ? 'opacity-60' : ''}`}
+                  >
+                    {/* Card top: photo + info */}
+                    <div className="flex items-start gap-4 p-4">
+                      {/* Photo */}
+                      <div className="w-16 h-16 rounded-xl overflow-hidden bg-warm-100 flex-shrink-0">
+                        {dog.photo_url ? (
+                          <img src={dog.photo_url} alt={dog.name} className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-warm-300 text-2xl">🐶</div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="font-bold text-warm-900 text-base leading-tight truncate">{dog.name}</h3>
+                        </div>
+                        <p className="text-warm-500 text-xs mt-1 leading-snug">
+                          {[
+                            SIZE_LABELS[dog.size] ?? dog.size,
+                            dog.sex ? SEX_LABELS[dog.sex] : null,
+                            dog.age || null,
+                          ].filter(Boolean).join(' · ')}
+                        </p>
+                        {/* Status toggle */}
+                        <button
+                          onClick={() => handleToggleAdopted(dog)}
+                          disabled={togglingId === dog.id}
+                          className={`mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors min-h-[32px] ${
+                            dog.is_adopted
+                              ? 'bg-nature-100 text-nature-700 hover:bg-nature-200'
+                              : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
+                          }`}
+                          title={dog.is_adopted ? 'Marcar como disponível' : 'Marcar como adotado'}
+                        >
+                          {togglingId === dog.id ? (
+                            <Spinner size="sm" />
+                          ) : (
+                            <span>{dog.is_adopted ? '✓' : '○'}</span>
+                          )}
+                          {dog.is_adopted ? 'Adotado' : 'Disponível'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Card actions row */}
+                    <div className="flex border-t border-warm-100">
+                      <button
+                        onClick={() => onEdit(dog)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold text-warm-600 hover:text-primary-600 hover:bg-primary-50 transition-colors min-h-[44px]"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                          <path d="M5.433 13.917l1.262-3.155A4 4 0 017.58 9.42l6.92-6.918a2.121 2.121 0 013 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 01-.65-.65z" />
+                          <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0010 3H4.75A2.75 2.75 0 002 5.75v9.5A2.75 2.75 0 004.75 18h9.5A2.75 2.75 0 0017 15.25V10a.75.75 0 00-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5z" />
+                        </svg>
+                        Editar
+                      </button>
+                      <div className="w-px bg-warm-100" />
+                      <button
+                        onClick={() => setDeleteTarget(dog)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold text-warm-600 hover:text-red-600 hover:bg-red-50 transition-colors min-h-[44px]"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                          <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
+                        </svg>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Table */}
-          <div className="bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden">
+          {/* ── Desktop table (md and up) ── */}
+          <div className="hidden md:block bg-white rounded-2xl border border-warm-200 shadow-sm overflow-hidden">
             {filtered.length === 0 ? (
               <div className="py-20 text-center">
                 <div className="text-4xl mb-3">🐾</div>
@@ -1032,6 +1149,17 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout }: DashboardProps)
             {filtered.length} de {dogs.length} cão(ões) listados
           </p>
         </main>
+
+        {/* Mobile FAB — floating "Adicionar Cão" button */}
+        <button
+          onClick={onAdd}
+          className="md:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white rounded-full shadow-lg transition-colors"
+          aria-label="Adicionar Cão"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6">
+            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+          </svg>
+        </button>
       </div>
     </>
   );
