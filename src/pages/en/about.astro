@@ -1,0 +1,282 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Stats from '../../components/Stats.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout
+  locale="en"
+  title="About CAPA — Animal Adoption and Protection Club"
+  description="Learn more about CAPA, our mission, principles, and the work we do for animal protection."
+  ogUrl="https://capapvl.pt/en/about"
+>
+  <Nav locale="en" />
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section
+      class="bg-gradient-to-br from-warm-800 via-warm-700 to-warm-600 py-20 sm:py-28"
+      aria-labelledby="hero-heading"
+    >
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-primary-500/20 text-primary-200 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+          Founded in 2001
+        </span>
+        <h1
+          id="hero-heading"
+          class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
+        >
+          About <span class="text-primary-400">CAPA</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-warm-200 max-w-2xl mx-auto leading-relaxed mb-4">
+          <strong class="text-white">Clube de Adoção e Proteção Animal</strong> (Animal Adoption and Protection Club).
+          A volunteer-run association dedicated to fighting animal abandonment and abuse by rescuing, treating,
+          and rehoming dogs.
+        </p>
+        <p class="text-warm-300 text-base sm:text-lg max-w-xl mx-auto">
+          Everything we do is sustained by volunteer work and the generosity of our community.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== STATS ===== -->
+    <Stats locale="en" />
+
+    <!-- ===== PRINCIPLES ===== -->
+    <section class="bg-white py-20" aria-labelledby="principles-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-14">
+          <h2 id="principles-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-4">
+            Our Principles
+          </h2>
+          <p class="text-warm-600 text-lg max-w-xl mx-auto">
+            Three pillars that guide every decision and every act of care we provide.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          <!-- Card 1: Respect and Protection -->
+          <article class="bg-warm-50 border border-warm-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-warm-100 border border-warm-300 rounded-2xl mb-6 text-warm-600 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-3">Respect and Protection</h3>
+            <p class="text-warm-600 leading-relaxed">
+              We promote respect for and protection of animals, ensuring them a dignified life free from abuse.
+            </p>
+          </article>
+
+          <!-- Card 2: Volunteering and Solidarity -->
+          <article class="bg-primary-50 border border-primary-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 border border-primary-300 rounded-2xl mb-6 text-primary-600 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-3">Volunteering and Solidarity</h3>
+            <p class="text-warm-600 leading-relaxed">
+              We rely on the help of volunteers and the solidarity of the community to care for our dogs and give them a better life.
+            </p>
+          </article>
+
+          <!-- Card 3: Responsible Adoption -->
+          <article class="bg-nature-50 border border-nature-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-nature-100 border border-nature-300 rounded-2xl mb-6 text-nature-600 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8" aria-hidden="true">
+                <path d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-1.72-1.72V5.25a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v1.79L12 2.15 1.72 12.47a.75.75 0 101.06 1.06l1.72-1.72V21a.75.75 0 00.75.75H9a.75.75 0 00.75-.75v-3.75h4.5V21a.75.75 0 00.75.75h3.75a.75.75 0 00.75-.75V11.81l1.72 1.72a.75.75 0 101.06-1.06L12.53 3.84z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-warm-900 mb-3">Responsible Adoption</h3>
+            <p class="text-warm-600 leading-relaxed">
+              We encourage responsible adoption, ensuring animals are welcomed by families committed to their wellbeing.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMMUNITY WORK ===== -->
+    <section class="bg-warm-50 py-20" aria-labelledby="community-heading">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+          <!-- Text -->
+          <div>
+            <span class="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+              In the Community
+            </span>
+            <h2 id="community-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-6">
+              Partnership with Schools
+            </h2>
+            <p class="text-warm-700 text-lg leading-relaxed mb-6">
+              CAPA is proud to work in partnership with schools, promoting animal care and welfare.
+              We select some of our most sociable dogs and bring joy to the hearts of children and young people
+              by presenting our work, building bonds of empathy and understanding through enriching experiences.
+            </p>
+            <p class="text-warm-600 text-base leading-relaxed mb-8">
+              Together, we can build a better world for our faithful companions.
+            </p>
+            <a
+              href="mailto:capa.geralpvl@gmail.com"
+              class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-3 rounded-xl shadow-sm transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+                <path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z" />
+                <path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z" />
+              </svg>
+              Book a Visit
+            </a>
+          </div>
+
+          <!-- Community photo -->
+          <div class="relative rounded-2xl overflow-hidden shadow-md border border-warm-300 aspect-[4/3]">
+            <img
+              src="/images/sobre-nos/community-event.png"
+              alt="CAPA volunteers with children during a school visit"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RESCUE & REHABILITATION ===== -->
+    <section class="bg-nature-50 py-20" aria-labelledby="rescue-heading">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10">
+          <span class="inline-block bg-nature-100 text-nature-700 text-sm font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wide">
+            Rescue and Rehabilitation
+          </span>
+          <h2 id="rescue-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-6">
+            A Second Chance at Life
+          </h2>
+        </div>
+
+        <div class="bg-white border border-nature-200 rounded-2xl p-8 sm:p-10 shadow-sm">
+          <div class="flex flex-col sm:flex-row gap-6 items-start">
+            <div class="flex-shrink-0 inline-flex items-center justify-center w-14 h-14 bg-nature-50 border border-nature-200 rounded-xl text-nature-600">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.53 5.47a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.72-1.72v5.69a.75.75 0 001.5 0v-5.69l1.72 1.72a.75.75 0 101.06-1.06l-3-3z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-warm-700 text-lg leading-relaxed mb-4">
+                Our work includes rescuing dogs from dangerous situations and neglect. Upon arriving at the shelter,
+                these dogs receive dedicated veterinary care and undergo physical rehabilitation and socialisation.
+              </p>
+              <p class="text-warm-600 leading-relaxed mb-4">
+                Our volunteers work tirelessly to restore their health and their trust in people,
+                giving them a second chance at life.
+              </p>
+              <p class="text-warm-600 leading-relaxed">
+                Through this dedication, we seek to give these animals the opportunity to find a loving and safe home
+                where they can live happily and healthily.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Three quick-stat pills -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+          <div class="bg-white border border-nature-200 rounded-xl px-5 py-4 text-center shadow-sm">
+            <div class="text-nature-600 font-bold text-lg mb-1">Triage</div>
+            <div class="text-warm-500 text-sm">Veterinary assessment on arrival</div>
+          </div>
+          <div class="bg-white border border-nature-200 rounded-xl px-5 py-4 text-center shadow-sm">
+            <div class="text-nature-600 font-bold text-lg mb-1">Rehabilitation</div>
+            <div class="text-warm-500 text-sm">Physical and behavioural</div>
+          </div>
+          <div class="bg-white border border-nature-200 rounded-xl px-5 py-4 text-center shadow-sm">
+            <div class="text-nature-600 font-bold text-lg mb-1">Adoption</div>
+            <div class="text-warm-500 text-sm">Placement in a loving home</div>
+          </div>
+        </div>
+
+        <!-- Photo strip -->
+        <div class="grid grid-cols-2 gap-4 mt-8">
+          <div class="rounded-2xl overflow-hidden shadow-sm border border-nature-200 aspect-[4/3]">
+            <img
+              src="/images/sobre-nos/rescued-dog.png"
+              alt="Rescued dog recovering at the CAPA shelter"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+          <div class="rounded-2xl overflow-hidden shadow-sm border border-nature-200 aspect-[4/3]">
+            <img
+              src="/images/sobre-nos/dog-recovery.jpg"
+              alt="Dog receiving veterinary care at CAPA"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SUCCESS STORIES ===== -->
+    <section class="bg-white py-20" aria-labelledby="stories-heading">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span class="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-3 py-1 rounded-full mb-6 uppercase tracking-wide">
+          Success Stories
+        </span>
+        <h2 id="stories-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-6">
+          Every Wagging Tail Is a Victory
+        </h2>
+
+        <!-- Success story dog photo -->
+        <div class="relative rounded-2xl overflow-hidden shadow-md border border-warm-200 mb-8 aspect-video max-w-2xl mx-auto">
+          <img
+            src="/images/sobre-nos/dog-zeus.png"
+            alt="Zeus, one of our success stories, adopted through CAPA PVL"
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
+          <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-warm-900/70 to-transparent p-4">
+            <p class="text-white text-sm font-semibold">Zeus — successfully adopted 🐾</p>
+          </div>
+        </div>
+
+        <!-- Pull quote -->
+        <blockquote class="bg-warm-50 border-l-4 border-primary-400 rounded-r-2xl p-6 sm:p-8 mb-8 text-left">
+          <p class="text-warm-700 text-lg leading-relaxed italic">
+            "We are proud of our success stories of dogs who found responsible and loving homes through adoption.
+            Every wagging tail and grateful gaze is proof of the transformative power of love."
+          </p>
+        </blockquote>
+
+        <!-- Decorative paw icons -->
+        <div class="flex justify-center gap-3 mb-10" aria-hidden="true">
+          {[1, 2, 3].map(() => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-primary-300">
+              <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
+            </svg>
+          ))}
+        </div>
+
+        <a
+          href="/en/dogs"
+          class="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-bold px-8 py-4 rounded-xl shadow-md hover:shadow-lg transition-all text-lg"
+        >
+          Meet Your New Best Friend
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5" aria-hidden="true">
+            <path fill-rule="evenodd" d="M12.97 3.97a.75.75 0 011.06 0l7.5 7.5a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 11-1.06-1.06l6.22-6.22H3a.75.75 0 010-1.5h16.19l-6.22-6.22a.75.75 0 010-1.06z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer locale="en" />
+</Layout>

@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdminPanel from '../../components/AdminPanel';
+
+const locale = 'en' as const;
+---
+
+<Layout
+  locale={locale}
+  title="Admin — CAPA Póvoa de Lanhoso"
+  noindex={true}
+>
+  <AdminPanel locale={locale} client:load />
+</Layout>

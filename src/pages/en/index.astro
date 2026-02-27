@@ -1,0 +1,31 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Hero from '../../components/Hero.astro';
+import Stats from '../../components/Stats.astro';
+import WhyAdopt from '../../components/WhyAdopt.astro';
+import FeaturedDogs from '../../components/FeaturedDogs';
+import AboutBlurb from '../../components/AboutBlurb.astro';
+import HelpCta from '../../components/HelpCta.astro';
+import Footer from '../../components/Footer.astro';
+
+const locale = 'en' as const;
+---
+
+<Layout
+  locale={locale}
+  title="CAPA Póvoa de Lanhoso — Adopt a Dog"
+  description="CAPA Póvoa de Lanhoso — Non-profit dog shelter. Adopt a rescued dog and give them a second chance."
+  ogUrl="https://capapvl.pt/en/"
+>
+  <Nav locale={locale} />
+  <main>
+    <Hero locale={locale} />
+    <Stats locale={locale} />
+    <WhyAdopt locale={locale} />
+    <FeaturedDogs locale={locale} client:visible />
+    <AboutBlurb locale={locale} />
+    <HelpCta locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

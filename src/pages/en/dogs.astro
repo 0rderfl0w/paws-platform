@@ -1,0 +1,38 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import DogListings from '../../components/DogListings';
+import Footer from '../../components/Footer.astro';
+
+const locale = 'en' as const;
+---
+
+<Layout
+  locale={locale}
+  title="Our Dogs — CAPA Póvoa de Lanhoso"
+  description="Meet our dogs available for adoption. Filter by size and find your new companion."
+  ogUrl="https://capapvl.pt/en/dogs"
+>
+  <Nav locale={locale} />
+  <main>
+    {/* Hero section */}
+    <section class="bg-gradient-to-b from-warm-100 to-warm-50 pt-16 pb-14 px-4 sm:px-6 lg:px-8 text-center">
+      <div class="max-w-3xl mx-auto">
+        <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-4">
+          Ready for adoption
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-bold text-warm-900 mb-5 leading-tight">
+          Our Dogs
+        </h1>
+        <p class="text-warm-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
+          Every one of them has a story, a unique personality, and so much love to give.
+          Could the next home be yours?
+        </p>
+      </div>
+    </section>
+
+    {/* Dog listings — interactive React island */}
+    <DogListings locale={locale} client:load />
+  </main>
+  <Footer locale={locale} />
+</Layout>
