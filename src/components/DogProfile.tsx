@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { getTranslations, type Locale } from '../i18n';
+import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
@@ -58,9 +58,70 @@ function parseDescription(raw: string) {
   return { fields, story, personality };
 }
 
+/* ── Localize parsed description fields ── */
+/* Descriptions are stored in PT. These helpers translate parsed labels/values to the target locale. */
+function localizeField(label: string, value: string, locale: Locale): { label: string; value: string } {
+  if (locale === 'pt') return { label, value };
+  const ptT = getTranslations('pt').admin;
+  const enT = getTranslations(locale).admin;
+  const ptSizes = getTranslations('pt').sizes;
+  const enSizes = getTranslations(locale).sizes;
+
+  const labelMap: Record<string, string> = {
+    [ptT.descSex]: enT.descSex,
+    [ptT.descAge]: enT.descAge,
+    [ptT.descEntryDate]: enT.descEntryDate,
+    [ptT.descBreed]: enT.descBreed,
+    [ptT.descSize]: enT.descSize,
+    [ptT.descPersonality]: enT.descPersonality,
+    [ptT.descStory]: enT.descStory,
+  };
+  const valueMap: Record<string, string> = {
+    [ptT.descSexMale]: enT.descSexMale,
+    [ptT.descSexFemale]: enT.descSexFemale,
+    [ptSizes.small]: enSizes.small,
+    [ptSizes.medium]: enSizes.medium,
+    [ptSizes.large]: enSizes.large,
+  };
+  return {
+    label: labelMap[label] ?? label,
+    value: valueMap[value] ?? value,
+  };
+}
+
+function localizeTag(text: string, locale: Locale): string {
+  if (locale === 'pt') return text;
+  const ptT = getTranslations('pt').admin;
+  const enT = getTranslations(locale).admin;
+  const tagMap: Record<string, string> = {
+    [ptT.descGoodWithPeople]: enT.descGoodWithPeople,
+    [ptT.descNotGoodWithPeople]: enT.descNotGoodWithPeople,
+    [ptT.descUnknownPeople]: enT.descUnknownPeople,
+    [ptT.descGoodWithMales]: enT.descGoodWithMales,
+    [ptT.descNotGoodWithMales]: enT.descNotGoodWithMales,
+    [ptT.descUnknownMales]: enT.descUnknownMales,
+    [ptT.descGoodWithFemales]: enT.descGoodWithFemales,
+    [ptT.descNotGoodWithFemales]: enT.descNotGoodWithFemales,
+    [ptT.descUnknownFemales]: enT.descUnknownFemales,
+    [ptT.descGoodWithCats]: enT.descGoodWithCats,
+    [ptT.descNotGoodWithCats]: enT.descNotGoodWithCats,
+    [ptT.descUnknownCats]: enT.descUnknownCats,
+    [ptT.descChipped]: enT.descChipped,
+    [ptT.descVaccinated]: enT.descVaccinated,
+    [ptT.descSterilized]: enT.descSterilized,
+  };
+  // Handle combined medical lines like "Chipado, Vacinado"
+  const parts = text.split(',').map(s => s.trim());
+  if (parts.length > 1 && parts.every(p => tagMap[p])) {
+    return parts.map(p => tagMap[p]).join(', ');
+  }
+  return tagMap[text] ?? text;
+}
+
 /* ── Sociability & medical tags ── */
 /* Tag text is always Portuguese (from stored description), so we check Portuguese strings */
-function TagBadge({ text }: { text: string }) {
+function TagBadge({ text, locale }: { text: string; locale: Locale }) {
+  const displayText = localizeTag(text, locale);
   const isPositive = text.startsWith('Sociável') || text.startsWith('Chipado') || text.startsWith('Vacinado') || text.startsWith('Esterilizado');
   const isUnknown = text.startsWith('Não sabemos');
 
@@ -74,7 +135,7 @@ function TagBadge({ text }: { text: string }) {
           : 'bg-warm-50 text-warm-600 border border-warm-200'
       }`}
     >
-      {isPositive && '✓'} {text}
+      {isPositive && '✓'} {displayText}
     </span>
   );
 }
@@ -305,12 +366,15 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
         <div className="mb-8">
           <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">{t.dogProfile.aboutHeading}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {infoFields.map((f, i) => (
-              <div key={i} className="bg-white border border-warm-200 rounded-xl p-4">
-                <dt className="text-xs font-semibold text-warm-400 uppercase tracking-wider mb-1">{f.label}</dt>
-                <dd className="text-warm-900 font-medium">{f.value}</dd>
-              </div>
-            ))}
+            {infoFields.map((f, i) => {
+              const localized = localizeField(f.label, f.value, locale);
+              return (
+                <div key={i} className="bg-white border border-warm-200 rounded-xl p-4">
+                  <dt className="text-xs font-semibold text-warm-400 uppercase tracking-wider mb-1">{localized.label}</dt>
+                  <dd className="text-warm-900 font-medium">{localized.value}</dd>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -321,7 +385,7 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
           <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">{t.dogProfile.compatibilityHeading}</h2>
           <div className="flex flex-wrap gap-2">
             {tags.map((tg, i) => (
-              <TagBadge key={i} text={tg.value} />
+              <TagBadge key={i} text={tg.value} locale={locale} />
             ))}
           </div>
         </div>

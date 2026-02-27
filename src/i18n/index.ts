@@ -61,3 +61,95 @@ export const locales = [
   { code: 'pt' as Locale, label: 'Português', flag: '🇵🇹' },
   { code: 'en' as Locale, label: 'English', flag: '🇬🇧' },
 ] as const;
+
+/**
+ * Translate a dog description from stored Portuguese to the target locale.
+ * Descriptions are always stored in PT by AdminPanel. This function parses
+ * the PT labels and re-renders them in the target locale.
+ * If locale is 'pt', returns the original unchanged.
+ */
+export function localizeDescription(rawPt: string, locale: Locale): string {
+  if (locale === 'pt' || !rawPt) return rawPt;
+
+  const ptT = translations.pt.admin;
+  const targetT = translations[locale].admin;
+
+  // Build label map: PT label → target label
+  const labelMap: Record<string, string> = {
+    [ptT.descSex]: targetT.descSex,
+    [ptT.descAge]: targetT.descAge,
+    [ptT.descEntryDate]: targetT.descEntryDate,
+    [ptT.descBreed]: targetT.descBreed,
+    [ptT.descSize]: targetT.descSize,
+    [ptT.descPersonality]: targetT.descPersonality,
+    [ptT.descStory]: targetT.descStory,
+  };
+
+  // Build value map for sex and size
+  const valueMap: Record<string, string> = {
+    [ptT.descSexMale]: targetT.descSexMale,
+    [ptT.descSexFemale]: targetT.descSexFemale,
+    [translations.pt.sizes.small]: translations[locale].sizes.small,
+    [translations.pt.sizes.medium]: translations[locale].sizes.medium,
+    [translations.pt.sizes.large]: translations[locale].sizes.large,
+  };
+
+  // Build full-line map for sociability and medical tags
+  const lineMap: Record<string, string> = {
+    [ptT.descGoodWithPeople]: targetT.descGoodWithPeople,
+    [ptT.descNotGoodWithPeople]: targetT.descNotGoodWithPeople,
+    [ptT.descUnknownPeople]: targetT.descUnknownPeople,
+    [ptT.descGoodWithMales]: targetT.descGoodWithMales,
+    [ptT.descNotGoodWithMales]: targetT.descNotGoodWithMales,
+    [ptT.descUnknownMales]: targetT.descUnknownMales,
+    [ptT.descGoodWithFemales]: targetT.descGoodWithFemales,
+    [ptT.descNotGoodWithFemales]: targetT.descNotGoodWithFemales,
+    [ptT.descUnknownFemales]: targetT.descUnknownFemales,
+    [ptT.descGoodWithCats]: targetT.descGoodWithCats,
+    [ptT.descNotGoodWithCats]: targetT.descNotGoodWithCats,
+    [ptT.descUnknownCats]: targetT.descUnknownCats,
+  };
+
+  // Medical terms (can appear combined: "Chipado, Vacinado, Esterilizado")
+  const medicalMap: Record<string, string> = {
+    [ptT.descChipped]: targetT.descChipped,
+    [ptT.descVaccinated]: targetT.descVaccinated,
+    [ptT.descSterilized]: targetT.descSterilized,
+  };
+
+  const lines = rawPt.split('\n').filter(Boolean);
+  const translated: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Check full-line matches (sociability tags)
+    if (lineMap[trimmed]) {
+      translated.push(lineMap[trimmed]);
+      continue;
+    }
+
+    // Check medical combined line
+    const medicalParts = trimmed.split(',').map(s => s.trim());
+    if (medicalParts.every(p => medicalMap[p])) {
+      translated.push(medicalParts.map(p => medicalMap[p]).join(', '));
+      continue;
+    }
+
+    // Check key:value pairs
+    const kv = trimmed.match(/^([^:]+):\s*(.+)$/);
+    if (kv) {
+      const [, label, value] = kv;
+      const translatedLabel = labelMap[label.trim()] ?? label.trim();
+      // Translate known values (sex, size)
+      const translatedValue = valueMap[value.trim()] ?? value.trim();
+      translated.push(`${translatedLabel}: ${translatedValue}`);
+      continue;
+    }
+
+    // Fallback: keep as-is
+    translated.push(trimmed);
+  }
+
+  return translated.join('\n');
+}

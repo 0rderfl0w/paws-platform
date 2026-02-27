@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { seedDogs } from '../data/seedDogs';
-import { getTranslations, type Locale } from '../i18n';
+import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
@@ -61,7 +61,7 @@ function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
           )}
         </div>
         <p className="text-warm-600 text-sm leading-relaxed line-clamp-3">
-          {dog.description}
+          {localizeDescription(dog.description ?? '', locale)}
         </p>
       </div>
     </a>
