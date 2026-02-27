@@ -1,21 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { seedDogs } from '../data/seedDogs';
+import { getTranslations, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
 type SexFilter = 'all' | 'male' | 'female';
-
-const SIZE_LABELS: Record<string, string> = {
-  small: 'Pequeno',
-  medium: 'Médio',
-  large: 'Grande',
-};
-
-const SEX_LABELS: Record<string, string> = {
-  male: 'Macho',
-  female: 'Fêmea',
-};
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-nature-100 text-nature-700 border border-nature-200',
@@ -23,25 +13,27 @@ const SIZE_BADGE_CLASSES: Record<string, string> = {
   large: 'bg-warm-100 text-warm-700 border border-warm-200',
 };
 
-const FILTER_TABS: { id: SizeFilter; label: string }[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'small', label: 'Pequenos' },
-  { id: 'medium', label: 'Médios' },
-  { id: 'large', label: 'Grandes' },
-];
-
-function DogCard({ dog }: { dog: Dog }) {
+function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
+  const t = getTranslations(locale);
   const badgeClasses = SIZE_BADGE_CLASSES[dog.size] ?? 'bg-warm-100 text-warm-700 border border-warm-200';
-  const sizeLabel = SIZE_LABELS[dog.size] ?? dog.size;
+
+  const sizeLabels: Record<string, string> = {
+    small: t.sizes.small,
+    medium: t.sizes.medium,
+    large: t.sizes.large,
+  };
+  const sizeLabel = sizeLabels[dog.size] ?? dog.size;
+
+  const dogPath = locale === 'pt' ? `/cao?id=${dog.id}` : `/en/dog?id=${dog.id}`;
 
   return (
-    <a href={`/cao?id=${dog.id}`} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
+    <a href={dogPath} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
       {/* Photo */}
       <div className="relative aspect-square overflow-hidden bg-warm-100">
         {dog.photo_url ? (
           <img
             src={dog.photo_url}
-            alt={`Foto de ${dog.name}`}
+            alt={`${t.dogProfile.breadcrumbDogs} ${dog.name}`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
@@ -76,12 +68,26 @@ function DogCard({ dog }: { dog: Dog }) {
   );
 }
 
-export default function DogListings() {
+export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
+  const t = getTranslations(locale);
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [filter, setFilter] = useState<SizeFilter>('all');
   const [sexFilter, setSexFilter] = useState<SexFilter>('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const filterTabs: { id: SizeFilter; label: string }[] = [
+    { id: 'all', label: t.dogListings.filterAll },
+    { id: 'small', label: t.dogListings.filterSmall },
+    { id: 'medium', label: t.dogListings.filterMedium },
+    { id: 'large', label: t.dogListings.filterLarge },
+  ];
+
+  const sexFilterTabs: { id: SexFilter; label: string }[] = [
+    { id: 'all', label: t.dogListings.filterAll },
+    { id: 'female', label: t.dogListings.filterFemale },
+    { id: 'male', label: t.dogListings.filterMale },
+  ];
 
   useEffect(() => {
     async function fetchDogs() {
@@ -133,8 +139,12 @@ export default function DogListings() {
     setSearch('');
   }
 
+  const resultsText = filteredDogs.length === 1
+    ? t.dogListings.resultsOne
+    : `${filteredDogs.length} ${t.dogListings.resultsMany}`;
+
   return (
-    <section className="bg-warm-50 py-16" aria-label="Lista de cães para adoção">
+    <section className="bg-warm-50 py-16" aria-label={t.dogListings.sectionLabel}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Search + Filters */}
@@ -150,15 +160,15 @@ export default function DogListings() {
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Procurar por nome..."
-              aria-label="Procurar cão por nome"
+              placeholder={t.dogListings.searchPlaceholder}
+              aria-label={t.dogListings.searchLabel}
               className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-warm-200 text-warm-900 placeholder-warm-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition-colors"
             />
           </div>
 
-          {/* Filter tabs */}
-          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filtrar por tamanho">
-            {FILTER_TABS.map(({ id, label }) => (
+          {/* Size filter tabs */}
+          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label={t.dogListings.filterBySize}>
+            {filterTabs.map(({ id, label }) => (
               <button
                 key={id}
                 role="tab"
@@ -176,12 +186,8 @@ export default function DogListings() {
           </div>
 
           {/* Sex filter tabs */}
-          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label="Filtrar por sexo">
-            {([
-              { id: 'all' as SexFilter, label: 'Todos' },
-              { id: 'female' as SexFilter, label: '♀ Fêmea' },
-              { id: 'male' as SexFilter, label: '♂ Macho' },
-            ]).map(({ id, label }) => (
+          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label={t.dogListings.filterBySex}>
+            {sexFilterTabs.map(({ id, label }) => (
               <button
                 key={id}
                 role="tab"
@@ -202,9 +208,7 @@ export default function DogListings() {
         {/* Results count */}
         {!loading && (
           <p className="text-warm-500 text-sm font-medium mb-6 text-center">
-            {filteredDogs.length === 1
-              ? '1 cão encontrado'
-              : `${filteredDogs.length} cães encontrados`}
+            {resultsText}
           </p>
         )}
 
@@ -228,7 +232,7 @@ export default function DogListings() {
         {!loading && filteredDogs.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDogs.map((dog) => (
-              <DogCard key={dog.id} dog={dog} />
+              <DogCard key={dog.id} dog={dog} locale={locale} />
             ))}
           </div>
         )}
@@ -238,16 +242,16 @@ export default function DogListings() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🐾</div>
             <p className="text-warm-700 text-xl font-semibold mb-2">
-              Nenhum cão encontrado
+              {t.dogListings.emptyTitle}
             </p>
             <p className="text-warm-500 text-sm mb-6">
-              Tenta ajustar a pesquisa ou os filtros.
+              {t.dogListings.emptyDesc}
             </p>
             <button
               onClick={resetFilters}
               className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
             >
-              Limpar filtros
+              {t.dogListings.clearFilters}
             </button>
           </div>
         )}

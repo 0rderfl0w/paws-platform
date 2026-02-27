@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { getTranslations, type Locale } from '../i18n';
 
 export interface Props {
   title?: string;
@@ -7,21 +8,26 @@ export interface Props {
   ogImage?: string;
   ogUrl?: string;
   noindex?: boolean;
+  locale?: Locale;
 }
 
 const {
-  title = 'CAPA Póvoa de Lanhoso — Adota um Cão',
-  description = 'Centro de Assistência e Proteção Animal de Póvoa de Lanhoso. Ajudamos cães abandonados a encontrar um lar.',
+  locale = 'pt',
   ogImage = '/images/hero-dog.jpg',
   ogUrl = 'https://capapvl.pt',
   noindex = false,
 } = Astro.props;
 
+const t = getTranslations(locale);
+
+const title = Astro.props.title ?? t.layout.defaultTitle;
+const description = Astro.props.description ?? t.layout.defaultDescription;
+
 const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.pt${ogImage}`;
 ---
 
 <!doctype html>
-<html lang="pt">
+<html lang={t.layout.htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -42,7 +48,7 @@ const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.
         <meta property="og:description" content={description} />
         <meta property="og:image" content={ogImageAbsolute} />
         <meta property="og:url" content={ogUrl} />
-        <meta property="og:locale" content="pt_PT" />
+        <meta property="og:locale" content={t.layout.ogLocale} />
         <meta property="og:site_name" content="CAPA Póvoa de Lanhoso" />
       </>
     )}

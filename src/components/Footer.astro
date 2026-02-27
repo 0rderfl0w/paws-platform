@@ -1,17 +1,32 @@
 ---
+import { getTranslations, type Locale } from '../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+
+const homePath = locale === 'pt' ? '/' : '/en/';
+const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
+const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+
 const quickLinks = [
-  { href: '/', label: 'Início' },
-  { href: '/caes', label: 'Os Nossos Cães' },
-  { href: '/adocao', label: 'Adoção' },
-  { href: '/sobre-nos', label: 'Sobre Nós' },
-  { href: '/ajudar', label: 'Como Ajudar' },
+  { href: homePath, label: t.nav.home },
+  { href: dogsPath, label: t.nav.dogs },
+  { href: adoptPath, label: t.footer.adoption },
+  { href: aboutPath, label: t.nav.about },
+  { href: helpPath, label: t.footer.howToHelp },
 ];
 
 const helpLinks = [
-  { href: '/adocao', label: 'Adotar um Cão' },
-  { href: '/ajudar', label: 'Voluntariado' },
-  { href: '/ajudar', label: 'Famílias de Acolhimento' },
-  { href: '/ajudar', label: 'Fazer Donativo' },
+  { href: adoptPath, label: t.footer.adoptDog },
+  { href: helpPath, label: t.footer.volunteering },
+  { href: helpPath, label: t.footer.fosterFamilies },
+  { href: helpPath, label: t.footer.donate },
 ];
 ---
 
@@ -34,7 +49,7 @@ const helpLinks = [
           </div>
         </div>
         <p class="text-warm-400 text-sm leading-relaxed mb-6">
-          Associação de voluntários dedicados ao bem-estar e proteção animal no município de Póvoa de Lanhoso.
+          {t.footer.brandDesc}
         </p>
         <!-- Social links -->
         <div class="flex gap-3">
@@ -65,7 +80,7 @@ const helpLinks = [
 
       <!-- Quick links -->
       <div>
-        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Navegação</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">{t.footer.navHeading}</h3>
         <ul class="space-y-2" role="list">
           {quickLinks.map(({ href, label }) => (
             <li>
@@ -79,7 +94,7 @@ const helpLinks = [
 
       <!-- Help links -->
       <div>
-        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Como Ajudar</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">{t.footer.helpHeading}</h3>
         <ul class="space-y-2" role="list">
           {helpLinks.map(({ href, label }) => (
             <li>
@@ -93,7 +108,7 @@ const helpLinks = [
 
       <!-- Contact -->
       <div>
-        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Contacto</h3>
+        <h3 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">{t.footer.contactHeading}</h3>
         <ul class="space-y-3" role="list">
           <li class="flex items-start gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" aria-hidden="true">
@@ -123,7 +138,7 @@ const helpLinks = [
     <div class="border-t border-warm-800 pt-8 pb-8 mb-4">
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
         <div>
-          <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-2">Apoie o CAPA</h3>
+          <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-2">{t.footer.supportCapa}</h3>
           <p class="text-warm-400 text-sm">IBAN: <span class="text-warm-200 font-mono">0010 0000 45914000001 49</span></p>
         </div>
       </div>
@@ -132,10 +147,10 @@ const helpLinks = [
     <!-- Bottom bar -->
     <div class="border-t border-warm-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="text-warm-500 text-sm">
-        © 2026 CAPA Póvoa de Lanhoso. Todos os direitos reservados.
+        {t.footer.copyright}
       </p>
       <p class="text-warm-600 text-xs">
-        Feito com ❤️ por voluntários que amam animais
+        {t.footer.madeWith}
       </p>
     </div>
 

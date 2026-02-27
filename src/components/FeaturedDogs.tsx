@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { seedDogs } from '../data/seedDogs';
+import { getTranslations, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
-
-const SIZE_LABELS: Record<string, string> = {
-  small: 'Pequeno',
-  medium: 'Médio',
-  large: 'Grande',
-};
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-nature-100 text-nature-700 border border-nature-200',
@@ -17,25 +12,27 @@ const SIZE_BADGE_CLASSES: Record<string, string> = {
   large: 'bg-warm-100 text-warm-700 border border-warm-200',
 };
 
-const FILTER_TABS: { id: SizeFilter; label: string }[] = [
-  { id: 'all', label: 'Todos' },
-  { id: 'small', label: 'Pequenos' },
-  { id: 'medium', label: 'Médios' },
-  { id: 'large', label: 'Grandes' },
-];
-
-function DogCard({ dog }: { dog: Dog }) {
+function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
+  const t = getTranslations(locale);
   const badgeClasses = SIZE_BADGE_CLASSES[dog.size] ?? 'bg-warm-100 text-warm-700 border border-warm-200';
-  const sizeLabel = SIZE_LABELS[dog.size] ?? dog.size;
+
+  const sizeLabels: Record<string, string> = {
+    small: t.sizes.small,
+    medium: t.sizes.medium,
+    large: t.sizes.large,
+  };
+  const sizeLabel = sizeLabels[dog.size] ?? dog.size;
+
+  const dogPath = locale === 'pt' ? `/cao?id=${dog.id}` : `/en/dog?id=${dog.id}`;
 
   return (
-    <a href={`/cao?id=${dog.id}`} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
+    <a href={dogPath} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
       {/* Photo */}
       <div className="relative aspect-square overflow-hidden bg-warm-100">
         {dog.photo_url ? (
           <img
             src={dog.photo_url}
-            alt={`Foto de ${dog.name}`}
+            alt={`${t.featuredDogs.photoAlt} ${dog.name}`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
@@ -70,10 +67,20 @@ function DogCard({ dog }: { dog: Dog }) {
   );
 }
 
-export default function FeaturedDogs() {
+export default function FeaturedDogs({ locale = 'pt' }: { locale?: Locale }) {
+  const t = getTranslations(locale);
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [filter, setFilter] = useState<SizeFilter>('all');
   const [loading, setLoading] = useState(true);
+
+  const filterTabs: { id: SizeFilter; label: string }[] = [
+    { id: 'all', label: t.featuredDogs.filterAll },
+    { id: 'small', label: t.featuredDogs.filterSmall },
+    { id: 'medium', label: t.featuredDogs.filterMedium },
+    { id: 'large', label: t.featuredDogs.filterLarge },
+  ];
+
+  const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 
   useEffect(() => {
     async function fetchDogs() {
@@ -119,19 +126,19 @@ export default function FeaturedDogs() {
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
-            Prontos para adoção
+            {t.featuredDogs.eyebrow}
           </span>
           <h2 id="featured-dogs-heading" className="text-3xl sm:text-4xl font-bold text-warm-900 mb-4">
-            Os Nossos Cães
+            {t.featuredDogs.heading}
           </h2>
           <p className="text-warm-600 text-lg max-w-2xl mx-auto">
-            Cada um deles tem uma personalidade única e muito amor para dar. Poderá o próximo lar ser o teu?
+            {t.featuredDogs.subheading}
           </p>
         </div>
 
         {/* Filter tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10" role="tablist" aria-label="Filtrar por tamanho">
-          {FILTER_TABS.map(({ id, label }) => (
+        <div className="flex flex-wrap justify-center gap-2 mb-10" role="tablist" aria-label={t.featuredDogs.filterBySize}>
+          {filterTabs.map(({ id, label }) => (
             <button
               key={id}
               role="tab"
@@ -168,7 +175,7 @@ export default function FeaturedDogs() {
         {!loading && filteredDogs.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredDogs.map((dog) => (
-              <DogCard key={dog.id} dog={dog} />
+              <DogCard key={dog.id} dog={dog} locale={locale} />
             ))}
           </div>
         )}
@@ -178,13 +185,13 @@ export default function FeaturedDogs() {
           <div className="text-center py-16">
             <div className="text-5xl mb-4">🐾</div>
             <p className="text-warm-600 text-lg font-medium">
-              Nenhum cão encontrado nesta categoria.
+              {t.featuredDogs.emptyState}
             </p>
             <button
               onClick={() => setFilter('all')}
               className="mt-4 text-primary-600 hover:text-primary-700 text-sm font-semibold underline underline-offset-2"
             >
-              Ver todos os cães
+              {t.featuredDogs.viewAll}
             </button>
           </div>
         )}
@@ -193,10 +200,10 @@ export default function FeaturedDogs() {
         {!loading && (
           <div className="text-center mt-12">
             <a
-              href="/caes"
+              href={dogsPath}
               className="inline-flex items-center gap-2 px-8 py-4 bg-primary-500 hover:bg-primary-600 text-white font-bold text-lg rounded-xl shadow-sm hover:shadow-md transition-all duration-200 group"
             >
-              Ver todos os cães
+              {t.featuredDogs.viewAll}
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true">
                 <path fillRule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clipRule="evenodd" />
               </svg>

@@ -6,11 +6,12 @@ import Footer from '../components/Footer.astro';
 ---
 
 <Layout
+  locale="pt"
   title="Sobre o CAPA — Clube de Adoção e Proteção Animal"
   description="Saiba mais sobre o CAPA, a nossa missão, princípios e o trabalho que fazemos pela proteção animal."
   ogUrl="https://capapvl.pt/sobre-nos"
 >
-  <Nav />
+  <Nav locale="pt" />
 
   <main>
 
@@ -40,7 +41,7 @@ import Footer from '../components/Footer.astro';
     </section>
 
     <!-- ===== STATS ===== -->
-    <Stats />
+    <Stats locale="pt" />
 
     <!-- ===== PRINCIPLES ===== -->
     <section class="bg-white py-20" aria-labelledby="principles-heading">
@@ -280,5 +281,5 @@ import Footer from '../components/Footer.astro';
 
   </main>
 
-  <Footer />
+  <Footer locale="pt" />
 </Layout>

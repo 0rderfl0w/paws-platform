@@ -3,14 +3,17 @@ import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import DogListings from '../components/DogListings';
 import Footer from '../components/Footer.astro';
+
+const locale = 'pt' as const;
 ---
 
 <Layout
+  locale={locale}
   title="Os Nossos Cães — CAPA Póvoa de Lanhoso"
   description="Conheça os nossos cães disponíveis para adoção. Filtre por tamanho e encontre o seu novo companheiro."
   ogUrl="https://capapvl.pt/caes"
 >
-  <Nav />
+  <Nav locale={locale} />
   <main>
     {/* Hero section */}
     <section class="bg-gradient-to-b from-warm-100 to-warm-50 pt-16 pb-14 px-4 sm:px-6 lg:px-8 text-center">
@@ -29,7 +32,7 @@ import Footer from '../components/Footer.astro';
     </section>
 
     {/* Dog listings — interactive React island */}
-    <DogListings client:load />
+    <DogListings locale={locale} client:load />
   </main>
-  <Footer />
+  <Footer locale={locale} />
 </Layout>

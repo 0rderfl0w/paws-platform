@@ -1,20 +1,34 @@
 ---
+import { getTranslations, getAlternatePath, locales, type Locale } from '../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+
+const homePath = locale === 'pt' ? '/' : '/en/';
+const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+
 const navLinks = [
-  { href: '/', label: 'Início' },
-  { href: '/caes', label: 'Os Nossos Cães' },
-  { href: '/sobre-nos', label: 'Sobre Nós' },
-  { href: '/ajudar', label: 'Ajudar' },
+  { href: homePath, label: t.nav.home },
+  { href: dogsPath, label: t.nav.dogs },
+  { href: aboutPath, label: t.nav.about },
+  { href: helpPath, label: t.nav.help },
 ];
 
 const currentPath = Astro.url.pathname;
 ---
 
 <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-warm-200 shadow-sm">
-  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navegação principal">
+  <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label={t.nav.mainNav}>
     <div class="flex items-center justify-between h-16">
 
       <!-- Logo + Name -->
-      <a href="/" class="flex items-center gap-3 group" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
+      <a href={homePath} class="flex items-center gap-3 group" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
         <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary-600 transition-colors">
           <!-- Paw icon SVG -->
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-6 h-6" aria-hidden="true">
@@ -46,20 +60,46 @@ const currentPath = Astro.url.pathname;
         ))}
       </ul>
 
-      <!-- Desktop CTA -->
-      <a
-        href="/ajudar"
-        class="hidden md:inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
-      >
-        Ajudar Agora
-      </a>
+      <!-- Desktop: Language Switcher + CTA -->
+      <div class="hidden md:flex items-center gap-3">
+        <!-- Language Switcher -->
+        <div class="flex items-center gap-1 bg-warm-100 rounded-lg p-1">
+          {locales.map(({ code, label, flag }) => {
+            const altPath = getAlternatePath(currentPath, code);
+            const isActive = code === locale;
+            return (
+              <a
+                href={altPath}
+                title={label}
+                aria-label={label}
+                class={`flex items-center justify-center w-8 h-8 rounded-md text-base transition-all ${
+                  isActive
+                    ? 'bg-white shadow-sm ring-1 ring-warm-200'
+                    : 'hover:bg-warm-50 opacity-60 hover:opacity-100'
+                }`}
+                aria-current={isActive ? 'true' : undefined}
+              >
+                {flag}
+              </a>
+            );
+          })}
+        </div>
+
+        <!-- CTA Button -->
+        <a
+          href={helpPath}
+          class="inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
+        >
+          {t.nav.helpNow}
+        </a>
+      </div>
 
       <!-- Mobile Hamburger -->
       <button
         id="mobile-menu-btn"
         type="button"
         class="md:hidden p-2 rounded-lg text-warm-600 hover:bg-warm-100 hover:text-warm-900 transition-colors"
-        aria-label="Abrir menu"
+        aria-label={t.nav.openMenu}
         aria-expanded="false"
         aria-controls="mobile-menu"
       >
@@ -74,6 +114,30 @@ const currentPath = Astro.url.pathname;
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden border-t border-warm-200 py-3 pb-4">
+      <!-- Mobile Language Switcher -->
+      <div class="flex items-center gap-2 px-4 py-2 mb-1">
+        {locales.map(({ code, label, flag }) => {
+          const altPath = getAlternatePath(currentPath, code);
+          const isActive = code === locale;
+          return (
+            <a
+              href={altPath}
+              title={label}
+              aria-label={label}
+              class={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                isActive
+                  ? 'bg-primary-50 text-primary-700 ring-1 ring-primary-200'
+                  : 'text-warm-600 hover:bg-warm-100'
+              }`}
+              aria-current={isActive ? 'true' : undefined}
+            >
+              <span>{flag}</span>
+              <span>{label}</span>
+            </a>
+          );
+        })}
+      </div>
+
       <ul class="flex flex-col gap-1" role="list">
         {navLinks.map(({ href, label }) => (
           <li>
@@ -92,10 +156,10 @@ const currentPath = Astro.url.pathname;
         ))}
         <li class="pt-2 border-t border-warm-200 mt-2">
           <a
-            href="/ajudar"
+            href={helpPath}
             class="block px-4 py-2.5 bg-primary-500 hover:bg-primary-600 text-white text-sm font-semibold rounded-lg text-center transition-colors"
           >
-            Ajudar Agora
+            {t.nav.helpNow}
           </a>
         </li>
       </ul>

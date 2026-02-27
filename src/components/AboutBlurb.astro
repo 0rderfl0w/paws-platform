@@ -1,4 +1,15 @@
 ---
+import { getTranslations, type Locale } from '../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+
+const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 ---
 
 <section class="bg-warm-100 py-20" aria-labelledby="about-heading">
@@ -7,37 +18,29 @@
 
       <!-- Text content -->
       <div>
-        <span class="inline-block text-nature-600 text-sm font-semibold tracking-wider uppercase mb-3">Sobre nós</span>
+        <span class="inline-block text-nature-600 text-sm font-semibold tracking-wider uppercase mb-3">{t.aboutBlurb.eyebrow}</span>
         <h2 id="about-heading" class="text-3xl sm:text-4xl font-bold text-warm-900 mb-6">
-          Lutamos contra o abandono animal desde o primeiro dia
+          {t.aboutBlurb.heading}
         </h2>
         <div class="space-y-4 text-warm-700 text-lg leading-relaxed">
-          <p>
-            A CAPA de Póvoa de Lanhoso é uma associação de voluntários comprometidos com o bem-estar animal. 
-            Nascemos da necessidade de combater o abandono de cães no nosso município e, desde então, 
-            dedicamo-nos a resgatar, tratar e encontrar lares amorosos para todos os animais que chegam até nós.
-          </p>
-          <p>
-            Cada cão que passa pelo nosso abrigo recebe cuidados veterinários, alimentação, carinho e a 
-            atenção que merece. A nossa equipa de voluntários trabalha todos os dias para que nenhum animal 
-            fique para trás.
-          </p>
+          <p>{t.aboutBlurb.p1}</p>
+          <p>{t.aboutBlurb.p2}</p>
         </div>
         <div class="mt-8 flex flex-wrap gap-4">
           <a
-            href="/sobre-nos"
+            href={aboutPath}
             class="inline-flex items-center gap-2 px-6 py-3 bg-nature-600 hover:bg-nature-700 text-white font-semibold rounded-xl shadow-sm transition-colors group"
           >
-            Saber Mais
+            {t.aboutBlurb.ctaPrimary}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true">
               <path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd" />
             </svg>
           </a>
           <a
-            href="/ajudar"
+            href={helpPath}
             class="inline-flex items-center gap-2 px-6 py-3 bg-transparent border-2 border-nature-600 text-nature-700 font-semibold rounded-xl hover:bg-nature-50 transition-colors"
           >
-            Ser Voluntário
+            {t.aboutBlurb.ctaSecondary}
           </a>
         </div>
       </div>
@@ -47,22 +50,22 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-4">
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200">
-              <div class="text-4xl font-extrabold text-primary-600 mb-1">100%</div>
-              <div class="text-warm-700 font-medium text-sm">Voluntários dedicados</div>
+              <div class="text-4xl font-extrabold text-primary-600 mb-1">{t.aboutBlurb.stat1Value}</div>
+              <div class="text-warm-700 font-medium text-sm">{t.aboutBlurb.stat1Label}</div>
             </div>
             <div class="bg-primary-500 rounded-2xl p-6 shadow-sm text-white">
-              <div class="text-4xl font-extrabold mb-1">24/7</div>
-              <div class="text-primary-100 font-medium text-sm">Cuidado contínuo</div>
+              <div class="text-4xl font-extrabold mb-1">{t.aboutBlurb.stat2Value}</div>
+              <div class="text-primary-100 font-medium text-sm">{t.aboutBlurb.stat2Label}</div>
             </div>
           </div>
           <div class="space-y-4 mt-8">
             <div class="bg-nature-600 rounded-2xl p-6 shadow-sm text-white">
-              <div class="text-4xl font-extrabold mb-1">+10</div>
-              <div class="text-nature-100 font-medium text-sm">Anos de missão</div>
+              <div class="text-4xl font-extrabold mb-1">{t.aboutBlurb.stat3Value}</div>
+              <div class="text-nature-100 font-medium text-sm">{t.aboutBlurb.stat3Label}</div>
             </div>
             <div class="bg-white rounded-2xl p-6 shadow-sm border border-warm-200">
-              <div class="text-4xl font-extrabold text-warm-600 mb-1">0€</div>
-              <div class="text-warm-700 font-medium text-sm">Custos de adoção</div>
+              <div class="text-4xl font-extrabold text-warm-600 mb-1">{t.aboutBlurb.stat4Value}</div>
+              <div class="text-warm-700 font-medium text-sm">{t.aboutBlurb.stat4Label}</div>
             </div>
           </div>
         </div>

@@ -8,21 +8,24 @@ import FeaturedDogs from '../components/FeaturedDogs';
 import AboutBlurb from '../components/AboutBlurb.astro';
 import HelpCta from '../components/HelpCta.astro';
 import Footer from '../components/Footer.astro';
+
+const locale = 'pt' as const;
 ---
 
 <Layout
+  locale={locale}
   title="CAPA Póvoa de Lanhoso — Adota um Cão"
   description="CAPA Póvoa de Lanhoso — Abrigo de cães sem fins lucrativos. Adote um cão resgatado e dê-lhe uma segunda oportunidade."
   ogUrl="https://capapvl.pt/"
 >
-  <Nav />
+  <Nav locale={locale} />
   <main>
-    <Hero />
-    <Stats />
-    <WhyAdopt />
-    <FeaturedDogs client:visible />
-    <AboutBlurb />
-    <HelpCta />
+    <Hero locale={locale} />
+    <Stats locale={locale} />
+    <WhyAdopt locale={locale} />
+    <FeaturedDogs locale={locale} client:visible />
+    <AboutBlurb locale={locale} />
+    <HelpCta locale={locale} />
   </main>
-  <Footer />
+  <Footer locale={locale} />
 </Layout>

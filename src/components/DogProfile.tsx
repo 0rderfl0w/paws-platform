@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { getTranslations, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
-
-const SIZE_LABELS: Record<string, string> = {
-  small: 'Pequeno',
-  medium: 'Médio',
-  large: 'Grande',
-};
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-nature-100 text-nature-700 border border-nature-200',
@@ -15,6 +10,8 @@ const SIZE_BADGE_CLASSES: Record<string, string> = {
 };
 
 /* ── Parse description into structured fields ── */
+/* Note: description text is always stored in Portuguese (built by AdminPanel).
+   The parsing logic therefore always uses Portuguese field names. */
 function parseDescription(raw: string) {
   const lines = raw.split('\n').filter(Boolean);
   const fields: { label: string; value: string }[] = [];
@@ -62,6 +59,7 @@ function parseDescription(raw: string) {
 }
 
 /* ── Sociability & medical tags ── */
+/* Tag text is always Portuguese (from stored description), so we check Portuguese strings */
 function TagBadge({ text }: { text: string }) {
   const isPositive = text.startsWith('Sociável') || text.startsWith('Chipado') || text.startsWith('Vacinado') || text.startsWith('Esterilizado');
   const isUnknown = text.startsWith('Não sabemos');
@@ -82,7 +80,8 @@ function TagBadge({ text }: { text: string }) {
 }
 
 /* ── Photo Gallery ── */
-function PhotoGallery({ photos, name }: { photos: string[]; name: string }) {
+function PhotoGallery({ photos, name, locale }: { photos: string[]; name: string; locale: Locale }) {
+  const t = getTranslations(locale);
   const [selected, setSelected] = useState(0);
 
   if (photos.length === 0) return null;
@@ -93,7 +92,7 @@ function PhotoGallery({ photos, name }: { photos: string[]; name: string }) {
       <div className="relative aspect-[16/10] md:aspect-[16/9] rounded-2xl overflow-hidden bg-warm-100 shadow-lg">
         <img
           src={photos[selected]}
-          alt={`Foto de ${name}`}
+          alt={`${t.dogProfile.breadcrumbDogs} ${name}`}
           className="w-full h-full object-cover"
         />
         {photos.length > 1 && (
@@ -101,7 +100,7 @@ function PhotoGallery({ photos, name }: { photos: string[]; name: string }) {
             <button
               onClick={() => setSelected((selected - 1 + photos.length) % photos.length)}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-              aria-label="Foto anterior"
+              aria-label={t.dogProfile.prevPhoto}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-warm-700">
                 <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
@@ -110,7 +109,7 @@ function PhotoGallery({ photos, name }: { photos: string[]; name: string }) {
             <button
               onClick={() => setSelected((selected + 1) % photos.length)}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/80 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-              aria-label="Foto seguinte"
+              aria-label={t.dogProfile.nextPhoto}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-warm-700">
                 <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
@@ -135,7 +134,7 @@ function PhotoGallery({ photos, name }: { photos: string[]; name: string }) {
                   ? 'border-primary-500 shadow-md ring-2 ring-primary-200'
                   : 'border-warm-200 hover:border-warm-400 opacity-70 hover:opacity-100'
               }`}
-              aria-label={`Ver foto ${i + 1} de ${name}`}
+              aria-label={`${t.dogProfile.viewPhoto} ${i + 1} ${name}`}
             >
               <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
             </button>
@@ -162,28 +161,42 @@ function LoadingSkeleton() {
 }
 
 /* ── 404 ── */
-function NotFound() {
+function NotFound({ locale }: { locale: Locale }) {
+  const t = getTranslations(locale);
+  const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+
   return (
     <div className="max-w-3xl mx-auto text-center py-20">
       <div className="text-6xl mb-4">🐾</div>
-      <h1 className="text-2xl font-bold text-warm-900 mb-2">Cão não encontrado</h1>
-      <p className="text-warm-600 mb-8">Este cão pode já ter encontrado um lar!</p>
+      <h1 className="text-2xl font-bold text-warm-900 mb-2">{t.dogProfile.notFoundTitle}</h1>
+      <p className="text-warm-600 mb-8">{t.dogProfile.notFoundDesc}</p>
       <a
-        href="/caes"
+        href={dogsPath}
         className="inline-flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
       >
-        Ver todos os cães
+        {t.dogProfile.viewAllDogs}
       </a>
     </div>
   );
 }
 
 /* ── Main Profile Component ── */
-export default function DogProfile() {
+export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
+  const t = getTranslations(locale);
   const [dog, setDog] = useState<Dog | null>(null);
   const [photos, setPhotos] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  const homePath = locale === 'pt' ? '/' : '/en/';
+  const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+  const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
+
+  const sizeLabels: Record<string, string> = {
+    small: t.sizes.small,
+    medium: t.sizes.medium,
+    large: t.sizes.large,
+  };
 
   useEffect(() => {
     async function load() {
@@ -242,9 +255,9 @@ export default function DogProfile() {
   }, []);
 
   if (loading) return <LoadingSkeleton />;
-  if (notFound || !dog) return <NotFound />;
+  if (notFound || !dog) return <NotFound locale={locale} />;
 
-  const sizeLabel = SIZE_LABELS[dog.size] ?? dog.size;
+  const sizeLabel = sizeLabels[dog.size] ?? dog.size;
   const badgeClasses = SIZE_BADGE_CLASSES[dog.size] ?? '';
   const parsed = dog.description ? parseDescription(dog.description) : null;
 
@@ -256,15 +269,15 @@ export default function DogProfile() {
     <div className="max-w-3xl mx-auto">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-2 text-sm text-warm-500" aria-label="Breadcrumb">
-        <a href="/" className="hover:text-primary-600 transition-colors">Início</a>
+        <a href={homePath} className="hover:text-primary-600 transition-colors">{t.dogProfile.breadcrumbHome}</a>
         <span aria-hidden="true">/</span>
-        <a href="/caes" className="hover:text-primary-600 transition-colors">Cães</a>
+        <a href={dogsPath} className="hover:text-primary-600 transition-colors">{t.dogProfile.breadcrumbDogs}</a>
         <span aria-hidden="true">/</span>
         <span className="text-warm-700 font-medium">{dog.name}</span>
       </nav>
 
       {/* Photos — full width, big and beautiful */}
-      <PhotoGallery photos={photos} name={dog.name} />
+      <PhotoGallery photos={photos} name={dog.name} locale={locale} />
 
       {/* Name + badge */}
       <div className="mt-8 mb-6">
@@ -282,7 +295,7 @@ export default function DogProfile() {
       {/* Story — the emotional hook */}
       {parsed?.story && (
         <div className="mb-8 bg-warm-50 border border-warm-200 rounded-2xl p-6">
-          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-3">A Minha História</h2>
+          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-3">{t.dogProfile.storyHeading}</h2>
           <p className="text-warm-700 leading-relaxed text-base">{parsed.story}</p>
         </div>
       )}
@@ -290,7 +303,7 @@ export default function DogProfile() {
       {/* Info grid */}
       {infoFields.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">Sobre Mim</h2>
+          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">{t.dogProfile.aboutHeading}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {infoFields.map((f, i) => (
               <div key={i} className="bg-white border border-warm-200 rounded-xl p-4">
@@ -305,10 +318,10 @@ export default function DogProfile() {
       {/* Tags — sociability + medical */}
       {tags.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">Compatibilidade</h2>
+          <h2 className="text-sm font-bold text-warm-500 uppercase tracking-wider mb-4">{t.dogProfile.compatibilityHeading}</h2>
           <div className="flex flex-wrap gap-2">
-            {tags.map((t, i) => (
-              <TagBadge key={i} text={t.value} />
+            {tags.map((tg, i) => (
+              <TagBadge key={i} text={tg.value} />
             ))}
           </div>
         </div>
@@ -317,28 +330,27 @@ export default function DogProfile() {
       {/* Adoption CTA */}
       <div className="mb-8 bg-primary-50 border border-primary-200 rounded-2xl p-8">
         <h2 className="text-xl font-bold text-warm-900 mb-3">
-          Queres adotar o/a {dog.name}?
+          {t.dogProfile.adoptTitle} {dog.name}?
         </h2>
         <p className="text-warm-600 leading-relaxed mb-6">
-          Entra em contacto connosco para saber mais sobre o processo de adoção.
-          Ficaremos felizes em ajudar-te a encontrar o teu novo melhor amigo!
+          {t.dogProfile.adoptDesc}
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
           <a
-            href={`mailto:capa.geralpvl@gmail.com?subject=Adoção — ${dog.name}`}
+            href={`mailto:capa.geralpvl@gmail.com?subject=${t.dogProfile.emailSubject} — ${dog.name}`}
             className="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
               <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
               <path d="M19 8.839l-7.616 3.808a2.75 2.75 0 01-2.768 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
             </svg>
-            Enviar email
+            {t.dogProfile.sendEmail}
           </a>
           <a
-            href="/adocao"
+            href={adoptPath}
             className="inline-flex items-center justify-center gap-2 bg-white hover:bg-warm-50 text-warm-700 font-semibold px-6 py-3.5 rounded-xl border border-warm-300 transition-colors"
           >
-            Processo de adoção
+            {t.dogProfile.adoptionProcess}
           </a>
         </div>
       </div>
@@ -346,13 +358,13 @@ export default function DogProfile() {
       {/* Back link */}
       <div className="pt-6 pb-4 border-t border-warm-200">
         <a
-          href="/caes"
+          href={dogsPath}
           className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
             <path fillRule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clipRule="evenodd" />
           </svg>
-          Ver todos os cães
+          {t.dogProfile.viewAllDogs}
         </a>
       </div>
     </div>
