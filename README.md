@@ -168,3 +168,15 @@ The lessons walk you through all of this, but here's a quick overview:
 ## License
 
 MIT — fork it, customize it, ship it. Give a shelter a website. 🐾
+
+---
+
+## Live Deployment: capapvl.pt
+
+This repo is also the live website for **CAPA Póvoa de Lanhoso** — a Portuguese non-profit rescue, shelter, and adoption organization.
+
+**Live site:** [capapvl.pt](https://capapvl.pt)
+
+The deployment uses Supabase as the backend with ~104 dogs and ~980 photos. All public content is in Portuguese (PT). The site is hosted on Hostinger and auto-deploys from the `deploy` branch.
+
+If you're looking for the template to fork for your own shelter, you're in the right place — this repo is both the template and the real thing.
