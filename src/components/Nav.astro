@@ -29,12 +29,7 @@ const currentPath = Astro.url.pathname;
 
       <!-- Logo + Name -->
       <a href={homePath} class="flex items-center gap-3 group" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
-        <div class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary-600 transition-colors">
-          <!-- Paw icon SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-6 h-6" aria-hidden="true">
-            <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
-          </svg>
-        </div>
+        <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="w-10 h-10 rounded-xl object-cover shadow-sm" width="40" height="40">
         <div class="leading-tight">
           <span class="block text-lg font-bold text-warm-900 group-hover:text-primary-600 transition-colors">CAPA</span>
           <span class="block text-xs text-warm-500 font-medium">Póvoa de Lanhoso</span>
