@@ -72,7 +72,7 @@ PUBLIC_SUPABASE_ANON_KEY=<legacy JWT anon key>
 SUPABASE_SERVICE_ROLE_KEY=<legacy JWT service_role key>
 ```
 
-.env is gitignored. **Must use legacy eyJhb... JWT format** — new sb_publishable_/sb_secret_ format is not compatible with @supabase/supabase-js.
+.env is gitignored. Now uses new `sb_publishable_`/`sb_secret_` key format — confirmed compatible with @supabase/supabase-js v2.97.0 (legacy JWT keys have been rotated out).
 
 ---
 
@@ -148,13 +148,18 @@ git worktree remove /tmp/capapvl-deploy
 
 WARNING: NEVER git checkout deploy in the project dir — use worktrees only.
 
+**CRITICAL: Never make changes directly on the deploy branch.**
+All changes must go through source files on main → build → copy to deploy. Direct edits to deploy HTML will be overwritten on the next build. Incident: Mar 16 — logo/footer redesign done directly on deploy branch was wiped when next build pushed from main.
+
+**Before overwriting deploy branch:** Always diff what's currently on deploy against what you're about to push. Don't blindly copy dist/ without checking for deploy-only changes that haven't been ported to source.
+
 ---
 
 ## Gotchas
 
 - **Supabase free tier:** 500MB storage — photos are pre-resized before upload. Monitor usage.
 - **Hostinger static only:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
-- **Legacy JWT keys required:** New sb_publishable_/sb_secret_ format doesn't work with @supabase/supabase-js.
+- **New key format works fine:** sb_publishable_/sb_secret_ confirmed working with @supabase/supabase-js v2.97.0. Legacy JWT keys were rotated after an accidental .env commit.
 - **Logo was photo-02:** Every dog's original page had the CAPA logo as photo-02. All deleted from storage. If re-scraping, filter files < 20KB.
 - **Accented slugs:** NFD normalization used in upload scripts (Jóia → joia). Don't break this.
 - **No unique constraint on name:** Re-running upload scripts creates duplicates. Use upsert or check first.
@@ -168,6 +173,7 @@ WARNING: NEVER git checkout deploy in the project dir — use worktrees only.
 - [ ] Supabase Auth setup — create admin user for shelter staff
 - [ ] Add unique constraint on dogs.name to prevent duplicates
 - [ ] Deploy branch setup on Hostinger
+- [ ] Z to revoke legacy HS256 signing key in Supabase dashboard (safe now — site runs on new publishable key)
 
 ---
 
@@ -178,3 +184,6 @@ WARNING: NEVER git checkout deploy in the project dir — use worktrees only.
 - 2026-02-24: Dog profile uses /cao?id=uuid (query param) — Hostinger static-only, no dynamic routes. (Crash & Burn)
 - 2026-02-24: Legacy JWT keys for Supabase — new format not compatible. (Crash & Burn)
 - 2026-02-24: Photos resized to 1200px/80% JPEG via sharp before upload — stays within 500MB free tier. (Crash & Burn)
+- 2026-03-16: sb_publishable_/sb_secret_ format confirmed working with @supabase/supabase-js v2.97.0 — legacy keys rotated after .env exposure. (Razor & Blade)
+- 2026-03-16: Logo/footer/header changes ported from deploy branch HTML back to Astro source files. Never edit deploy branch directly again. (Razor & Blade)
+- 2026-03-16: SUPABASE_SERVICE_ROLE_KEY was committed to git — rotated all keys, .env recreated. (Razor & Blade)
