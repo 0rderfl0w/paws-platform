@@ -1,5 +1,13 @@
 # AGENTS.md — capapvl.pt (CAPA Póvoa de Lanhoso)
 
+## Hetzner Primary Workflow
+
+- Active project work happens on Hetzner under `/home/deploy/projects/...`.
+- GitHub is durable version history after meaningful changes are committed and pushed.
+- Air `/Users/z/Projects/...` is a backup/mirror, not the active working root unless Z explicitly asks for Air-local work.
+- If Z explicitly asks for Air-local work, pull the Air repo from GitHub before editing, commit/push from Air afterward, then pull/update the Hetzner repo before hosted agents continue on that repo.
+- If an old prompt names `/Users/z/Projects/<repo>`, translate it to `/home/deploy/projects/<repo>` for active work after verifying the Hetzner root exists.
+
 ## Skills
 
 Before starting frontend work, invoke the **`frontend`** skill (Astro 5 + React 19 + Tailwind 4).
