@@ -1,5 +1,9 @@
 # AGENTS.md — capapvl.pt (CAPA Póvoa de Lanhoso)
 
+## Skills
+
+Before starting frontend work, invoke the **`frontend`** skill (Astro 5 + React 19 + Tailwind 4).
+
 Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteção Animal), a Portuguese non-profit rescue/shelter/adoption organization. Built on the paws-platform open-source template.
 
 **Live:** https://capapvl.pt/ (Hostinger static, auto-deploys from `deploy` branch)
