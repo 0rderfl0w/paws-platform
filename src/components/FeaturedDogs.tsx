@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { capaApi } from '../lib/capaApi';
 import { capaDogs } from '../data/capaDogs';
 import { getTranslations, localizeDescription, type Locale } from '../i18n';
-import type { Dog } from '../lib/supabase';
+import type { Dog } from '../lib/capaApi';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
 
@@ -97,21 +97,15 @@ export default function FeaturedDogs({ locale = 'pt' }: { locale?: Locale }) {
       setDogs(localDogs);
       setLoading(false);
 
-      if (!supabase) {
+      if (!capaApi) {
         return;
       }
 
       try {
-        const { data, error } = await supabase
-          .from('dogs')
-          .select('*')
-          .eq('is_adopted', false)
-          .order('name', { ascending: true });
-
-        if (error) throw error;
-        if (data && data.length > 0) setDogs(data);
+        const data = await capaApi.getDogs(false);
+        if (data.length > 0) setDogs(data);
       } catch {
-        // Keep the local generated dataset when the old Supabase project is unavailable.
+        // Keep the committed dataset if the Hetzner API is temporarily unavailable.
       }
     }
 

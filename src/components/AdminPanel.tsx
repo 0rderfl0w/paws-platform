@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '../lib/supabase';
+import { capaApi } from '../lib/capaApi';
 import { getTranslations, type Locale, type Translations } from '../i18n';
-import type { Dog } from '../lib/supabase';
+import type { Dog } from '../lib/capaApi';
 import { capaDogs } from '../data/capaDogs';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -32,7 +32,7 @@ function photoNumberToFilename(n: number): string {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type View = 'dashboard' | 'add' | 'edit';
-type AdminBackendMode = 'supabase' | 'static';
+type AdminBackendMode = 'api' | 'static';
 
 const STATIC_ADMIN_SESSION_KEY = 'capa-static-admin-session';
 const STATIC_ADMIN_DOGS_KEY = 'capa-static-admin-dogs-v1';
@@ -294,27 +294,18 @@ function LoginScreen({ onLogin, t }: { onLogin: (mode: AdminBackendMode) => void
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!supabase) return;
     setError('');
     setLoading(true);
     try {
-      if (await verifyStaticAdminLogin(email, password)) {
-        setStaticAdminSession(true);
-        onLogin('static');
+      if (!capaApi) {
+        setError(t.admin.apiUnavailable);
         return;
       }
 
-      if (supabase) {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-        if (!authError) {
-          onLogin('supabase');
-          return;
-        }
-      }
-
-      setError(t.admin.loginError);
+      await capaApi.login(email, password);
+      onLogin('api');
     } catch {
-      setError(t.admin.loginGenericError);
+      setError(t.admin.loginError);
     } finally {
       setLoading(false);
     }
@@ -410,27 +401,12 @@ function DogFormPanel({ initial, existingDog, backendMode, onSave, onCancel, t }
   // Load existing photos when editing
   useEffect(() => {
     if (!isEdit || !existingDog) return;
-    if (backendMode === 'static') {
-      const photos = existingDog.photos?.length ? existingDog.photos : existingDog.photo_url ? [existingDog.photo_url] : [];
-      setCurrentPhotos(photos.map((url) => ({ path: url, url })));
-      return;
-    }
-    if (!supabase) return;
-    loadCurrentPhotos(toSlug(existingDog.name));
+    const photos = existingDog.photos?.length ? existingDog.photos : existingDog.photo_url ? [existingDog.photo_url] : [];
+    setCurrentPhotos(photos.map((url) => ({ path: url, url })));
   }, [isEdit, existingDog, backendMode]);
 
-  async function loadCurrentPhotos(slug: string) {
-    if (!supabase) return;
-    const { data, error } = await supabase.storage.from('dog-photos').list(slug, { sortBy: { column: 'name', order: 'asc' } });
-    if (error || !data) return;
-    const photos = data
-      .filter((f) => f.name.endsWith('.jpg') || f.name.endsWith('.jpeg') || f.name.endsWith('.png') || f.name.endsWith('.webp'))
-      .map((f) => {
-        const path = `${slug}/${f.name}`;
-        const { data: urlData } = supabase!.storage.from('dog-photos').getPublicUrl(path);
-        return { path, url: urlData.publicUrl };
-      });
-    setCurrentPhotos(photos);
+  function getPhotoFilename(photoPath: string): string {
+    return decodeURIComponent(photoPath.split('/').pop() ?? '');
   }
 
   async function handleDeletePhoto(path: string) {
@@ -438,11 +414,12 @@ function DogFormPanel({ initial, existingDog, backendMode, onSave, onCancel, t }
       setCurrentPhotos((prev) => prev.filter((p) => p.path !== path));
       return;
     }
-    if (!supabase) return;
+    if (!capaApi || !existingDog) return;
     setDeletingPhoto(path);
     try {
-      await supabase.storage.from('dog-photos').remove([path]);
-      setCurrentPhotos((prev) => prev.filter((p) => p.path !== path));
+      const updated = await capaApi.deletePhoto(existingDog.id, getPhotoFilename(path));
+      const photos = updated.photos?.length ? updated.photos : updated.photo_url ? [updated.photo_url] : [];
+      setCurrentPhotos(photos.map((url) => ({ path: url, url })));
     } finally {
       setDeletingPhoto(null);
     }
@@ -476,63 +453,7 @@ function DogFormPanel({ initial, existingDog, backendMode, onSave, onCancel, t }
         return;
       }
 
-      if (!supabase) return;
-      const slug = toSlug(form.name || (existingDog?.name ?? ''));
-      let photo_url = existingDog?.photo_url ?? '';
-
-      // Upload new photos
-      if (photoFiles.length > 0) {
-        let startIndex = 0;
-        if (isEdit) {
-          const existingNums = currentPhotos.map((p) => {
-            const match = p.path.match(/photo-(\d+)\./);
-            return match ? parseInt(match[1], 10) : 0;
-          });
-          const maxNum = existingNums.length > 0 ? Math.max(...existingNums) : 0;
-          if (maxNum === 0) startIndex = 0;
-          else if (maxNum === 1) startIndex = 1;
-          else startIndex = maxNum - 1;
-        }
-
-        const uploadedUrls: string[] = [];
-        for (let i = 0; i < photoFiles.length; i++) {
-          const slotIndex = startIndex + i;
-          const photoNum = indexToPhotoNumber(slotIndex);
-          const filename = photoNumberToFilename(photoNum);
-          const storagePath = `${slug}/${filename}`;
-
-          const file = photoFiles[i];
-          const { error: uploadError } = await supabase.storage
-            .from('dog-photos')
-            .upload(storagePath, file, { upsert: true, contentType: file.type || 'image/jpeg' });
-
-          if (!uploadError) {
-            const { data: urlData } = supabase.storage.from('dog-photos').getPublicUrl(storagePath);
-            uploadedUrls.push(urlData.publicUrl);
-          }
-        }
-
-        if (uploadedUrls.length > 0 && !photo_url) {
-          photo_url = uploadedUrls[0];
-        } else if (uploadedUrls.length > 0 && !isEdit) {
-          photo_url = uploadedUrls[0];
-        }
-      }
-
-      // If editing and photo_url is the deleted photo, update to first remaining
-      if (isEdit) {
-        if (!currentPhotos.find((p) => p.url === photo_url) && !photo_url.includes(slug)) {
-          photo_url = currentPhotos.length > 0 ? currentPhotos[0].url : '';
-        }
-        const { data: refreshed } = await supabase.storage.from('dog-photos').list(slug, { sortBy: { column: 'name', order: 'asc' } });
-        if (refreshed && refreshed.length > 0) {
-          const first = refreshed.find((f) => f.name.endsWith('.jpg') || f.name.endsWith('.jpeg') || f.name.endsWith('.png') || f.name.endsWith('.webp'));
-          if (first && !photo_url) {
-            const { data: urlData } = supabase.storage.from('dog-photos').getPublicUrl(`${slug}/${first.name}`);
-            photo_url = urlData.publicUrl;
-          }
-        }
-      }
+      if (!capaApi) throw new Error(t.admin.apiUnavailable);
 
       const generatedDescription = buildDescription(form, t);
       const payload = {
@@ -541,16 +462,19 @@ function DogFormPanel({ initial, existingDog, backendMode, onSave, onCancel, t }
         sex: form.sex || null,
         age: form.age,
         description: generatedDescription,
-        photo_url,
+        photo_url: existingDog?.photo_url ?? '',
         updated_at: new Date().toISOString(),
       };
 
+      let savedDog: Dog;
       if (isEdit && existingDog) {
-        const { error: updateError } = await supabase.from('dogs').update(payload).eq('id', existingDog.id);
-        if (updateError) throw updateError;
+        savedDog = await capaApi.updateDog(existingDog.id, payload);
       } else {
-        const { error: insertError } = await supabase.from('dogs').insert({ ...payload, is_adopted: false });
-        if (insertError) throw insertError;
+        savedDog = await capaApi.createDog({ ...payload, is_adopted: false });
+      }
+
+      if (photoFiles.length > 0) {
+        await capaApi.uploadPhotos(savedDog.id, photoFiles);
       }
 
       onSave();
@@ -940,10 +864,10 @@ function Dashboard({ dogs, backendMode, onRefresh, onAdd, onEdit, onLogout, t }:
       setTogglingId(null);
       return;
     }
-    if (!supabase || togglingId) return;
+    if (!capaApi || togglingId) return;
     setTogglingId(dog.id);
     try {
-      await supabase.from('dogs').update({ is_adopted: !dog.is_adopted, updated_at: new Date().toISOString() }).eq('id', dog.id);
+      await capaApi.updateDog(dog.id, { is_adopted: !dog.is_adopted, updated_at: new Date().toISOString() });
       onRefresh();
     } finally {
       setTogglingId(null);
@@ -959,16 +883,10 @@ function Dashboard({ dogs, backendMode, onRefresh, onAdd, onEdit, onLogout, t }:
       setDeleting(false);
       return;
     }
-    if (!supabase) return;
+    if (!capaApi) return;
     setDeleting(true);
     try {
-      const slug = toSlug(dog.name);
-      const { data: files } = await supabase.storage.from('dog-photos').list(slug);
-      if (files && files.length > 0) {
-        const paths = files.map((f) => `${slug}/${f.name}`);
-        await supabase.storage.from('dog-photos').remove(paths);
-      }
-      await supabase.from('dogs').delete().eq('id', dog.id);
+      await capaApi.deleteDog(dog.id);
       setDeleteTarget(null);
       onRefresh();
     } finally {
@@ -1346,49 +1264,11 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
 
   // Check auth on mount
   useEffect(() => {
-    let cancelled = false;
-    let subscription: { unsubscribe: () => void } | null = null;
-
-    async function checkAuth() {
-      if (hasStaticAdminSession()) {
-        if (!cancelled) {
-          setBackendMode('static');
-          setIsLoggedIn(true);
-          setAuthChecked(true);
-        }
-        return;
-      }
-
-      if (!supabase) {
-        if (!cancelled) setAuthChecked(true);
-        return;
-      }
-
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (!cancelled) {
-          setIsLoggedIn(!!data.user);
-          setBackendMode(data.user ? 'supabase' : null);
-        }
-      } finally {
-        if (!cancelled) setAuthChecked(true);
-      }
+    if (capaApi?.hasToken()) {
+      setBackendMode('api');
+      setIsLoggedIn(true);
     }
-
-    if (supabase) {
-      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (hasStaticAdminSession()) return;
-        setIsLoggedIn(!!session?.user);
-        setBackendMode(session?.user ? 'supabase' : null);
-      });
-      subscription = data.subscription;
-    }
-
-    checkAuth();
-    return () => {
-      cancelled = true;
-      subscription?.unsubscribe();
-    };
+    setAuthChecked(true);
   }, []);
 
   // Load dogs when logged in
@@ -1405,9 +1285,8 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
         return;
       }
 
-      if (!supabase) return;
-      const { data } = await supabase.from('dogs').select('*').order('created_at', { ascending: false });
-      setDogs(data ?? []);
+      if (!capaApi) return;
+      setDogs(await capaApi.getDogs(true));
     } finally {
       setDogsLoading(false);
     }
@@ -1416,8 +1295,8 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
   async function handleLogout() {
     if (backendMode === 'static') {
       setStaticAdminSession(false);
-    } else if (supabase) {
-      await supabase.auth.signOut();
+    } else if (capaApi) {
+      capaApi.clearToken();
     }
     setIsLoggedIn(false);
     setBackendMode(null);
@@ -1454,7 +1333,7 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
     return <LoginScreen onLogin={(mode) => { setBackendMode(mode); setIsLoggedIn(true); }} t={t} />;
   }
 
-  const activeBackendMode = backendMode ?? 'supabase';
+  const activeBackendMode = backendMode ?? 'api';
 
   // Add dog view
   if (view === 'add') {

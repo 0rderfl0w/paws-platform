@@ -1,7 +1,7 @@
-import type { Dog } from '../lib/supabase';
+import type { Dog } from '../lib/capaApi';
 
 // Generated from Hetzner capapvl_db.dogs on 2026-05-15.
-// The old Supabase project no longer resolves, so public pages use this as the offline data source.
+// Public pages use this as the offline fallback if the Hetzner API is unavailable.
 // Photos were restored from /Users/z/capapvl-photos-backup into public/images/dogs.
 export const capaDogs = [
   {

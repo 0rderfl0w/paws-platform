@@ -23,7 +23,7 @@ Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteç�
 
 ```bash
 bun install
-cp .env.example .env   # fill in Supabase keys (see Env Vars below)
+cp .env.example .env   # set PUBLIC_CAPA_API_URL for local frontend work
 bun dev                # http://localhost:4321
 bun build              # builds to ./dist/
 bun preview            # preview production build locally
@@ -38,24 +38,27 @@ bun preview            # preview production build locally
 | Framework | Astro 5 + React 19 islands |
 | Styling | Tailwind CSS 4 (CSS-first @theme in src/styles/global.css) |
 | Runtime | Bun |
-| Backend | Supabase legacy data plus committed static fallback |
+| Backend | Hetzner Bun API + PostgreSQL (`capapvl_db`) plus committed public static fallback |
 | Hosting | Hostinger (static only) |
 
 **Architecture pattern:**
 - Astro static pages for public content (Home, About, Help/Donate, Adoption)
 - React islands (client:visible) for dynamic content (dog listings, profiles, admin)
-- Public dog listings and profiles load from Supabase when available, but must keep the committed local fallback because the legacy Supabase project has gone unavailable before.
+- Public dog listings and profiles load from the Hetzner API when available, but must keep the committed local fallback because external/backend outages have happened before.
 - Static hosting constraint: no SSR, no dynamic routes → dog profile uses query param /cao?id=uuid
 
 ---
 
-## Supabase
+## Hetzner API
 
-**Project ref:** amkwoeepuhlnjmybbnbo
+**API:** `https://richkapp.com/capapvl-api` (temporary HTTPS path on Hetzner until `api.capapvl.pt` DNS points to Hetzner)
+**Service:** `capapvl-api.service`
+**Runtime:** Bun, `server/capa-api.ts`
+**Database:** `capapvl_db` on local PostgreSQL
 
-**2026-05-15 status:** `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Public pages therefore rely on `src/data/capaDogs.ts` and static files under `public/images/dogs/` until Supabase is recovered or replaced. Do not remove the local dataset/photo fallback unless a live replacement is verified.
+**2026-05-15 status:** The legacy Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Runtime Supabase usage has been migrated to the Hetzner API. Public pages still keep `src/data/capaDogs.ts` and static files under `public/images/dogs/` as a fallback.
 
-**Admin fallback:** `/admin` and `/en/admin` include an env-backed static demo login for the shelter account while Supabase is unavailable. The demo dashboard loads `src/data/capaDogs.ts`; add/edit/delete/status changes persist only in browser `localStorage` and do not update production public dog pages. New photo uploads remain disabled in this mode because Hostinger is static-only. Restore/replace Supabase or another real backend before treating the admin as production CRUD.
+**Admin:** `/admin` and `/en/admin` authenticate against the Hetzner API and write to `capapvl_db`. Photo uploads write to `public/images/dogs/{slug}/` on Hetzner and are served through the API image route.
 
 ### dogs table
 | Column | Type | Notes |
@@ -66,14 +69,15 @@ bun preview            # preview production build locally
 | sex | text | 'male' / 'female' / null |
 | age | text | Free text |
 | description | text | Multi-line, parsed client-side |
-| photo_url | text | Public URL to first photo in storage |
+| photo_url | text | Public URL to first API-served photo |
 | is_adopted | boolean | Default false |
 | created_at | timestamptz | Auto |
 | updated_at | timestamptz | Auto |
 
-### Storage: dog-photos bucket
-- Public read, authenticated write (RLS)
-- Structure: {slug}/photo-01.jpg, photo-03.jpg, etc. (photo-02 was the logo, all deleted)
+### Hetzner photo files
+- Public read through the API image route; authenticated admin writes through the API upload/delete routes.
+- Files live at `public/images/dogs/{slug}/photo-*.jpg` on Hetzner.
+- Structure: `{slug}/photo-01.jpg`, `photo-03.jpg`, etc. (`photo-02` was the logo, all deleted)
 - Slugs: lowercase, accents stripped (NFD normalization), spaces → hyphens
 
 **Current data:** 104 dogs in `src/data/capaDogs.ts`; 977 restored dog photos committed under `public/images/dogs/{slug}/photo-*.jpg`, recovered from `/Users/z/capapvl-photos-backup` on 2026-05-15.
@@ -83,14 +87,20 @@ bun preview            # preview production build locally
 ## Env Vars
 
 ```
-PUBLIC_SUPABASE_URL=https://amkwoeepuhlnjmybbnbo.supabase.co
-PUBLIC_SUPABASE_ANON_KEY=<legacy JWT anon key>
-SUPABASE_SERVICE_ROLE_KEY=<legacy JWT service_role key>
-PUBLIC_STATIC_ADMIN_EMAIL=<demo admin email>
-PUBLIC_STATIC_ADMIN_PASSWORD_SHA256=<sha256 demo password hash>
+PUBLIC_CAPA_API_URL=https://richkapp.com/capapvl-api
+
+# server-only (/etc/capapvl-api.env on Hetzner)
+DATABASE_URL=postgres://capapvl_app:<password>@127.0.0.1:5432/capapvl_db
+CAPA_ADMIN_EMAIL=<admin email>
+CAPA_ADMIN_PASSWORD_SHA256=<sha256 password hash>
+CAPA_SESSION_SECRET=<random secret>
+CAPA_PUBLIC_API_URL=https://richkapp.com/capapvl-api
+CAPA_ALLOWED_ORIGINS=https://capapvl.pt,https://www.capapvl.pt,http://127.0.0.1:14324,http://127.0.0.1:4321
+CAPA_PROJECT_ROOT=/home/deploy/projects/capapvl.pt
+PORT=3314
 ```
 
-.env is gitignored. Now uses new `sb_publishable_`/`sb_secret_` key format — confirmed compatible with @supabase/supabase-js v2.97.0 (legacy JWT keys have been rotated out).
+.env is gitignored. Do not commit `/etc/capapvl-api.env` or any server-only secrets.
 
 ---
 
@@ -104,7 +114,7 @@ PUBLIC_STATIC_ADMIN_PASSWORD_SHA256=<sha256 demo password hash>
 | About | /sobre-nos | Static | Mission, principles, community |
 | Help | /ajudar | Static | Donations, FAT foster program |
 | Adoption | /adocao | Static | Process, pricing (F 75€, M 65€, puppy 30€) |
-| Admin | /admin | Static fallback + planned backend | Protected demo login; browser-local edits only until Supabase/replacement backend is restored |
+| Admin | /admin | Hetzner API | Protected login; CRUD and photo uploads persist to `capapvl_db` + Hetzner image files |
 
 ---
 
@@ -116,21 +126,21 @@ src/
 │   ├── FeaturedDogs.tsx    # Homepage React island (client:visible)
 │   ├── DogListings.tsx     # /caes — filters + search (React)
 │   ├── DogProfile.tsx      # /cao?id= — gallery + CTA (React)
-│   ├── AdminPanel.tsx      # /admin — planned (React)
+│   ├── AdminPanel.tsx      # /admin — Hetzner API admin (React)
 │   ├── Hero.astro          # Homepage hero
 │   ├── Nav.astro           # Navigation
 │   ├── Stats.astro         # Shelter statistics counters
 │   └── ...
 ├── lib/
-│   └── supabase.ts         # Supabase client
+│   └── capaApi.ts          # Hetzner API client + Dog type
 ├── data/
 │   └── capaDogs.ts         # 104-dog static fallback with local photo/gallery paths
 ├── pages/                  # Each file = a route
 └── styles/
     └── global.css          # Tailwind @theme (color tokens)
 public/images/dogs/         # Restored dog photo galleries, committed static fallback
-supabase/                   # DB setup files
-scripts/                    # Upload + data migration scripts
+server/capa-api.ts          # Bun API served by capapvl-api.service
+scripts/                    # Hetzner migration/data maintenance scripts
 ```
 
 ---
@@ -187,11 +197,11 @@ On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfu
 
 ## Gotchas
 
-- **Supabase free tier:** 500MB storage — photos are pre-resized before upload. Monitor usage.
-- **Supabase project unavailable:** The legacy project ref returned NXDOMAIN on 2026-05-15. Keep `src/data/capaDogs.ts` and `public/images/dogs/` as the production fallback until a replacement backend is verified.
+- **Hetzner API path:** `https://richkapp.com/capapvl-api` is a temporary HTTPS bridge. Move to `https://api.capapvl.pt` after DNS points to Hetzner and a Let's Encrypt certificate is issued.
+- **Legacy Supabase unavailable:** The old project ref returned NXDOMAIN on 2026-05-15. Do not add new runtime Supabase dependencies.
 - **Hostinger static only:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
 - **Hostinger deploy trigger can stall:** Verify live origin, not just GitHub branch state.
-- **New key format works fine:** sb_publishable_/sb_secret_ confirmed working with @supabase/supabase-js v2.97.0. Legacy JWT keys were rotated after an accidental .env commit.
+- **Legacy Supabase key note:** sb_publishable_/sb_secret_ previously worked with @supabase/supabase-js v2.97.0, but runtime Supabase usage has since been removed.
 - **Logo was photo-02:** Every dog's original page had the CAPA logo as photo-02. All deleted from storage. If re-scraping, filter files < 20KB.
 - **Accented slugs:** NFD normalization used in upload scripts (Jóia → joia). Don't break this.
 - **No unique constraint on name:** Re-running upload scripts creates duplicates. Use upsert or check first.
@@ -201,12 +211,9 @@ On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfu
 
 ## Remaining Work
 
-- [ ] Decide whether to restore/replace Supabase or keep static dog data as the production path.
-- [ ] Verify Hostinger hPanel Git deployment pulls commit `24bf174` or manually trigger it.
-- [ ] /admin page — React island exists and has a static demo login fallback, but still depends on a working backend/storage path before shelter staff can safely use real CRUD/photo management.
-- [ ] Supabase Auth setup — create admin user for shelter staff if Supabase is restored/replaced.
-- [ ] Add unique constraint on dogs.name to prevent duplicates
-- [ ] Z to revoke legacy HS256 signing key in Supabase dashboard (safe now — site runs on new publishable key)
+- [ ] Point `api.capapvl.pt` DNS to Hetzner `65.21.156.73`, issue cert, and update `PUBLIC_CAPA_API_URL`/`CAPA_PUBLIC_API_URL` from the temporary richkapp.com bridge.
+- [ ] Verify Hostinger hPanel Git deployment pulls the latest deploy commit after each static build push.
+- [ ] Z to revoke/remove any remaining legacy Supabase project credentials in Supabase dashboard if accessible.
 
 ---
 

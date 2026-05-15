@@ -1,4 +1,4 @@
-import type { Dog } from '../lib/supabase';
+import type { Dog } from '../lib/capaApi';
 
 export const seedDogs: Dog[] = [
   // --- Small dogs ---

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { capaApi } from '../lib/capaApi';
 import { capaDogs } from '../data/capaDogs';
 import { getTranslations, localizeDescription, type Locale } from '../i18n';
-import type { Dog } from '../lib/supabase';
+import type { Dog } from '../lib/capaApi';
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-nature-100 text-nature-700 border border-nature-200',
@@ -280,40 +280,16 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
         setLoading(false);
       }
 
-      if (supabase) {
+      if (capaApi) {
         try {
-          const { data: remoteDog, error } = await supabase
-            .from('dogs')
-            .select('*')
-            .eq('id', dogId)
-            .single();
+          const remoteDog = await capaApi.getDog(dogId);
 
-          if (!error && remoteDog) {
+          if (remoteDog) {
             data = remoteDog;
-
-            const slug = remoteDog.name
-              .toLowerCase()
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .replace(/\s+/g, '-');
-
-            const { data: files } = await supabase.storage
-              .from('dog-photos')
-              .list(slug, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
-
-            if (files && files.length > 0) {
-              urls = files
-                .filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
-                .map(f => {
-                  const { data: urlData } = supabase!.storage
-                    .from('dog-photos')
-                    .getPublicUrl(`${slug}/${f.name}`);
-                  return urlData.publicUrl;
-                });
-            }
+            urls = remoteDog.photos?.length ? remoteDog.photos : remoteDog.photo_url ? [remoteDog.photo_url] : [];
           }
         } catch {
-          // Use the local generated dataset when the old Supabase project is unavailable.
+          // Use the committed dataset if the Hetzner API is temporarily unavailable.
         }
       }
 

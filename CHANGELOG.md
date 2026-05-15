@@ -1,7 +1,10 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-05-15
-- Admin: Added an env-backed static demo login fallback for the shelter account while the legacy Supabase Auth host returns NXDOMAIN. `/admin` now loads the restored 104-dog local dataset after login, with browser-local add/edit/delete/status changes and disabled new-photo uploads until a real backend is restored.
+- Migration: Moved CAPA runtime data/auth/photo management off Supabase and onto a Hetzner Bun API backed by `capapvl_db`. Added `server/capa-api.ts`, persistent token auth, dog CRUD, status updates, photo upload/delete, and API-served dog images from `public/images/dogs`.
+- Frontend: Replaced runtime Supabase calls in public dog listings, featured dogs, dog profiles, and admin with `src/lib/capaApi.ts`. Public pages still retain committed `src/data/capaDogs.ts` fallback data if the Hetzner API is unavailable.
+- Infra: Added `capapvl-api.service` and an Nginx proxy path at `https://richkapp.com/capapvl-api` as a temporary HTTPS bridge until `api.capapvl.pt` DNS points to Hetzner and has its own certificate.
+- Admin: Replaced the browser-local demo admin with Hetzner API authentication and persistent CRUD/status/photo management against `capapvl_db` plus `public/images/dogs`.
 - Deploy: Pushed source fix to `main` (`6c003c4`) and static output to `deploy` (`24bf174`). GitHub deploy branch contains `_astro/AdminPanel.DxKTiPf4.js`, but live `https://capapvl.pt/en/admin/` still serves old `_astro/AdminPanel.q4P30BYD.js`; Hostinger hPanel manual Git deploy/reconnect is required before production reflects the admin fallback.
 - Recovery: Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN while the public React islands still queried Supabase, causing `/caes` and homepage featured dogs to fall back to the 12-dog Unsplash seed list.
 - Data: Generated `src/data/capaDogs.ts` from Hetzner `capapvl_db.public.dogs` (104 rows) and switched public dog listing/profile fallbacks to that local dataset.
