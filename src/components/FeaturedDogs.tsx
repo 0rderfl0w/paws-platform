@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { seedDogs } from '../data/seedDogs';
+import { capaDogs } from '../data/capaDogs';
 import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
@@ -11,6 +11,15 @@ const SIZE_BADGE_CLASSES: Record<string, string> = {
   medium: 'bg-primary-100 text-primary-700 border border-primary-200',
   large: 'bg-warm-100 text-warm-700 border border-warm-200',
 };
+
+function getCardDescription(description: string, locale: Locale): string {
+  const normalized = description.replace(/\\n/g, '\n');
+  const personality = normalized.match(/^Personalidade:\s*(.+)$/m)?.[1]?.trim();
+  const story = normalized.match(/^História:\s*([\s\S]+)/m)?.[1]?.trim();
+  const summary = [personality, story].filter(Boolean).join('. ');
+
+  return localizeDescription(summary || normalized, locale);
+}
 
 function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
   const t = getTranslations(locale);
@@ -60,7 +69,7 @@ function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
           )}
         </div>
         <p className="text-warm-600 text-sm leading-relaxed line-clamp-3">
-          {localizeDescription(dog.description ?? '', locale)}
+          {getCardDescription(dog.description ?? '', locale)}
         </p>
       </div>
     </a>
@@ -84,10 +93,11 @@ export default function FeaturedDogs({ locale = 'pt' }: { locale?: Locale }) {
 
   useEffect(() => {
     async function fetchDogs() {
+      const localDogs = capaDogs.filter((d) => !d.is_adopted);
+      setDogs(localDogs);
+      setLoading(false);
+
       if (!supabase) {
-        // No Supabase configured — use seed data
-        setDogs(seedDogs.filter((d) => !d.is_adopted));
-        setLoading(false);
         return;
       }
 
@@ -99,12 +109,9 @@ export default function FeaturedDogs({ locale = 'pt' }: { locale?: Locale }) {
           .order('name', { ascending: true });
 
         if (error) throw error;
-        setDogs(data ?? seedDogs.filter((d) => !d.is_adopted));
+        if (data && data.length > 0) setDogs(data);
       } catch {
-        // Fall back to seed data on any error
-        setDogs(seedDogs.filter((d) => !d.is_adopted));
-      } finally {
-        setLoading(false);
+        // Keep the local generated dataset when the old Supabase project is unavailable.
       }
     }
 

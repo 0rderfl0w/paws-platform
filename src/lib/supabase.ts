@@ -15,6 +15,7 @@ export type Dog = {
   age: string;
   description: string;
   photo_url: string;
+  photos?: string[];
   is_adopted: boolean;
   created_at: string;
   updated_at: string;

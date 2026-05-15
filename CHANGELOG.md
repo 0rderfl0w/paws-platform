@@ -1,5 +1,11 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-05-15
+- Recovery: Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN while the public React islands still queried Supabase, causing `/caes` and homepage featured dogs to fall back to the 12-dog Unsplash seed list.
+- Data: Generated `src/data/capaDogs.ts` from Hetzner `capapvl_db.public.dogs` (104 rows) and switched public dog listing/profile fallbacks to that local dataset.
+- Photos: Restored 977 dog photos from `/Users/z/capapvl-photos-backup` into `public/images/dogs/` on Hetzner and updated the local dog dataset to use `/images/dogs/{slug}/photo-01.jpg` plus profile gallery photo arrays.
+- Verification: `bun run build` passes; `/caes` shows 104 dogs; dog profile pages render from local fallback data.
+
 ## 2025-07-25
 - Replaced wavy SVG hero divider with a clean single-arc curve for smoother hero-to-content transition (Crash & Burn)
 

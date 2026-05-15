@@ -18,7 +18,7 @@ pnpm-debug.log*
 .env.production
 
 # scraped dog photos (local reference only, not in repo)
-dogs/
+/dogs/
 
 # scraped content (reference only)
 content/

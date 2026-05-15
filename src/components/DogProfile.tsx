@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { capaDogs } from '../data/capaDogs';
 import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/supabase';
 
@@ -13,7 +14,7 @@ const SIZE_BADGE_CLASSES: Record<string, string> = {
 /* Note: description text is always stored in Portuguese (built by AdminPanel).
    The parsing logic therefore always uses Portuguese field names. */
 function parseDescription(raw: string) {
-  const lines = raw.split('\n').filter(Boolean);
+  const lines = raw.replace(/\\n/g, '\n').split('\n').filter(Boolean);
   const fields: { label: string; value: string }[] = [];
   let story = '';
   let personality = '';
@@ -264,19 +265,59 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
       const params = new URLSearchParams(window.location.search);
       const dogId = params.get('id');
 
-      if (!dogId || !supabase) {
+      if (!dogId) {
         setNotFound(true);
         setLoading(false);
         return;
       }
 
-      const { data, error } = await supabase
-        .from('dogs')
-        .select('*')
-        .eq('id', dogId)
-        .single();
+      let data: Dog | null = capaDogs.find((d) => d.id === dogId) ?? null;
+      let urls: string[] = [];
 
-      if (error || !data) {
+      if (data) {
+        setDog(data);
+        setPhotos(data.photos?.length ? data.photos : data.photo_url ? [data.photo_url] : []);
+        setLoading(false);
+      }
+
+      if (supabase) {
+        try {
+          const { data: remoteDog, error } = await supabase
+            .from('dogs')
+            .select('*')
+            .eq('id', dogId)
+            .single();
+
+          if (!error && remoteDog) {
+            data = remoteDog;
+
+            const slug = remoteDog.name
+              .toLowerCase()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/\s+/g, '-');
+
+            const { data: files } = await supabase.storage
+              .from('dog-photos')
+              .list(slug, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
+
+            if (files && files.length > 0) {
+              urls = files
+                .filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
+                .map(f => {
+                  const { data: urlData } = supabase!.storage
+                    .from('dog-photos')
+                    .getPublicUrl(`${slug}/${f.name}`);
+                  return urlData.publicUrl;
+                });
+            }
+          }
+        } catch {
+          // Use the local generated dataset when the old Supabase project is unavailable.
+        }
+      }
+
+      if (!data) {
         setNotFound(true);
         setLoading(false);
         return;
@@ -284,27 +325,10 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
 
       setDog(data);
 
-      // Fetch all photos from storage
-      const slug = data.name
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, '-');
-
-      const { data: files } = await supabase.storage
-        .from('dog-photos')
-        .list(slug, { limit: 50, sortBy: { column: 'name', order: 'asc' } });
-
-      if (files && files.length > 0) {
-        const urls = files
-          .filter(f => /\.(jpe?g|png|webp)$/i.test(f.name))
-          .map(f => {
-            const { data: urlData } = supabase!.storage
-              .from('dog-photos')
-              .getPublicUrl(`${slug}/${f.name}`);
-            return urlData.publicUrl;
-          });
+      if (urls.length > 0) {
         setPhotos(urls);
+      } else if (data.photos?.length) {
+        setPhotos(data.photos);
       } else if (data.photo_url) {
         setPhotos([data.photo_url]);
       }
