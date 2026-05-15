@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { getTranslations, type Locale, type Translations } from '../i18n';
 import type { Dog } from '../lib/supabase';
+import { capaDogs } from '../data/capaDogs';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -31,6 +32,12 @@ function photoNumberToFilename(n: number): string {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type View = 'dashboard' | 'add' | 'edit';
+type AdminBackendMode = 'supabase' | 'static';
+
+const STATIC_ADMIN_SESSION_KEY = 'capa-static-admin-session';
+const STATIC_ADMIN_DOGS_KEY = 'capa-static-admin-dogs-v1';
+const STATIC_ADMIN_EMAIL = import.meta.env.PUBLIC_STATIC_ADMIN_EMAIL || '';
+const STATIC_ADMIN_PASSWORD_SHA256 = import.meta.env.PUBLIC_STATIC_ADMIN_PASSWORD_SHA256 || '';
 
 interface DogForm {
   name: string;
@@ -70,6 +77,93 @@ const EMPTY_FORM: DogForm = {
   vaccinated: false,
   sterilized: false,
 };
+
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+}
+
+function hasStaticAdminConfig(): boolean {
+  return Boolean(STATIC_ADMIN_EMAIL && STATIC_ADMIN_PASSWORD_SHA256);
+}
+
+async function sha256(value: string): Promise<string> {
+  if (typeof crypto === 'undefined' || !crypto.subtle) return '';
+  const data = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function verifyStaticAdminLogin(email: string, password: string): Promise<boolean> {
+  if (!hasStaticAdminConfig()) return false;
+  if (email.trim().toLowerCase() !== STATIC_ADMIN_EMAIL.trim().toLowerCase()) return false;
+  return (await sha256(password)) === STATIC_ADMIN_PASSWORD_SHA256;
+}
+
+function hasStaticAdminSession(): boolean {
+  if (!isBrowser()) return false;
+  return window.localStorage.getItem(STATIC_ADMIN_SESSION_KEY) === '1';
+}
+
+function setStaticAdminSession(active: boolean): void {
+  if (!isBrowser()) return;
+  if (active) window.localStorage.setItem(STATIC_ADMIN_SESSION_KEY, '1');
+  else window.localStorage.removeItem(STATIC_ADMIN_SESSION_KEY);
+}
+
+function cloneDog(dog: Dog): Dog {
+  return {
+    ...dog,
+    photos: dog.photos ? [...dog.photos] : undefined,
+  };
+}
+
+function sortAdminDogs(dogs: Dog[]): Dog[] {
+  return [...dogs].sort((a, b) => a.name.localeCompare(b.name, 'pt', { sensitivity: 'base' }));
+}
+
+function loadStaticDogs(): Dog[] {
+  if (isBrowser()) {
+    const stored = window.localStorage.getItem(STATIC_ADMIN_DOGS_KEY);
+    if (stored) {
+      try {
+        return sortAdminDogs((JSON.parse(stored) as Dog[]).map(cloneDog));
+      } catch {
+        window.localStorage.removeItem(STATIC_ADMIN_DOGS_KEY);
+      }
+    }
+  }
+  return sortAdminDogs((capaDogs as Dog[]).map(cloneDog));
+}
+
+function saveStaticDogs(dogs: Dog[]): void {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(STATIC_ADMIN_DOGS_KEY, JSON.stringify(sortAdminDogs(dogs)));
+}
+
+function upsertStaticDog(dog: Dog): void {
+  const dogs = loadStaticDogs();
+  const index = dogs.findIndex((d) => d.id === dog.id);
+  if (index >= 0) dogs[index] = dog;
+  else dogs.unshift(dog);
+  saveStaticDogs(dogs);
+}
+
+function updateStaticDog(id: string, updates: Partial<Dog>): void {
+  saveStaticDogs(loadStaticDogs().map((dog) => (dog.id === id ? { ...dog, ...updates } : dog)));
+}
+
+function deleteStaticDog(id: string): void {
+  saveStaticDogs(loadStaticDogs().filter((dog) => dog.id !== id));
+}
+
+function makeStaticDogId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID();
+  }
+  return `static-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 // ─── Description builder/parser (use translations for all field names) ────────
 
@@ -192,7 +286,7 @@ function Spinner({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 
-function LoginScreen({ onLogin, t }: { onLogin: () => void; t: Translations }) {
+function LoginScreen({ onLogin, t }: { onLogin: (mode: AdminBackendMode) => void; t: Translations }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -204,12 +298,21 @@ function LoginScreen({ onLogin, t }: { onLogin: () => void; t: Translations }) {
     setError('');
     setLoading(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
-      if (authError) {
-        setError(t.admin.loginError);
-      } else {
-        onLogin();
+      if (await verifyStaticAdminLogin(email, password)) {
+        setStaticAdminSession(true);
+        onLogin('static');
+        return;
       }
+
+      if (supabase) {
+        const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+        if (!authError) {
+          onLogin('supabase');
+          return;
+        }
+      }
+
+      setError(t.admin.loginError);
     } catch {
       setError(t.admin.loginGenericError);
     } finally {
@@ -288,12 +391,13 @@ function LoginScreen({ onLogin, t }: { onLogin: () => void; t: Translations }) {
 interface DogFormPanelProps {
   initial: DogForm;
   existingDog?: Dog;
+  backendMode: AdminBackendMode;
   onSave: () => void;
   onCancel: () => void;
   t: Translations;
 }
 
-function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPanelProps) {
+function DogFormPanel({ initial, existingDog, backendMode, onSave, onCancel, t }: DogFormPanelProps) {
   const [form, setForm] = useState<DogForm>(initial);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [currentPhotos, setCurrentPhotos] = useState<{ path: string; url: string }[]>([]);
@@ -305,9 +409,15 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
 
   // Load existing photos when editing
   useEffect(() => {
-    if (!isEdit || !supabase || !existingDog) return;
+    if (!isEdit || !existingDog) return;
+    if (backendMode === 'static') {
+      const photos = existingDog.photos?.length ? existingDog.photos : existingDog.photo_url ? [existingDog.photo_url] : [];
+      setCurrentPhotos(photos.map((url) => ({ path: url, url })));
+      return;
+    }
+    if (!supabase) return;
     loadCurrentPhotos(toSlug(existingDog.name));
-  }, [isEdit, existingDog]);
+  }, [isEdit, existingDog, backendMode]);
 
   async function loadCurrentPhotos(slug: string) {
     if (!supabase) return;
@@ -324,6 +434,10 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
   }
 
   async function handleDeletePhoto(path: string) {
+    if (backendMode === 'static') {
+      setCurrentPhotos((prev) => prev.filter((p) => p.path !== path));
+      return;
+    }
     if (!supabase) return;
     setDeletingPhoto(path);
     try {
@@ -336,11 +450,33 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!supabase) return;
     setError('');
     setSaving(true);
 
     try {
+      if (backendMode === 'static') {
+        const now = new Date().toISOString();
+        const generatedDescription = buildDescription(form, t);
+        const photos = currentPhotos.map((photo) => photo.url);
+        const dog: Dog = {
+          id: existingDog?.id ?? makeStaticDogId(),
+          name: form.name,
+          size: form.size,
+          sex: form.sex || null,
+          age: form.age,
+          description: generatedDescription,
+          photo_url: photos[0] ?? existingDog?.photo_url ?? '',
+          photos,
+          is_adopted: existingDog?.is_adopted ?? false,
+          created_at: existingDog?.created_at ?? now,
+          updated_at: now,
+        };
+        upsertStaticDog(dog);
+        onSave();
+        return;
+      }
+
+      if (!supabase) return;
       const slug = toSlug(form.name || (existingDog?.name ?? ''));
       let photo_url = existingDog?.photo_url ?? '';
 
@@ -432,6 +568,12 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {backendMode === 'static' && (
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+          {t.admin.staticModeFormNote}
+        </p>
+      )}
+
       {error && (
         <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
           {error}
@@ -632,8 +774,14 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
           {isEdit ? t.admin.formAddPhotos : t.admin.formPhotos}
         </label>
         <div
-          className="border-2 border-dashed border-warm-300 rounded-xl p-6 text-center cursor-pointer hover:border-primary-400 hover:bg-primary-50 transition-colors"
-          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed border-warm-300 rounded-xl p-6 text-center transition-colors ${
+            backendMode === 'static'
+              ? 'cursor-not-allowed bg-warm-50 opacity-70'
+              : 'cursor-pointer hover:border-primary-400 hover:bg-primary-50'
+          }`}
+          onClick={() => {
+            if (backendMode !== 'static') fileInputRef.current?.click();
+          }}
         >
           <div className="text-3xl mb-2">📷</div>
           <p className="text-sm text-warm-600 font-medium">
@@ -641,13 +789,16 @@ function DogFormPanel({ initial, existingDog, onSave, onCancel, t }: DogFormPane
               ? `${photoFiles.length} ${t.admin.formFilesSelected}`
               : t.admin.formPhotoClick}
           </p>
-          <p className="text-xs text-warm-400 mt-1">{t.admin.formPhotoFormats}</p>
+          <p className="text-xs text-warm-400 mt-1">
+            {backendMode === 'static' ? t.admin.staticPhotoDisabled : t.admin.formPhotoFormats}
+          </p>
         </div>
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
           multiple
+          disabled={backendMode === 'static'}
           className="hidden"
           onChange={handleFileChange}
         />
@@ -738,6 +889,7 @@ function DeleteDialog({
 
 interface DashboardProps {
   dogs: Dog[];
+  backendMode: AdminBackendMode;
   onRefresh: () => void;
   onAdd: () => void;
   onEdit: (dog: Dog) => void;
@@ -749,7 +901,7 @@ type SizeFilter = 'all' | 'small' | 'medium' | 'large';
 type SexFilter = 'all' | 'male' | 'female';
 type StatusFilter = 'all' | 'available' | 'adopted';
 
-function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout, t }: DashboardProps) {
+function Dashboard({ dogs, backendMode, onRefresh, onAdd, onEdit, onLogout, t }: DashboardProps) {
   const [search, setSearch] = useState('');
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('all');
   const [sexFilter, setSexFilter] = useState<SexFilter>('all');
@@ -781,6 +933,13 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout, t }: DashboardPro
   });
 
   async function handleToggleAdopted(dog: Dog) {
+    if (backendMode === 'static') {
+      setTogglingId(dog.id);
+      updateStaticDog(dog.id, { is_adopted: !dog.is_adopted, updated_at: new Date().toISOString() });
+      onRefresh();
+      setTogglingId(null);
+      return;
+    }
     if (!supabase || togglingId) return;
     setTogglingId(dog.id);
     try {
@@ -792,6 +951,14 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout, t }: DashboardPro
   }
 
   async function handleDelete(dog: Dog) {
+    if (backendMode === 'static') {
+      setDeleting(true);
+      deleteStaticDog(dog.id);
+      setDeleteTarget(null);
+      onRefresh();
+      setDeleting(false);
+      return;
+    }
     if (!supabase) return;
     setDeleting(true);
     try {
@@ -846,6 +1013,12 @@ function Dashboard({ dogs, onRefresh, onAdd, onEdit, onLogout, t }: DashboardPro
         </header>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28 md:pb-8">
+          {backendMode === 'static' && (
+            <div className="mb-6 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+              {t.admin.staticModeBanner}
+            </div>
+          )}
+
           {/* Stats + actions bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
@@ -1166,36 +1339,73 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [view, setView] = useState<View>('dashboard');
+  const [backendMode, setBackendMode] = useState<AdminBackendMode | null>(null);
   const [editingDog, setEditingDog] = useState<Dog | null>(null);
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [dogsLoading, setDogsLoading] = useState(false);
 
   // Check auth on mount
   useEffect(() => {
-    if (!supabase) {
-      setAuthChecked(true);
-      return;
-    }
-    supabase.auth.getUser().then(({ data }) => {
-      setIsLoggedIn(!!data.user);
-      setAuthChecked(true);
-    });
+    let cancelled = false;
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-    return () => subscription.unsubscribe();
+    async function checkAuth() {
+      if (hasStaticAdminSession()) {
+        if (!cancelled) {
+          setBackendMode('static');
+          setIsLoggedIn(true);
+          setAuthChecked(true);
+        }
+        return;
+      }
+
+      if (!supabase) {
+        if (!cancelled) setAuthChecked(true);
+        return;
+      }
+
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (!cancelled) {
+          setIsLoggedIn(!!data.user);
+          setBackendMode(data.user ? 'supabase' : null);
+        }
+      } finally {
+        if (!cancelled) setAuthChecked(true);
+      }
+    }
+
+    if (supabase) {
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (hasStaticAdminSession()) return;
+        setIsLoggedIn(!!session?.user);
+        setBackendMode(session?.user ? 'supabase' : null);
+      });
+      subscription = data.subscription;
+    }
+
+    checkAuth();
+    return () => {
+      cancelled = true;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   // Load dogs when logged in
   useEffect(() => {
     if (isLoggedIn) loadDogs();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, backendMode]);
 
   async function loadDogs() {
-    if (!supabase) return;
+    if (!backendMode) return;
     setDogsLoading(true);
     try {
+      if (backendMode === 'static') {
+        setDogs(loadStaticDogs());
+        return;
+      }
+
+      if (!supabase) return;
       const { data } = await supabase.from('dogs').select('*').order('created_at', { ascending: false });
       setDogs(data ?? []);
     } finally {
@@ -1204,9 +1414,13 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
   }
 
   async function handleLogout() {
-    if (!supabase) return;
-    await supabase.auth.signOut();
+    if (backendMode === 'static') {
+      setStaticAdminSession(false);
+    } else if (supabase) {
+      await supabase.auth.signOut();
+    }
     setIsLoggedIn(false);
+    setBackendMode(null);
     setView('dashboard');
   }
 
@@ -1237,8 +1451,10 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
 
   // Not logged in
   if (!isLoggedIn) {
-    return <LoginScreen onLogin={() => setIsLoggedIn(true)} t={t} />;
+    return <LoginScreen onLogin={(mode) => { setBackendMode(mode); setIsLoggedIn(true); }} t={t} />;
   }
+
+  const activeBackendMode = backendMode ?? 'supabase';
 
   // Add dog view
   if (view === 'add') {
@@ -1261,6 +1477,7 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
           <div className="bg-white rounded-2xl border border-warm-200 shadow-sm p-6 sm:p-8">
             <DogFormPanel
               initial={EMPTY_FORM}
+              backendMode={activeBackendMode}
               onSave={handleSaved}
               onCancel={handleCancel}
               t={t}
@@ -1304,6 +1521,7 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
             <DogFormPanel
               initial={initial}
               existingDog={editingDog}
+              backendMode={activeBackendMode}
               onSave={handleSaved}
               onCancel={handleCancel}
               t={t}
@@ -1327,6 +1545,7 @@ export default function AdminPanel({ locale = 'pt' }: { locale?: Locale }) {
   return (
     <Dashboard
       dogs={dogs}
+      backendMode={activeBackendMode}
       onRefresh={loadDogs}
       onAdd={() => setView('add')}
       onEdit={handleEdit}

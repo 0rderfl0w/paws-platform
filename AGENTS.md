@@ -55,6 +55,8 @@ bun preview            # preview production build locally
 
 **2026-05-15 status:** `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Public pages therefore rely on `src/data/capaDogs.ts` and static files under `public/images/dogs/` until Supabase is recovered or replaced. Do not remove the local dataset/photo fallback unless a live replacement is verified.
 
+**Admin fallback:** `/admin` and `/en/admin` include an env-backed static demo login for the shelter account while Supabase is unavailable. The demo dashboard loads `src/data/capaDogs.ts`; add/edit/delete/status changes persist only in browser `localStorage` and do not update production public dog pages. New photo uploads remain disabled in this mode because Hostinger is static-only. Restore/replace Supabase or another real backend before treating the admin as production CRUD.
+
 ### dogs table
 | Column | Type | Notes |
 |--------|------|-------|
@@ -84,6 +86,8 @@ bun preview            # preview production build locally
 PUBLIC_SUPABASE_URL=https://amkwoeepuhlnjmybbnbo.supabase.co
 PUBLIC_SUPABASE_ANON_KEY=<legacy JWT anon key>
 SUPABASE_SERVICE_ROLE_KEY=<legacy JWT service_role key>
+PUBLIC_STATIC_ADMIN_EMAIL=<demo admin email>
+PUBLIC_STATIC_ADMIN_PASSWORD_SHA256=<sha256 demo password hash>
 ```
 
 .env is gitignored. Now uses new `sb_publishable_`/`sb_secret_` key format — confirmed compatible with @supabase/supabase-js v2.97.0 (legacy JWT keys have been rotated out).
@@ -100,7 +104,7 @@ SUPABASE_SERVICE_ROLE_KEY=<legacy JWT service_role key>
 | About | /sobre-nos | Static | Mission, principles, community |
 | Help | /ajudar | Static | Donations, FAT foster program |
 | Adoption | /adocao | Static | Process, pricing (F 75€, M 65€, puppy 30€) |
-| Admin | /admin | Planned | Protected — CRUD dogs + photo management |
+| Admin | /admin | Static fallback + planned backend | Protected demo login; browser-local edits only until Supabase/replacement backend is restored |
 
 ---
 
@@ -199,7 +203,7 @@ On 2026-05-15, `main` (`fad3f16`) and `deploy` (`2d83c7c`) were pushed successfu
 
 - [ ] Decide whether to restore/replace Supabase or keep static dog data as the production path.
 - [ ] Verify Hostinger hPanel Git deployment pulls commit `2d83c7c` or manually trigger it.
-- [ ] /admin page — React island exists, but depends on a working backend/storage path before shelter staff can safely use CRUD/photo management.
+- [ ] /admin page — React island exists and has a static demo login fallback, but still depends on a working backend/storage path before shelter staff can safely use real CRUD/photo management.
 - [ ] Supabase Auth setup — create admin user for shelter staff if Supabase is restored/replaced.
 - [ ] Add unique constraint on dogs.name to prevent duplicates
 - [ ] Z to revoke legacy HS256 signing key in Supabase dashboard (safe now — site runs on new publishable key)
