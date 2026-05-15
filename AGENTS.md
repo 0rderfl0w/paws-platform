@@ -14,7 +14,7 @@ Before starting frontend work, invoke the **`frontend`** skill (Astro 5 + React 
 
 Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteção Animal), a Portuguese non-profit rescue/shelter/adoption organization. Built on the paws-platform open-source template.
 
-**Live:** https://capapvl.pt/ (Hostinger static, auto-deploys from `deploy` branch)
+**Live:** https://capapvl.pt/ (Hostinger static; deploy branch is the intended source, but hPanel may need manual trigger if Git deploy stalls)
 **Repo:** https://github.com/0rderfl0w/paws-platform
 
 ---
@@ -38,13 +38,13 @@ bun preview            # preview production build locally
 | Framework | Astro 5 + React 19 islands |
 | Styling | Tailwind CSS 4 (CSS-first @theme in src/styles/global.css) |
 | Runtime | Bun |
-| Backend | Supabase (DB + Storage + Auth planned) |
+| Backend | Supabase legacy data plus committed static fallback |
 | Hosting | Hostinger (static only) |
 
 **Architecture pattern:**
 - Astro static pages for public content (Home, About, Help/Donate, Adoption)
 - React islands (client:visible) for dynamic content (dog listings, profiles, admin)
-- All dog data in Supabase — no rebuild needed when dogs change
+- Public dog listings and profiles load from Supabase when available, but must keep the committed local fallback because the legacy Supabase project has gone unavailable before.
 - Static hosting constraint: no SSR, no dynamic routes → dog profile uses query param /cao?id=uuid
 
 ---
@@ -52,6 +52,8 @@ bun preview            # preview production build locally
 ## Supabase
 
 **Project ref:** amkwoeepuhlnjmybbnbo
+
+**2026-05-15 status:** `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Public pages therefore rely on `src/data/capaDogs.ts` and static files under `public/images/dogs/` until Supabase is recovered or replaced. Do not remove the local dataset/photo fallback unless a live replacement is verified.
 
 ### dogs table
 | Column | Type | Notes |
@@ -72,7 +74,7 @@ bun preview            # preview production build locally
 - Structure: {slug}/photo-01.jpg, photo-03.jpg, etc. (photo-02 was the logo, all deleted)
 - Slugs: lowercase, accents stripped (NFD normalization), spaces → hyphens
 
-**Current data:** ~104 dogs, ~980 photos resized to 1200px wide / 80% JPEG quality via sharp
+**Current data:** 104 dogs in `src/data/capaDogs.ts`; 977 restored dog photos committed under `public/images/dogs/{slug}/photo-*.jpg`, recovered from `/Users/z/capapvl-photos-backup` on 2026-05-15.
 
 ---
 
@@ -117,9 +119,12 @@ src/
 │   └── ...
 ├── lib/
 │   └── supabase.ts         # Supabase client
+├── data/
+│   └── capaDogs.ts         # 104-dog static fallback with local photo/gallery paths
 ├── pages/                  # Each file = a route
 └── styles/
     └── global.css          # Tailwind @theme (color tokens)
+public/images/dogs/         # Restored dog photo galleries, committed static fallback
 supabase/                   # DB setup files
 scripts/                    # Upload + data migration scripts
 ```
@@ -143,7 +148,7 @@ scripts/                    # Upload + data migration scripts
 
 ## Deploy
 
-Uses orphan deploy branch (Hostinger auto-deploys from Git).
+Uses orphan deploy branch. Hostinger is configured to deploy from Git, but this can stall; verify live origin after every push.
 
 **Git identity:** zkgit.substance129@passmail.com
 
@@ -153,7 +158,7 @@ bun build
 
 # Push dist/ to deploy branch via worktree (NEVER checkout the branch directly)
 git worktree add /tmp/capapvl-deploy deploy
-cp -r dist/* /tmp/capapvl-deploy/
+rsync -a --delete --exclude=.git --exclude=.gitignore dist/ /tmp/capapvl-deploy/
 cd /tmp/capapvl-deploy && git add -A && git commit -m "deploy" && git push
 git worktree remove /tmp/capapvl-deploy
 ```
@@ -163,14 +168,25 @@ WARNING: NEVER git checkout deploy in the project dir — use worktrees only.
 **CRITICAL: Never make changes directly on the deploy branch.**
 All changes must go through source files on main → build → copy to deploy. Direct edits to deploy HTML will be overwritten on the next build. Incident: Mar 16 — logo/footer redesign done directly on deploy branch was wiped when next build pushed from main.
 
-**Before overwriting deploy branch:** Always diff what's currently on deploy against what you're about to push. Don't blindly copy dist/ without checking for deploy-only changes that haven't been ported to source.
+**Before overwriting deploy branch:** Always dry-run the sync against the deploy worktree, e.g. `rsync -ani --delete --exclude=.git --exclude=.gitignore dist/ /tmp/capapvl-deploy/`, and inspect deletes/new assets. Don't blindly copy `dist/` without checking for deploy-only changes that haven't been ported to source.
+
+**Live verification:** A successful push to `deploy` is not enough. Confirm the live HTML references the new hashed asset(s) and that changed files return `200`, for example:
+
+```bash
+curl -sSL https://capapvl.pt/caes/ | rg '_astro/(capaDogs|DogListings).*\.js'
+curl -sS -o /dev/null -w '%{http_code}\n' https://capapvl.pt/images/dogs/andy/photo-01.jpg
+```
+
+On 2026-05-15, `main` (`fad3f16`) and `deploy` (`2d83c7c`) were pushed successfully, but Hostinger still served the old build during verification. If that repeats, manually trigger/reconnect Git deployment in Hostinger hPanel before claiming production is updated.
 
 ---
 
 ## Gotchas
 
 - **Supabase free tier:** 500MB storage — photos are pre-resized before upload. Monitor usage.
+- **Supabase project unavailable:** The legacy project ref returned NXDOMAIN on 2026-05-15. Keep `src/data/capaDogs.ts` and `public/images/dogs/` as the production fallback until a replacement backend is verified.
 - **Hostinger static only:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
+- **Hostinger deploy trigger can stall:** Verify live origin, not just GitHub branch state.
 - **New key format works fine:** sb_publishable_/sb_secret_ confirmed working with @supabase/supabase-js v2.97.0. Legacy JWT keys were rotated after an accidental .env commit.
 - **Logo was photo-02:** Every dog's original page had the CAPA logo as photo-02. All deleted from storage. If re-scraping, filter files < 20KB.
 - **Accented slugs:** NFD normalization used in upload scripts (Jóia → joia). Don't break this.
@@ -181,10 +197,11 @@ All changes must go through source files on main → build → copy to deploy. D
 
 ## Remaining Work
 
-- [ ] /admin page — React island behind Supabase auth, CRUD dogs + photo management
-- [ ] Supabase Auth setup — create admin user for shelter staff
+- [ ] Decide whether to restore/replace Supabase or keep static dog data as the production path.
+- [ ] Verify Hostinger hPanel Git deployment pulls commit `2d83c7c` or manually trigger it.
+- [ ] /admin page — React island exists, but depends on a working backend/storage path before shelter staff can safely use CRUD/photo management.
+- [ ] Supabase Auth setup — create admin user for shelter staff if Supabase is restored/replaced.
 - [ ] Add unique constraint on dogs.name to prevent duplicates
-- [ ] Deploy branch setup on Hostinger
 - [ ] Z to revoke legacy HS256 signing key in Supabase dashboard (safe now — site runs on new publishable key)
 
 ---
@@ -199,3 +216,4 @@ All changes must go through source files on main → build → copy to deploy. D
 - 2026-03-16: sb_publishable_/sb_secret_ format confirmed working with @supabase/supabase-js v2.97.0 — legacy keys rotated after .env exposure. (Razor & Blade)
 - 2026-03-16: Logo/footer/header changes ported from deploy branch HTML back to Astro source files. Never edit deploy branch directly again. (Razor & Blade)
 - 2026-03-16: SUPABASE_SERVICE_ROLE_KEY was committed to git — rotated all keys, .env recreated. (Razor & Blade)
+- 2026-05-15: Supabase project ref returned NXDOMAIN; public dog pages now use committed static fallback data and restored local dog photos. Hostinger Git deploy push succeeded but live origin did not update during verification, so hPanel may need manual deployment trigger. (Codex)

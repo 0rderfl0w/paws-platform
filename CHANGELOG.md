@@ -4,7 +4,9 @@
 - Recovery: Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN while the public React islands still queried Supabase, causing `/caes` and homepage featured dogs to fall back to the 12-dog Unsplash seed list.
 - Data: Generated `src/data/capaDogs.ts` from Hetzner `capapvl_db.public.dogs` (104 rows) and switched public dog listing/profile fallbacks to that local dataset.
 - Photos: Restored 977 dog photos from `/Users/z/capapvl-photos-backup` into `public/images/dogs/` on Hetzner and updated the local dog dataset to use `/images/dogs/{slug}/photo-01.jpg` plus profile gallery photo arrays.
-- Verification: `bun run build` passes; `/caes` shows 104 dogs; dog profile pages render from local fallback data.
+- Deploy: Committed and pushed source recovery to `main` (`fad3f16`) and static deploy output to `deploy` (`2d83c7c`). Hostinger had not pulled the new deploy branch during verification; hPanel manual Git deploy/reconnect may be required.
+- Docs: Updated project `AGENTS.md` with the static fallback, restored photo path, live verification commands, and Hostinger deploy-stall warning. Also updated `/home/deploy/projects/websites/AGENTS.md` and `CHANGELOG.md` with CAPA's active repo and recovery state.
+- Verification: `bun run build` passes; local `/caes` preview shows 104 dogs with real photos; dog profile pages render restored local galleries. Production still needs live-origin verification after Hostinger pulls the pushed deploy branch.
 
 ## 2025-07-25
 - Replaced wavy SVG hero divider with a clean single-arc curve for smoother hero-to-content transition (Crash & Burn)
