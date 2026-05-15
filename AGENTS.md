@@ -181,7 +181,7 @@ curl -sSL https://capapvl.pt/caes/ | rg '_astro/(capaDogs|DogListings).*\.js'
 curl -sS -o /dev/null -w '%{http_code}\n' https://capapvl.pt/images/dogs/andy/photo-01.jpg
 ```
 
-On 2026-05-15, `main` (`fad3f16`) and `deploy` (`2d83c7c`) were pushed successfully, but Hostinger still served the old build during verification. If that repeats, manually trigger/reconnect Git deployment in Hostinger hPanel before claiming production is updated.
+On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfully for the admin fallback, but Hostinger still served the old `_astro/AdminPanel.q4P30BYD.js` build during verification. If that repeats, manually trigger/reconnect Git deployment in Hostinger hPanel before claiming production is updated.
 
 ---
 
@@ -202,7 +202,7 @@ On 2026-05-15, `main` (`fad3f16`) and `deploy` (`2d83c7c`) were pushed successfu
 ## Remaining Work
 
 - [ ] Decide whether to restore/replace Supabase or keep static dog data as the production path.
-- [ ] Verify Hostinger hPanel Git deployment pulls commit `2d83c7c` or manually trigger it.
+- [ ] Verify Hostinger hPanel Git deployment pulls commit `24bf174` or manually trigger it.
 - [ ] /admin page — React island exists and has a static demo login fallback, but still depends on a working backend/storage path before shelter staff can safely use real CRUD/photo management.
 - [ ] Supabase Auth setup — create admin user for shelter staff if Supabase is restored/replaced.
 - [ ] Add unique constraint on dogs.name to prevent duplicates

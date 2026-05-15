@@ -2,6 +2,7 @@
 
 ## 2026-05-15
 - Admin: Added an env-backed static demo login fallback for the shelter account while the legacy Supabase Auth host returns NXDOMAIN. `/admin` now loads the restored 104-dog local dataset after login, with browser-local add/edit/delete/status changes and disabled new-photo uploads until a real backend is restored.
+- Deploy: Pushed source fix to `main` (`6c003c4`) and static output to `deploy` (`24bf174`). GitHub deploy branch contains `_astro/AdminPanel.DxKTiPf4.js`, but live `https://capapvl.pt/en/admin/` still serves old `_astro/AdminPanel.q4P30BYD.js`; Hostinger hPanel manual Git deploy/reconnect is required before production reflects the admin fallback.
 - Recovery: Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN while the public React islands still queried Supabase, causing `/caes` and homepage featured dogs to fall back to the 12-dog Unsplash seed list.
 - Data: Generated `src/data/capaDogs.ts` from Hetzner `capapvl_db.public.dogs` (104 rows) and switched public dog listing/profile fallbacks to that local dataset.
 - Photos: Restored 977 dog photos from `/Users/z/capapvl-photos-backup` into `public/images/dogs/` on Hetzner and updated the local dog dataset to use `/images/dogs/{slug}/photo-01.jpg` plus profile gallery photo arrays.
