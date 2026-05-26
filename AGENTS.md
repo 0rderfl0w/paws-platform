@@ -102,6 +102,8 @@ PORT=3314
 
 .env is gitignored. Do not commit `/etc/capapvl-api.env` or any server-only secrets.
 
+Hetzner security posture: local `.env` files are intentionally owner-only (`chmod 600`, `deploy:deploy`). Do not loosen permissions to "fix" access; agents running as `deploy` can still read them. The live API's server-only secrets belong in `/etc/capapvl-api.env`, not in repo files.
+
 ---
 
 ## Pages
