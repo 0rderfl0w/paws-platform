@@ -329,6 +329,7 @@ async function serveImage(slug: string, filename: string, origin: string | null)
 
 Bun.serve({
   port: PORT,
+  hostname: '127.0.0.1',
   async fetch(request) {
     const origin = request.headers.get('origin');
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin) });

@@ -55,6 +55,7 @@ bun preview            # preview production build locally
 **Service:** `capapvl-api.service`
 **Runtime:** Bun, `server/capa-api.ts`
 **Database:** `capapvl_db` on local PostgreSQL
+**Bind/security:** `server/capa-api.ts` must bind `127.0.0.1:3314`; public HTTPS access goes through the nginx bridge only. Do not widen the API to `0.0.0.0` or expose raw `3314` to fix connectivity.
 
 **2026-05-15 status:** The legacy Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Runtime Supabase usage has been migrated to the Hetzner API. Public pages still keep `src/data/capaDogs.ts` and static files under `public/images/dogs/` as a fallback.
 
@@ -200,6 +201,7 @@ On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfu
 ## Gotchas
 
 - **Hetzner API path:** `https://richkapp.com/capapvl-api` is a temporary HTTPS bridge. Move to `https://api.capapvl.pt` after DNS points to Hetzner and a Let's Encrypt certificate is issued.
+- **Raw API bind:** `capapvl-api.service` must stay loopback-only on `127.0.0.1:3314`. The public surface is the nginx HTTPS bridge, not raw port `3314`.
 - **Legacy Supabase unavailable:** The old project ref returned NXDOMAIN on 2026-05-15. Do not add new runtime Supabase dependencies.
 - **Hostinger static only:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
 - **Hostinger deploy trigger can stall:** Verify live origin, not just GitHub branch state.

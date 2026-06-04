@@ -1,5 +1,10 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-06-04
+- Security: hardened `capapvl-api.service` so `server/capa-api.ts` binds `127.0.0.1:3314` instead of a broad interface. Public API access remains through the temporary nginx HTTPS bridge at `https://richkapp.com/capapvl-api`; raw port `3314` must not be exposed publicly.
+- Verification: local health and nginx-backed `richkapp.com/capapvl-api/health` smokes returned HTTP 200 after restart; external probe confirmed raw `3314` closed publicly.
+- Docs: updated `AGENTS.md` with the loopback-bind requirement and raw-port gotcha.
+
 ## 2026-05-15
 - Migration: Moved CAPA runtime data/auth/photo management off Supabase and onto a Hetzner Bun API backed by `capapvl_db`. Added `server/capa-api.ts`, persistent token auth, dog CRUD, status updates, photo upload/delete, and API-served dog images from `public/images/dogs`.
 - Frontend: Replaced runtime Supabase calls in public dog listings, featured dogs, dog profiles, and admin with `src/lib/capaApi.ts`. Public pages still retain committed `src/data/capaDogs.ts` fallback data if the Hetzner API is unavailable.
