@@ -9,7 +9,8 @@ import Footer from '../components/Footer.astro';
   locale="pt"
   title="Sobre o CAPA — Clube de Adoção e Proteção Animal"
   description="Saiba mais sobre o CAPA, a nossa missão, princípios e o trabalho que fazemos pela proteção animal."
-  ogUrl="https://capapvl.pt/sobre-nos"
+  ogImage="/images/sobre-nos/dog-recovery.jpg"
+  ogUrl="https://capapvl.org/sobre-nos"
 >
   <Nav locale="pt" />
 
@@ -17,26 +18,49 @@ import Footer from '../components/Footer.astro';
 
     <!-- ===== HERO ===== -->
     <section
-      class="bg-gradient-to-br from-warm-800 via-warm-700 to-warm-600 py-20 sm:py-28"
+      class="relative overflow-hidden bg-gradient-to-br from-warm-800 via-warm-700 to-warm-600 py-16 sm:py-24"
       aria-labelledby="hero-heading"
     >
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span class="inline-block bg-primary-500/20 text-primary-200 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
-          Fundados em 2001
-        </span>
-        <h1
-          id="hero-heading"
-          class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
-        >
-          Sobre o <span class="text-primary-400">CAPA</span>
-        </h1>
-        <p class="text-lg sm:text-xl text-warm-200 max-w-2xl mx-auto leading-relaxed mb-4">
-          <strong class="text-white">Clube de Adoção e Proteção Animal</strong> — uma associação de voluntários
-          dedicados a combater o abandono e os maus tratos animais, recolhendo, tratando e encaminhando-os para adoção.
-        </p>
-        <p class="text-warm-300 text-base sm:text-lg max-w-xl mx-auto">
-          Tudo o que fazemos é sustentado pelo trabalho voluntário e pela generosidade da nossa comunidade.
-        </p>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(245,158,11,0.22),transparent_34rem)]" aria-hidden="true"></div>
+
+      <div class="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_0.92fr] gap-10 lg:gap-14 items-center">
+          <div class="text-center lg:text-left">
+            <span class="inline-block bg-primary-500/20 text-primary-200 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 tracking-wide uppercase">
+              Fundados em 2001
+            </span>
+            <h1
+              id="hero-heading"
+              class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight"
+            >
+              Sobre o <span class="text-primary-400">CAPA</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-warm-200 max-w-2xl mx-auto lg:mx-0 leading-relaxed mb-4">
+              <strong class="text-white">Clube de Adoção e Proteção Animal</strong> — uma associação de voluntários
+              dedicados a combater o abandono e os maus tratos animais, recolhendo, tratando e encaminhando-os para adoção.
+            </p>
+            <p class="text-warm-300 text-base sm:text-lg max-w-xl mx-auto lg:mx-0">
+              Tudo o que fazemos é sustentado pelo trabalho voluntário e pela generosidade da nossa comunidade.
+            </p>
+          </div>
+
+          <figure class="relative max-w-xl mx-auto lg:max-w-none">
+            <div class="absolute -inset-3 rounded-[2rem] bg-primary-400/20 blur-2xl" aria-hidden="true"></div>
+            <div class="relative overflow-hidden rounded-[2rem] border border-white/15 bg-white/10 shadow-2xl aspect-[4/3] sm:aspect-[16/10] lg:aspect-[5/4]">
+              <img
+                src="/images/sobre-nos/dog-recovery.jpg"
+                alt="Cão acolhido pelo CAPA a receber carinho de voluntários"
+                class="w-full h-full object-cover object-center"
+                loading="eager"
+                fetchpriority="high"
+              />
+              <figcaption class="absolute left-4 right-4 bottom-4 rounded-2xl bg-warm-900/70 backdrop-blur-sm border border-white/10 px-4 py-3 text-left">
+                <span class="block text-white text-sm sm:text-base font-semibold">Cuidado diário, reabilitação e novas famílias</span>
+                <span class="block text-warm-200 text-xs sm:text-sm mt-0.5">Cada gesto aproxima um patudo de uma vida segura.</span>
+              </figcaption>
+            </div>
+          </figure>
+        </div>
       </div>
     </section>
 

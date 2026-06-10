@@ -14,16 +14,15 @@ export interface Props {
 const {
   locale = 'pt',
   ogImage = '/images/hero-dog.jpg',
-  ogUrl = 'https://capapvl.pt',
+  ogUrl = 'https://capapvl.org',
   noindex = false,
 } = Astro.props;
 
 const t = getTranslations(locale);
-
 const title = Astro.props.title ?? t.layout.defaultTitle;
 const description = Astro.props.description ?? t.layout.defaultDescription;
 
-const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.pt${ogImage}`;
+const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.org${ogImage}`;
 ---
 
 <!doctype html>
