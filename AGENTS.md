@@ -14,7 +14,7 @@ Before starting frontend work, invoke the **`frontend`** skill (Astro 5 + React 
 
 Dog shelter website for **CAPA Póvoa de Lanhoso** (Clube de Adoção e Proteção Animal), a Portuguese non-profit rescue/shelter/adoption organization. Built on the paws-platform open-source template.
 
-**Live:** https://capapvl.pt/ (Hostinger static; deploy branch is the intended source, but hPanel may need manual trigger if Git deploy stalls)
+**Live:** https://capapvl.org/ (Hetzner nginx static site + API proxy)
 **Repo:** https://github.com/0rderfl0w/paws-platform
 
 ---
@@ -39,7 +39,7 @@ bun preview            # preview production build locally
 | Styling | Tailwind CSS 4 (CSS-first @theme in src/styles/global.css) |
 | Runtime | Bun |
 | Backend | Hetzner Bun API + PostgreSQL (`capapvl_db`) plus committed public static fallback |
-| Hosting | Hostinger (static only) |
+| Hosting | Hetzner nginx static site at `/home/deploy/apps/capapvl`; API proxied to loopback Bun service |
 
 **Architecture pattern:**
 - Astro static pages for public content (Home, About, Help/Donate, Adoption)
@@ -51,11 +51,11 @@ bun preview            # preview production build locally
 
 ## Hetzner API
 
-**API:** `https://richkapp.com/capapvl-api` (temporary HTTPS path on Hetzner until `api.capapvl.pt` DNS points to Hetzner)
+**API:** `https://api.capapvl.org` (Namecheap DNS points `capapvl.org`, `www`, and `api` to Hetzner `65.21.156.73`)
 **Service:** `capapvl-api.service`
 **Runtime:** Bun, `server/capa-api.ts`
 **Database:** `capapvl_db` on local PostgreSQL
-**Bind/security:** `server/capa-api.ts` must bind `127.0.0.1:3314`; public HTTPS access goes through the nginx bridge only. Do not widen the API to `0.0.0.0` or expose raw `3314` to fix connectivity.
+**Bind/security:** `server/capa-api.ts` must bind `127.0.0.1:3314`; public HTTPS access goes through nginx only. Do not widen the API to `0.0.0.0` or expose raw `3314` to fix connectivity.
 
 **2026-05-15 status:** The legacy Supabase project `amkwoeepuhlnjmybbnbo.supabase.co` returns NXDOMAIN from Hetzner and local DNS. Runtime Supabase usage has been migrated to the Hetzner API. Public pages still keep `src/data/capaDogs.ts` and static files under `public/images/dogs/` as a fallback.
 
@@ -88,15 +88,15 @@ bun preview            # preview production build locally
 ## Env Vars
 
 ```
-PUBLIC_CAPA_API_URL=https://richkapp.com/capapvl-api
+PUBLIC_CAPA_API_URL=https://api.capapvl.org
 
 # server-only (/etc/capapvl-api.env on Hetzner)
 DATABASE_URL=postgres://capapvl_app:<password>@127.0.0.1:5432/capapvl_db
 CAPA_ADMIN_EMAIL=<admin email>
 CAPA_ADMIN_PASSWORD_SHA256=<sha256 password hash>
 CAPA_SESSION_SECRET=<random secret>
-CAPA_PUBLIC_API_URL=https://richkapp.com/capapvl-api
-CAPA_ALLOWED_ORIGINS=https://capapvl.pt,https://www.capapvl.pt,http://127.0.0.1:14324,http://127.0.0.1:4321
+CAPA_PUBLIC_API_URL=https://api.capapvl.org
+CAPA_ALLOWED_ORIGINS=https://capapvl.org,https://www.capapvl.org,https://capapvl.pt,https://www.capapvl.pt,http://127.0.0.1:14324,http://127.0.0.1:4321
 CAPA_PROJECT_ROOT=/home/deploy/projects/capapvl.pt
 PORT=3314
 ```
@@ -165,46 +165,39 @@ scripts/                    # Hetzner migration/data maintenance scripts
 
 ## Deploy
 
-Uses orphan deploy branch. Hostinger is configured to deploy from Git, but this can stall; verify live origin after every push.
+Live production is Hetzner nginx serving the Astro static build from `/home/deploy/apps/capapvl`, plus `api.capapvl.org` proxying the loopback Bun API. The old Hostinger `deploy` branch workflow is legacy/transitional only, not the current live surface.
 
 **Git identity:** zkgit.substance129@passmail.com
 
 ```bash
-# Build first
-bun build
-
-# Push dist/ to deploy branch via worktree (NEVER checkout the branch directly)
-git worktree add /tmp/capapvl-deploy deploy
-rsync -a --delete --exclude=.git --exclude=.gitignore dist/ /tmp/capapvl-deploy/
-cd /tmp/capapvl-deploy && git add -A && git commit -m "deploy" && git push
-git worktree remove /tmp/capapvl-deploy
+# Build with the production API URL, then publish static files to nginx root.
+PUBLIC_CAPA_API_URL=https://api.capapvl.org bun run build
+rsync -a --delete dist/ /home/deploy/apps/capapvl/
+find /home/deploy/apps/capapvl -type d -exec chmod 755 {} +
+find /home/deploy/apps/capapvl -type f -exec chmod 644 {} +
 ```
 
-WARNING: NEVER git checkout deploy in the project dir — use worktrees only.
+WARNING: Do not edit files directly under `/home/deploy/apps/capapvl`; they are generated from source and overwritten by the next build/sync.
 
-**CRITICAL: Never make changes directly on the deploy branch.**
-All changes must go through source files on main → build → copy to deploy. Direct edits to deploy HTML will be overwritten on the next build. Incident: Mar 16 — logo/footer redesign done directly on deploy branch was wiped when next build pushed from main.
-
-**Before overwriting deploy branch:** Always dry-run the sync against the deploy worktree, e.g. `rsync -ani --delete --exclude=.git --exclude=.gitignore dist/ /tmp/capapvl-deploy/`, and inspect deletes/new assets. Don't blindly copy `dist/` without checking for deploy-only changes that haven't been ported to source.
-
-**Live verification:** A successful push to `deploy` is not enough. Confirm the live HTML references the new hashed asset(s) and that changed files return `200`, for example:
+**Live verification:** A successful build/sync is not enough. Confirm the live site and API return the expected production responses, for example:
 
 ```bash
-curl -sSL https://capapvl.pt/caes/ | rg '_astro/(capaDogs|DogListings).*\.js'
-curl -sS -o /dev/null -w '%{http_code}\n' https://capapvl.pt/images/dogs/andy/photo-01.jpg
+curl -sS -I https://capapvl.org/
+curl -sS https://api.capapvl.org/health
+curl -sS 'https://api.capapvl.org/dogs?includeAdopted=true' | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["dogs"]))'
 ```
 
-On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfully for the admin fallback, but Hostinger still served the old `_astro/AdminPanel.q4P30BYD.js` build during verification. If that repeats, manually trigger/reconnect Git deployment in Hostinger hPanel before claiming production is updated.
+For browser-level verification, use Playwright against `https://capapvl.org/caes/` and confirm `https://api.capapvl.org/dogs` returns 200 with 104 dog cards rendered.
 
 ---
 
 ## Gotchas
 
-- **Hetzner API path:** `https://richkapp.com/capapvl-api` is a temporary HTTPS bridge. Move to `https://api.capapvl.pt` after DNS points to Hetzner and a Let's Encrypt certificate is issued.
+- **Canonical domain:** `https://capapvl.org` is canonical; `www.capapvl.org` should redirect to the apex so browser API calls use the allowed `https://capapvl.org` origin.
+- **Hetzner API path:** `https://api.capapvl.org` is the public API origin. The older `https://richkapp.com/capapvl-api` bridge is legacy and should not be used for new builds.
 - **Raw API bind:** `capapvl-api.service` must stay loopback-only on `127.0.0.1:3314`. The public surface is the nginx HTTPS bridge, not raw port `3314`.
 - **Legacy Supabase unavailable:** The old project ref returned NXDOMAIN on 2026-05-15. Do not add new runtime Supabase dependencies.
-- **Hostinger static only:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
-- **Hostinger deploy trigger can stall:** Verify live origin, not just GitHub branch state.
+- **Static site:** No SSR, no dynamic routes. Dog profiles use /cao?id=uuid.
 - **Legacy Supabase key note:** sb_publishable_/sb_secret_ previously worked with @supabase/supabase-js v2.97.0, but runtime Supabase usage has since been removed.
 - **Logo was photo-02:** Every dog's original page had the CAPA logo as photo-02. All deleted from storage. If re-scraping, filter files < 20KB.
 - **Accented slugs:** NFD normalization used in upload scripts (Jóia → joia). Don't break this.
@@ -215,8 +208,7 @@ On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfu
 
 ## Remaining Work
 
-- [ ] Point `api.capapvl.pt` DNS to Hetzner `65.21.156.73`, issue cert, and update `PUBLIC_CAPA_API_URL`/`CAPA_PUBLIC_API_URL` from the temporary richkapp.com bridge.
-- [ ] Verify Hostinger hPanel Git deployment pulls the latest deploy commit after each static build push.
+- [x] Point `capapvl.org`, `www.capapvl.org`, and `api.capapvl.org` to Hetzner `65.21.156.73`, issue cert, and update `PUBLIC_CAPA_API_URL`/`CAPA_PUBLIC_API_URL` from the temporary RichKapp bridge.
 - [ ] Z to revoke/remove any remaining legacy Supabase project credentials in Supabase dashboard if accessible.
 
 ---
@@ -232,3 +224,4 @@ On 2026-05-15, `main` (`6c003c4`) and `deploy` (`24bf174`) were pushed successfu
 - 2026-03-16: Logo/footer/header changes ported from deploy branch HTML back to Astro source files. Never edit deploy branch directly again. (Razor & Blade)
 - 2026-03-16: SUPABASE_SERVICE_ROLE_KEY was committed to git — rotated all keys, .env recreated. (Razor & Blade)
 - 2026-05-15: Supabase project ref returned NXDOMAIN; public dog pages now use committed static fallback data and restored local dog photos. Hostinger Git deploy push succeeded but live origin did not update during verification, so hPanel may need manual deployment trigger. (Codex)
+- 2026-06-10: Canonical live surface moved to Hetzner at `https://capapvl.org`; Namecheap DNS points apex/www/api to `65.21.156.73`; Let's Encrypt covers apex/www/api; `www` redirects to apex; API origin is `https://api.capapvl.org`. (Hermes)

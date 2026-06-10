@@ -1,5 +1,12 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-06-10
+- Go-live: moved CAPA public hosting to Hetzner under `https://capapvl.org`, with Namecheap DNS `A` records for `@`, `www`, and `api` pointing to `65.21.156.73`.
+- Infra: deployed the Astro static build to `/home/deploy/apps/capapvl`, added nginx vhosts for `capapvl.org` and `api.capapvl.org`, and issued a Let's Encrypt certificate covering `capapvl.org`, `www.capapvl.org`, and `api.capapvl.org`.
+- Routing: canonicalized `www.capapvl.org` to `https://capapvl.org`; `api.capapvl.org` proxies to the loopback Bun API on `127.0.0.1:3314`.
+- Config: updated frontend/server API URLs from the old RichKapp bridge to `https://api.capapvl.org` while retaining `capapvl.pt` origins in the server allowlist for transitional compatibility.
+- Verification: DNS resolved globally to Hetzner; HTTPS smokes returned 200 for the site and admin page, API health returned `{"ok":true}`, `/dogs` returned 104 dogs, and Playwright verified `/caes` loads 104 dog cards and API-served photos without console/page errors.
+
 ## 2026-06-04
 - Security: hardened `capapvl-api.service` so `server/capa-api.ts` binds `127.0.0.1:3314` instead of a broad interface. Public API access remains through the temporary nginx HTTPS bridge at `https://richkapp.com/capapvl-api`; raw port `3314` must not be exposed publicly.
 - Verification: local health and nginx-backed `richkapp.com/capapvl-api/health` smokes returned HTTP 200 after restart; external probe confirmed raw `3314` closed publicly.

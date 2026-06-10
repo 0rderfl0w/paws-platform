@@ -171,12 +171,13 @@ MIT — fork it, customize it, ship it. Give a shelter a website. 🐾
 
 ---
 
-## Live Deployment: capapvl.pt
+## Live Deployment: capapvl.org
 
 This repo is also the live website for **CAPA Póvoa de Lanhoso** — a Portuguese non-profit rescue, shelter, and adoption organization.
 
-**Live site:** [capapvl.pt](https://capapvl.pt)
+**Live site:** [capapvl.org](https://capapvl.org)
+**API:** [api.capapvl.org](https://api.capapvl.org/health)
 
-The deployment uses Supabase as the backend with ~104 dogs and ~980 photos. All public content is in Portuguese (PT). The site is hosted on Hostinger and auto-deploys from the `deploy` branch.
+The production deployment is hosted on Hetzner: Astro static files are served by nginx from `/home/deploy/apps/capapvl`, and dog/admin data is served by the loopback Bun API backed by local PostgreSQL. Runtime Supabase is retired; the repo still carries a committed 104-dog static fallback and restored dog photos for resilience.
 
 If you're looking for the template to fork for your own shelter, you're in the right place — this repo is both the template and the real thing.
