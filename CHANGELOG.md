@@ -2,7 +2,7 @@
 
 ## 2026-06-10
 - Go-live: moved CAPA public hosting to Hetzner under `https://capapvl.org`, with Namecheap DNS `A` records for `@`, `www`, and `api` pointing to `65.21.156.73`.
-- Sobre nós: replaced the text-only dark hero with a warmer split hero using a real CAPA dog-care photo and updated the page's Open Graph image/URL for `capapvl.org`.
+- Sobre nós/About: replaced the text-only dark hero on both Portuguese and English pages with a warmer split hero using a real CAPA dog-care photo, and updated Open Graph image/URL metadata for `capapvl.org`.
 - Infra: deployed the Astro static build to `/home/deploy/apps/capapvl`, added nginx vhosts for `capapvl.org` and `api.capapvl.org`, and issued a Let's Encrypt certificate covering `capapvl.org`, `www.capapvl.org`, and `api.capapvl.org`.
 - Routing: canonicalized `www.capapvl.org` to `https://capapvl.org`; `api.capapvl.org` proxies to the loopback Bun API on `127.0.0.1:3314`.
 - Config: updated frontend/server API URLs from the old RichKapp bridge to `https://api.capapvl.org` while retaining `capapvl.pt` origins in the server allowlist for transitional compatibility.
