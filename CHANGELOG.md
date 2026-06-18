@@ -3,6 +3,7 @@
 ## 2026-06-19
 - Dogs: marked Abby, Bella, Bolt, Buggy, Farrusco, Kiki, Klein, Mickey, and Mouse as adopted, and added a visible adopted banner on dog listing/profile photos.
 - Dogs: removed deceased dogs Farrusca, Iman, Molly, Ringo, and Salsa from the public fallback dataset and public photo assets.
+- Deploy: added a CAPA asset-version token to built Astro filenames and set HTML responses to `Cache-Control: no-cache` so browsers do not keep stale dog-listing JavaScript after status updates.
 
 ## 2026-06-10
 - Go-live: moved CAPA public hosting to Hetzner under `https://capapvl.org`, with Namecheap DNS `A` records for `@`, `www`, and `api` pointing to `65.21.156.73`.
