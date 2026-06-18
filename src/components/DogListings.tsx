@@ -57,6 +57,11 @@ function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
         <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClasses}`}>
           {sizeLabel}
         </span>
+        {dog.is_adopted && (
+          <span className="absolute inset-x-0 bottom-0 bg-primary-500/95 py-2 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-md">
+            {t.status.adopted}
+          </span>
+        )}
       </div>
 
       {/* Content */}
@@ -100,7 +105,7 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
 
   useEffect(() => {
     async function fetchDogs() {
-      const localDogs = capaDogs.filter((d) => !d.is_adopted);
+      const localDogs = capaDogs;
       setDogs(localDogs);
       setLoading(false);
 
@@ -109,7 +114,7 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
       }
 
       try {
-        const data = await capaApi.getDogs(false);
+        const data = await capaApi.getDogs(true);
         if (data.length > 0) setDogs(data);
       } catch {
         // Keep the committed dataset if the Hetzner API is temporarily unavailable.

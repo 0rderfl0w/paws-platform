@@ -142,7 +142,7 @@ function TagBadge({ text, locale }: { text: string; locale: Locale }) {
 }
 
 /* ── Photo Gallery ── */
-function PhotoGallery({ photos, name, locale }: { photos: string[]; name: string; locale: Locale }) {
+function PhotoGallery({ photos, name, locale, adoptedLabel }: { photos: string[]; name: string; locale: Locale; adoptedLabel?: string }) {
   const t = getTranslations(locale);
   const [selected, setSelected] = useState(0);
 
@@ -157,6 +157,11 @@ function PhotoGallery({ photos, name, locale }: { photos: string[]; name: string
           alt={`${t.dogProfile.breadcrumbDogs} ${name}`}
           className="w-full h-full object-cover"
         />
+        {adoptedLabel && (
+          <span className="absolute inset-x-0 top-0 bg-primary-500/95 py-3 text-center text-base font-extrabold uppercase tracking-wide text-white shadow-md">
+            {adoptedLabel}
+          </span>
+        )}
         {photos.length > 1 && (
           <>
             <button
@@ -338,7 +343,7 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
       </nav>
 
       {/* Photos — full width, big and beautiful */}
-      <PhotoGallery photos={photos} name={dog.name} locale={locale} />
+      <PhotoGallery photos={photos} name={dog.name} locale={locale} adoptedLabel={dog.is_adopted ? t.status.adopted : undefined} />
 
       {/* Name + badge */}
       <div className="mt-8 mb-6">
@@ -392,32 +397,43 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
       )}
 
       {/* Adoption CTA */}
-      <div className="mb-8 bg-primary-50 border border-primary-200 rounded-2xl p-8">
-        <h2 className="text-xl font-bold text-warm-900 mb-3">
-          {t.dogProfile.adoptTitle} {dog.name}?
-        </h2>
-        <p className="text-warm-600 leading-relaxed mb-6">
-          {t.dogProfile.adoptDesc}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <a
-            href={`mailto:capa.geralpvl@gmail.com?subject=${t.dogProfile.emailSubject} — ${dog.name}`}
-            className="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors shadow-sm"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
-              <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
-              <path d="M19 8.839l-7.616 3.808a2.75 2.75 0 01-2.768 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
-            </svg>
-            {t.dogProfile.sendEmail}
-          </a>
-          <a
-            href={adoptPath}
-            className="inline-flex items-center justify-center gap-2 bg-white hover:bg-warm-50 text-warm-700 font-semibold px-6 py-3.5 rounded-xl border border-warm-300 transition-colors"
-          >
-            {t.dogProfile.adoptionProcess}
-          </a>
+      {dog.is_adopted ? (
+        <div className="mb-8 bg-nature-50 border border-nature-200 rounded-2xl p-8">
+          <h2 className="text-xl font-bold text-warm-900 mb-3">
+            {t.dogProfile.adoptedTitle}
+          </h2>
+          <p className="text-warm-600 leading-relaxed">
+            {t.dogProfile.adoptedDesc}
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="mb-8 bg-primary-50 border border-primary-200 rounded-2xl p-8">
+          <h2 className="text-xl font-bold text-warm-900 mb-3">
+            {t.dogProfile.adoptTitle} {dog.name}?
+          </h2>
+          <p className="text-warm-600 leading-relaxed mb-6">
+            {t.dogProfile.adoptDesc}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href={`mailto:capa.geralpvl@gmail.com?subject=${t.dogProfile.emailSubject} — ${dog.name}`}
+              className="inline-flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-3.5 rounded-xl transition-colors shadow-sm"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
+                <path d="M19 8.839l-7.616 3.808a2.75 2.75 0 01-2.768 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
+              </svg>
+              {t.dogProfile.sendEmail}
+            </a>
+            <a
+              href={adoptPath}
+              className="inline-flex items-center justify-center gap-2 bg-white hover:bg-warm-50 text-warm-700 font-semibold px-6 py-3.5 rounded-xl border border-warm-300 transition-colors"
+            >
+              {t.dogProfile.adoptionProcess}
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Back link */}
       <div className="pt-6 pb-4 border-t border-warm-200">

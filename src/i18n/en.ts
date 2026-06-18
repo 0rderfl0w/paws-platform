@@ -152,6 +152,8 @@ const en: TranslationKeys = {
     sendEmail: 'Send email',
     adoptionProcess: 'Adoption process',
     emailSubject: 'Adoption',
+    adoptedTitle: 'I have found a family!',
+    adoptedDesc: 'This dog has already been adopted. Thank you for helping our dogs get seen.',
     viewAllDogs: 'View all dogs',
     notFoundTitle: 'Dog not found',
     notFoundDesc: 'This dog may have already found a home!',
@@ -169,6 +171,9 @@ const en: TranslationKeys = {
   sexes: {
     male: 'Male',
     female: 'Female',
+  },
+  status: {
+    adopted: 'Adopted!',
   },
 
   // ─── Admin Panel ───────────────────────────────────

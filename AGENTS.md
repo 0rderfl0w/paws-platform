@@ -81,7 +81,7 @@ bun preview            # preview production build locally
 - Structure: `{slug}/photo-01.jpg`, `photo-03.jpg`, etc. (`photo-02` was the logo, all deleted)
 - Slugs: lowercase, accents stripped (NFD normalization), spaces → hyphens
 
-**Current data:** 104 dogs in `src/data/capaDogs.ts`; 977 restored dog photos committed under `public/images/dogs/{slug}/photo-*.jpg`, recovered from `/Users/z/capapvl-photos-backup` on 2026-05-15.
+**Current data:** 99 public dog records in `src/data/capaDogs.ts`; 941 public dog photos committed under `public/images/dogs/{slug}/photo-*.jpg`, originally recovered from `/Users/z/capapvl-photos-backup` on 2026-05-15.
 
 ---
 

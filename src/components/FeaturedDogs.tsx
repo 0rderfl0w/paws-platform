@@ -56,6 +56,11 @@ function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
         <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClasses}`}>
           {sizeLabel}
         </span>
+        {dog.is_adopted && (
+          <span className="absolute inset-x-0 bottom-0 bg-primary-500/95 py-2 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-md">
+            {t.status.adopted}
+          </span>
+        )}
       </div>
 
       {/* Content */}

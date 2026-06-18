@@ -12,9 +12,9 @@ export const capaDogs = [
     "age": "Nasceu em 2019",
     "description": "Sexo: Feminino\\nIdade: Nasceu em 2019\\nData de entrada: 2022\\nRaça: X Podenga\\nPorte: Médio\\nPersonalidade: Meiga, brincalhona e companheira\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: Mais uma vítima de abandono. Tinha sido mãe, foi recolhida\\njuntamente com os seus 5 filhos recém-nascidos.",
     "photo_url": "/images/dogs/abby/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:56:35.544437+02:00",
-    "updated_at": "2026-02-24T21:56:35.544437+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/abby/photo-01.jpg",
       "/images/dogs/abby/photo-03.jpg",
@@ -340,9 +340,9 @@ export const capaDogs = [
     "age": "",
     "description": "A Bella é uma cadela dócil e carinhosa que adora companhia. Está à espera de uma família que lhe dê o amor que merece.",
     "photo_url": "/images/dogs/bella/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:57:32.190829+02:00",
-    "updated_at": "2026-02-24T21:57:32.190829+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/bella/photo-01.jpg",
       "/images/dogs/bella/photo-03.jpg"
@@ -461,9 +461,9 @@ export const capaDogs = [
     "age": "",
     "description": "O Bolt é um cão enérgico e brincalhão, sempre pronto para uma aventura. Procura um lar ativo e cheio de amor.",
     "photo_url": "/images/dogs/bolt/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:57:42.929136+02:00",
-    "updated_at": "2026-02-24T21:57:42.929136+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/bolt/photo-01.jpg",
       "/images/dogs/bolt/photo-03.jpg",
@@ -481,9 +481,9 @@ export const capaDogs = [
     "age": "Nasceu em 2010",
     "description": "Sexo: Masculino\\nIdade: Nasceu em 2010\\nData de entrada:2013\\nRaça: Indefinida\\nPorte: Grande\\nPersonalidade: Companheiro, meigo e brincalhão\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nSociável com gatos\\nChipado, Vacinado, Castrado\\nHistória: Foi deixado acorrentado ao portão do abrigo.",
     "photo_url": "/images/dogs/buggy/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:56:07.039549+02:00",
-    "updated_at": "2026-02-24T21:56:07.039549+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/buggy/photo-01.jpg",
       "/images/dogs/buggy/photo-03.jpg",
@@ -722,27 +722,6 @@ export const capaDogs = [
     ]
   },
   {
-    "id": "7ccadadc-5514-4f66-ae0a-67f95f1ba6f7",
-    "name": "Farrusca",
-    "size": "small",
-    "sex": "female",
-    "age": "Nasceu em 2018",
-    "description": "Sexo: Feminino\\nIdade: Nasceu em 2018\\nData de entrada: 2023\\nRaça: Podenga\\nPorte: Pequeno\\nPersonalidade: Meiga, muito tranquila e companheira\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: Apareceu a vaguear na rua de uma freguesia, acolhida por quem não ficou indiferente e nos pediu ajuda. Estava com um olho bastante ferido, com uma grande infeção, causada por algum trauma. Estava com anemia, desidratada, desnutrida, com o baço aumentado e em cio. Foi tratada, recuperou por completo e está mais que pronta para adoção.",
-    "photo_url": "/images/dogs/farrusca/photo-01.jpg",
-    "is_adopted": false,
-    "created_at": "2026-02-24T21:55:38.32123+02:00",
-    "updated_at": "2026-02-24T21:55:38.32123+02:00",
-    "photos": [
-      "/images/dogs/farrusca/photo-01.jpg",
-      "/images/dogs/farrusca/photo-03.jpg",
-      "/images/dogs/farrusca/photo-04.jpg",
-      "/images/dogs/farrusca/photo-05.jpg",
-      "/images/dogs/farrusca/photo-06.jpg",
-      "/images/dogs/farrusca/photo-07.jpg",
-      "/images/dogs/farrusca/photo-08.jpg"
-    ]
-  },
-  {
     "id": "38a75a11-ab4a-4b1b-bb61-6eb13f8c35ff",
     "name": "Farrusco",
     "size": "medium",
@@ -750,9 +729,9 @@ export const capaDogs = [
     "age": "Nasceu em 2019",
     "description": "Sexo: Masculino\\nIdade: Nasceu em 2019\\nData de entrada: 2022\\nRaça: Podengo\\nPorte: Médio\\nPersonalidade: Calmo e meigo\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nSociável com gatos\\nChipado, Vacinado, Esterilizado\\nHistória: Farrusco foi abandonado na nossa vila. Viveu durante alguns meses na rua, onde era feliz e cuidado por muitos, mas, infelizmente, também há gente muito má, que começaram a fazer mal ao Farrusco. Tivemos de o\\nrecolhe e a adaptação ao canil foi muito difícil, uma vez que estava habituado à liberdade. Os seus dias eram passados a chorar. Felizmente foi melhorando e, com amigos de box, ele melhorou bastante. Só necessita de uma família que o volto a dar a liberdade a que ele estava tão habituado.",
     "photo_url": "/images/dogs/farrusco/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:58:32.181448+02:00",
-    "updated_at": "2026-02-24T21:58:32.181448+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/farrusco/photo-01.jpg",
       "/images/dogs/farrusco/photo-03.jpg",
@@ -923,26 +902,6 @@ export const capaDogs = [
     ]
   },
   {
-    "id": "5b9a884c-f54e-4fdb-835c-42cf0d084ffc",
-    "name": "Iman",
-    "size": "medium",
-    "sex": "female",
-    "age": "Nasceu em 2014",
-    "description": "Sexo: Feminino\\nIdade: Nasceu em 2014\\nData de entrada: 2014\\nRaça: Indefinida\\nPorte: Médio\\nPersonalidade: Receosa no início mas muito meiga e tranquila\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: Nasceu na rua, foi recolhida com a sua mãe e cresceu no abrigo.",
-    "photo_url": "/images/dogs/iman/photo-01.jpg",
-    "is_adopted": false,
-    "created_at": "2026-02-24T21:59:10.824776+02:00",
-    "updated_at": "2026-02-24T21:59:10.824776+02:00",
-    "photos": [
-      "/images/dogs/iman/photo-01.jpg",
-      "/images/dogs/iman/photo-03.jpg",
-      "/images/dogs/iman/photo-04.jpg",
-      "/images/dogs/iman/photo-05.jpg",
-      "/images/dogs/iman/photo-06.jpg",
-      "/images/dogs/iman/photo-07.jpg"
-    ]
-  },
-  {
     "id": "b4d1f70e-6496-4251-8359-9d3a2116b2d4",
     "name": "Isis",
     "size": "small",
@@ -1084,9 +1043,9 @@ export const capaDogs = [
     "age": "Nasceu em 2016",
     "description": "Sexo: Feminino\\nIdade: Nasceu em 2016\\nData de entrada: 2016\\nRaça: Indefinida\\nPorte: Médio\\nPersonalidade: Muito companheira e meiga\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: Foi abandonada em bebé, e cresceu no abrigo. Chegou a ser adotada por duas vezes, mas das duas vezes ela conseguia escapar de casa para voltar para o canil.",
     "photo_url": "/images/dogs/kiki/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:59:23.878438+02:00",
-    "updated_at": "2026-02-24T21:59:23.878438+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/kiki/photo-01.jpg",
       "/images/dogs/kiki/photo-03.jpg",
@@ -1162,9 +1121,9 @@ export const capaDogs = [
     "age": "Nasceu em 2024",
     "description": "Sexo: Masculino\\nIdade: Nasceu em 2024\\nData de entrada: 2024\\nRaça: Indefinida\\nPorte: Médio\\nPersonalidade: Ativo, muito meigo e brincalhão\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipado, Vacinado, Esterilizado\\nHistória: Klein, foi abandonado à porta do nosso abrigo, mais um irmão. Vinham repletos de feridas pelo corpo e com falhas de pelo. Diagnóstico foi sarna e de imediato iniciaram tratamento. Ainda em recuperação, os dois irmãos contraíram Parvovirose. Estiveram bastante mal, mas felizmente recuperaram e sem sequelas. Como se não fosse suficiente a sarna, a parvovirose, só veio atrasar o seu processo de adoção, mas agora está completamente recuperado e pronto a seguir para uma família.",
     "photo_url": "/images/dogs/klein/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:59:38.779255+02:00",
-    "updated_at": "2026-02-24T21:59:38.779255+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/klein/photo-01.jpg",
       "/images/dogs/klein/photo-03.jpg",
@@ -1478,9 +1437,9 @@ export const capaDogs = [
     "age": "Nasceu em 2018",
     "description": "Sexo: Masculino\\nIdade: Nasceu em 2018\\nData de entrada: 2018\\nRaça: Indefinida\\nPorte: Grande\\nPersonalidade: Calmo e muito meigo\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipado, Vacinado, Castrado\\nHistória: Foi abandonado em bebé junto com a sua irmã, e cresceu no abrigo.",
     "photo_url": "/images/dogs/mickey/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:56:15.68296+02:00",
-    "updated_at": "2026-02-24T21:56:15.68296+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/mickey/photo-01.jpg",
       "/images/dogs/mickey/photo-03.jpg",
@@ -1515,29 +1474,6 @@ export const capaDogs = [
       "/images/dogs/mimi/photo-07.jpg",
       "/images/dogs/mimi/photo-08.jpg",
       "/images/dogs/mimi/photo-09.jpg"
-    ]
-  },
-  {
-    "id": "5fc2e78e-4897-432f-8e96-44430774d28b",
-    "name": "Molly",
-    "size": "medium",
-    "sex": "female",
-    "age": "Nasceu em 2010",
-    "description": "Sexo: Feminino\\nIdade: Nasceu em 2010\\nData entrada: 2012\\nRaça: X Podengo\\nPorte: Médio\\nPersonalidade: Calma, muito meiga e carente\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nSociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: Deambulava pelas ruas em muito mau estado.",
-    "photo_url": "/images/dogs/molly/photo-01.jpg",
-    "is_adopted": false,
-    "created_at": "2026-02-24T21:52:37.687684+02:00",
-    "updated_at": "2026-02-24T21:52:37.687684+02:00",
-    "photos": [
-      "/images/dogs/molly/photo-01.jpg",
-      "/images/dogs/molly/photo-03.jpg",
-      "/images/dogs/molly/photo-04.jpg",
-      "/images/dogs/molly/photo-05.jpg",
-      "/images/dogs/molly/photo-06.jpg",
-      "/images/dogs/molly/photo-07.jpg",
-      "/images/dogs/molly/photo-08.jpg",
-      "/images/dogs/molly/photo-09.jpg",
-      "/images/dogs/molly/photo-10.jpg"
     ]
   },
   {
@@ -1597,9 +1533,9 @@ export const capaDogs = [
     "age": "Nasceu em 2020",
     "description": "Sexo: Feminino\\nIdade: Nasceu em 2020\\nDeu entrada: 2022\\nRaça: Indefinida\\nPorte: Médio\\nPersonalidade: Energética, muito brincalhona e meiga\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: A Morena foi deixada com uma corrente à porta do nosso abrigo, descobrimos quem foi o autor do abandono e avançamos com queixa. Vivia a corrente e vinha bastante magra e com alguns medos. Desconfia quando não conhece, mas depressa ganha a confiança.",
     "photo_url": "/images/dogs/mouse/photo-01.jpg",
-    "is_adopted": false,
+    "is_adopted": true,
     "created_at": "2026-02-24T21:52:59.081796+02:00",
-    "updated_at": "2026-02-24T21:52:59.081796+02:00",
+    "updated_at": "2026-06-18T22:34:12.773752+00:00",
     "photos": [
       "/images/dogs/mouse/photo-01.jpg",
       "/images/dogs/mouse/photo-03.jpg",
@@ -2072,27 +2008,6 @@ export const capaDogs = [
     ]
   },
   {
-    "id": "6921a8d8-1fd7-45e7-bd8c-eb00917f7f1f",
-    "name": "Ringo",
-    "size": "large",
-    "sex": "male",
-    "age": "Nasceu em 2015",
-    "description": "Sexo: Masculino\\nIdade: Nasceu em 2015\\nDeu entrada: 2020\\nRaça: X Boxer\\nPorte: Médio/Grande\\nPersonalidade: Meigo, muito fiel e brincalhão\\nSociável com humanos\\nNão é sociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipado, Vacinado, Castrado\\nHistória: Foi abandonado numa freguesia, junto com uma cadela, ambos muito magros e com sequelas físicas e psicológicas.",
-    "photo_url": "/images/dogs/ringo/photo-01.jpg",
-    "is_adopted": false,
-    "created_at": "2026-02-24T22:01:57.693423+02:00",
-    "updated_at": "2026-02-24T22:01:57.693423+02:00",
-    "photos": [
-      "/images/dogs/ringo/photo-01.jpg",
-      "/images/dogs/ringo/photo-03.jpg",
-      "/images/dogs/ringo/photo-04.jpg",
-      "/images/dogs/ringo/photo-05.jpg",
-      "/images/dogs/ringo/photo-06.jpg",
-      "/images/dogs/ringo/photo-07.jpg",
-      "/images/dogs/ringo/photo-08.jpg"
-    ]
-  },
-  {
     "id": "e6833a61-5297-480b-a5b3-e31a886cf6f1",
     "name": "Romeu",
     "size": "large",
@@ -2113,27 +2028,6 @@ export const capaDogs = [
       "/images/dogs/romeu/photo-08.jpg",
       "/images/dogs/romeu/photo-09.jpg",
       "/images/dogs/romeu/photo-10.jpg"
-    ]
-  },
-  {
-    "id": "ac085125-ada3-438b-915a-1731b76b2f9f",
-    "name": "Salsa",
-    "size": "medium",
-    "sex": "female",
-    "age": "Nasceu em 2012",
-    "description": "Sexo: Feminino\\nIdade: Nasceu em 2012\\nData de entrada: 2017\\nRaça: Indefinida\\nPorte: Médio/Grande\\nPersonalidade: Muito carente, tranquila e companheira\\nSociável com humanos\\nSociável com machos\\nSociável com fêmeas\\nNão sabemos se é sociável com gatos\\nChipada, Vacinada, Esterilizada\\nHistória: A Salsa teve um dono, o qual gostava muito dela, mas que infelizmente devido á idade e problemas de saúde, teve que ir para um lar e ninguém da família quis ficar com a Salsa quando mais ela precisou. Os primeiros meses foram muito complicados para a Salsa, e mesmo nos dias de hoje, ela nunca se adaptará a vida de canil.",
-    "photo_url": "/images/dogs/salsa/photo-01.jpg",
-    "is_adopted": false,
-    "created_at": "2026-02-24T21:54:43.595663+02:00",
-    "updated_at": "2026-02-24T21:54:43.595663+02:00",
-    "photos": [
-      "/images/dogs/salsa/photo-01.jpg",
-      "/images/dogs/salsa/photo-03.jpg",
-      "/images/dogs/salsa/photo-04.jpg",
-      "/images/dogs/salsa/photo-05.jpg",
-      "/images/dogs/salsa/photo-06.jpg",
-      "/images/dogs/salsa/photo-07.jpg",
-      "/images/dogs/salsa/photo-08.jpg"
     ]
   },
   {

@@ -150,6 +150,8 @@ const pt = {
     sendEmail: 'Enviar email',
     adoptionProcess: 'Processo de adoção',
     emailSubject: 'Adoção',
+    adoptedTitle: 'Já encontrei uma família!',
+    adoptedDesc: 'Este cão já foi adotado. Obrigado por ajudares a dar visibilidade aos nossos patudos.',
     viewAllDogs: 'Ver todos os cães',
     notFoundTitle: 'Cão não encontrado',
     notFoundDesc: 'Este cão pode já ter encontrado um lar!',
@@ -167,6 +169,9 @@ const pt = {
   sexes: {
     male: 'Macho',
     female: 'Fêmea',
+  },
+  status: {
+    adopted: 'Adotado!',
   },
 
   // ─── Admin Panel ───────────────────────────────────
