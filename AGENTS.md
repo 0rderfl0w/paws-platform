@@ -171,7 +171,9 @@ Live production is Hetzner nginx serving the Astro static build from `/home/depl
 
 ```bash
 # Build with the production API URL, then publish static files to nginx root.
-PUBLIC_CAPA_API_URL=https://api.capapvl.org bun run build
+# Bump CAPA_ASSET_VERSION for behavior/data-status changes that affect React islands,
+# because nginx serves /_astro assets as immutable for one year.
+CAPA_ASSET_VERSION=$(date -u +%Y%m%d-%H%M%S) PUBLIC_CAPA_API_URL=https://api.capapvl.org bun run build
 rsync -a --delete dist/ /home/deploy/apps/capapvl/
 find /home/deploy/apps/capapvl -type d -exec chmod 755 {} +
 find /home/deploy/apps/capapvl -type f -exec chmod 644 {} +
@@ -185,9 +187,10 @@ WARNING: Do not edit files directly under `/home/deploy/apps/capapvl`; they are 
 curl -sS -I https://capapvl.org/
 curl -sS https://api.capapvl.org/health
 curl -sS 'https://api.capapvl.org/dogs?includeAdopted=true' | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["dogs"]))'
+curl -sS -I https://capapvl.org/caes/ | grep -i '^cache-control:'
 ```
 
-For browser-level verification, use Playwright against `https://capapvl.org/caes/` and confirm `https://api.capapvl.org/dogs` returns 200 with 104 dog cards rendered.
+For browser-level verification, use Playwright or CDP-driven Chromium against `https://capapvl.org/caes/` and confirm `https://api.capapvl.org/dogs?includeAdopted=true` returns 200 with 99 dog cards rendered, 9 adopted banners, and adopted-name searches such as Abby/Bella/Bolt each return `1 cão encontrado` with `ADOTADO!`.
 
 ---
 
@@ -203,6 +206,7 @@ For browser-level verification, use Playwright against `https://capapvl.org/caes
 - **Accented slugs:** NFD normalization used in upload scripts (Jóia → joia). Don't break this.
 - **No unique constraint on name:** Re-running upload scripts creates duplicates. Use upsert or check first.
 - **React islands are client:visible:** They lazy-load on scroll. Good for performance.
+- **Immutable Astro assets:** nginx serves `/_astro/*` with `Cache-Control: public, immutable`. If a dog-listing/profile behavior change appears correct in API data but wrong in a user's browser, check for stale island JS. Bump `CAPA_ASSET_VERSION`, rebuild/sync, verify `/caes/` has `Cache-Control: no-cache`, and confirm the live HTML references the new `/_astro/DogListings.*.js` filename.
 
 ---
 
