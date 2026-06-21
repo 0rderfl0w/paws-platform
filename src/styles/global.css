@@ -37,7 +37,7 @@
 
   --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
-  /* Playful Impact test-landing tokens */
+  /* Playful Impact route tokens */
   --color-playful-canvas: #fff9f0;
   --color-playful-cream: #f9f3ea;
   --color-playful-paper: #ffffff;
@@ -166,6 +166,7 @@ html {
     opacity: 1;
     filter: blur(0);
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    will-change: auto;
   }
 
   @media (prefers-reduced-motion: reduce) {

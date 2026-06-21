@@ -8,6 +8,7 @@ import PlayfulFeaturedDogs from '../components/test-landing/PlayfulFeaturedDogs'
 import PlayfulAboutBlurb from '../components/test-landing/PlayfulAboutBlurb.astro';
 import PlayfulHelpCta from '../components/test-landing/PlayfulHelpCta.astro';
 import PlayfulFooter from '../components/test-landing/PlayfulFooter.astro';
+import PlayfulScrollReveal from '../components/playful/PlayfulScrollReveal.astro';
 
 const locale = 'pt' as const;
 ---
@@ -35,67 +36,5 @@ const locale = 'pt' as const;
     </div>
   </div>
 
-  <script>
-    const revealRoot = document.querySelector('[data-playful-scroll-reveal]');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const revealDelayValue = (value: string | undefined) => {
-      if (!value) return undefined;
-      return /^\d+$/.test(value) ? `${value}ms` : value;
-    };
-
-    if (revealRoot) {
-      const revealItems = new WeakSet<Element>();
-      let observer: IntersectionObserver | null = null;
-
-      const applyReveal = (item: Element) => {
-        if (revealItems.has(item)) return;
-        revealItems.add(item);
-
-        item.classList.add('playful-reveal');
-
-        const explicitDelay = revealDelayValue((item as HTMLElement).dataset.revealDelay);
-        const group = item.parentElement?.closest('[data-reveal-stagger]') as HTMLElement | null;
-
-        if (explicitDelay) {
-          (item as HTMLElement).style.setProperty('--reveal-delay', explicitDelay);
-        } else if (group) {
-          const groupItems = Array.from(group.querySelectorAll('[data-reveal]')).filter((child) => child.parentElement?.closest('[data-reveal-stagger]') === group);
-          const index = Math.max(0, groupItems.indexOf(item));
-          const step = Number(group.dataset.revealStagger || 90);
-          (item as HTMLElement).style.setProperty('--reveal-delay', `${Math.min(index * step, 420)}ms`);
-        }
-
-        if (reduceMotion || !observer) {
-          item.classList.add('is-visible');
-          return;
-        }
-
-        observer.observe(item);
-      };
-
-      if (!reduceMotion && 'IntersectionObserver' in window) {
-        observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('is-visible');
-            observer?.unobserve(entry.target);
-          });
-        }, { rootMargin: '0px 0px -4% 0px', threshold: 0.08 });
-      }
-
-      revealRoot.querySelectorAll('[data-reveal]').forEach(applyReveal);
-
-      const mutationObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          mutation.addedNodes.forEach((node) => {
-            if (!(node instanceof Element)) return;
-            if (node.matches('[data-reveal]')) applyReveal(node);
-            node.querySelectorAll('[data-reveal]').forEach(applyReveal);
-          });
-        });
-      });
-
-      mutationObserver.observe(revealRoot, { childList: true, subtree: true });
-    }
-  </script>
+  <PlayfulScrollReveal observeDynamic />
 </Layout>

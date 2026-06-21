@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Playful Impact: moved the shared scroll-reveal behavior into a reusable `PlayfulScrollReveal` component, kept MutationObserver support only for dynamic Playful routes, and cleared long-lived `will-change` after reveal to reduce mobile compositor pressure.
 - Ajudar: redesigned the live `/ajudar/` page directly with the CAPA Playful Impact system while preserving all existing help, donation, volunteer, FAT, payment, email, and CTA copy; added a stronger poster-style hero using a local real-photo fallback after image generation was unavailable in this environment.
 - Ajudar: added route-aware Playful nav/footer chrome, tactile donation/volunteer/FAT/payment sections, route-scoped scroll reveal, a content-preservation smoke script, and desktop/mobile screenshot QA for the live help page redesign.
 - Landing: added `/test-landing/` as a noindex production review page that preserves the current homepage copy and section flow while applying the Playful Impact design concept: cream canvas, Sora/Plus Jakarta Sans type, juicy orange CTAs, blob hero image treatment, pillowy cards, soft-brutalist rotations, and squishy interaction states.
