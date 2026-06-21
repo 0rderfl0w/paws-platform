@@ -39,6 +39,7 @@ function DogCard({ dog, locale, index }: { dog: Dog; locale: Locale; index: numb
   return (
     <a
       href={dogPath}
+      data-reveal="tilt"
       className={`group block rounded-[1.75rem] border border-playful-line/80 bg-white p-3 shadow-pillowy transition-transform duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-pillowy-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-playful-orange/35 ${rotation}`}
     >
       <div className="relative aspect-square overflow-hidden rounded-[1.35rem] border-4 border-playful-cream bg-playful-cream shadow-inner">
@@ -124,7 +125,7 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
   return (
     <section id="caes" className="relative px-5 py-16 sm:px-8 lg:py-24" aria-labelledby="playful-featured-dogs-heading">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10 text-center">
+        <div data-reveal="rise" className="mb-10 text-center">
           <span className="mb-3 inline-block text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">
             {t.featuredDogs.eyebrow}
           </span>
@@ -136,7 +137,7 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
           </p>
         </div>
 
-        <div className="mb-10 flex flex-wrap justify-center gap-3" role="tablist" aria-label={t.featuredDogs.filterBySize}>
+        <div data-reveal="pop" className="mb-10 flex flex-wrap justify-center gap-3" role="tablist" aria-label={t.featuredDogs.filterBySize}>
           {filterTabs.map(({ id, label }) => (
             <button
               key={id}
@@ -156,9 +157,9 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
         </div>
 
         {loading && (
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+          <div data-reveal-stagger="80" className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="rounded-[1.75rem] border border-playful-line bg-white p-3 shadow-pillowy">
+              <div key={i} data-reveal="pop" className="rounded-[1.75rem] border border-playful-line bg-white p-3 shadow-pillowy">
                 <div className="aspect-square animate-pulse rounded-[1.35rem] bg-playful-cream" />
                 <div className="space-y-3 p-5">
                   <div className="mx-auto h-5 w-2/3 animate-pulse rounded-full bg-playful-line/50" />
@@ -171,7 +172,7 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
         )}
 
         {!loading && filteredDogs.length > 0 && (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div data-reveal-stagger="80" className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDogs.map((dog, index) => (
               <DogCard key={dog.id} dog={dog} locale={locale} index={index} />
             ))}
@@ -179,7 +180,7 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
         )}
 
         {!loading && filteredDogs.length === 0 && (
-          <div className="rounded-playful border border-playful-line bg-white px-6 py-16 text-center shadow-pillowy">
+          <div data-reveal="pop" className="rounded-playful border border-playful-line bg-white px-6 py-16 text-center shadow-pillowy">
             <div className="mb-4 text-5xl">🐾</div>
             <p className="text-lg font-bold text-playful-muted">{t.featuredDogs.emptyState}</p>
             <button onClick={() => setFilter('all')} className="mt-4 rounded-full bg-playful-peach px-5 py-2 text-sm font-extrabold text-playful-orange-dark">
@@ -189,7 +190,7 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
         )}
 
         {!loading && (
-          <div className="mt-12 text-center">
+          <div data-reveal="rise" className="mt-12 text-center">
             <a href={dogsPath} className="squishy inline-flex items-center justify-center rounded-full bg-playful-orange px-8 py-4 font-playful-display font-extrabold text-white shadow-squish focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-playful-orange/35">
               {t.featuredDogs.viewAll}
             </a>

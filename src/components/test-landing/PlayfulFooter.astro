@@ -30,13 +30,13 @@ const helpLinks = [
 ];
 ---
 
-<footer class="relative overflow-hidden rounded-t-[3rem] bg-playful-peach text-playful-muted shadow-pillowy-lg" aria-label="Rodapé">
+<footer data-reveal="rise" class="relative overflow-hidden rounded-t-[3rem] bg-playful-peach text-playful-muted shadow-pillowy-lg" aria-label="Rodapé">
   <div class="ambient-blob -left-24 top-10 h-72 w-72 bg-white"></div>
   <div class="ambient-blob -right-16 bottom-6 h-80 w-80 bg-playful-orange/25"></div>
 
   <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 sm:px-8">
-    <div class="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr]">
-      <div>
+    <div data-reveal-stagger="80" class="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr]">
+      <div data-reveal="left">
         <a href={homePath} class="playful-focus inline-flex items-center gap-4 rounded-full">
           <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="h-20 w-20 rounded-[1.75rem] border-4 border-white object-cover shadow-pillowy" width="80" height="80" />
           <div>
@@ -51,7 +51,7 @@ const helpLinks = [
         </div>
       </div>
 
-      <div>
+      <div data-reveal="rise">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.navHeading}</h3>
         <ul class="mt-4 space-y-2" role="list">
           {quickLinks.map(({ href, label }) => (
@@ -60,7 +60,7 @@ const helpLinks = [
         </ul>
       </div>
 
-      <div>
+      <div data-reveal="rise">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.helpHeading}</h3>
         <ul class="mt-4 space-y-2" role="list">
           {helpLinks.map(({ href, label }) => (
@@ -69,7 +69,7 @@ const helpLinks = [
         </ul>
       </div>
 
-      <div>
+      <div data-reveal="right">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.contactHeading}</h3>
         <ul class="mt-4 space-y-3 text-sm font-medium leading-6" role="list">
           <li>EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal</li>
@@ -83,7 +83,7 @@ const helpLinks = [
       </div>
     </div>
 
-    <div class="mt-12 border-t border-playful-orange/15 pt-8 text-center text-xs font-bold text-playful-muted/80">
+    <div data-reveal="rise" class="mt-12 border-t border-playful-orange/15 pt-8 text-center text-xs font-bold text-playful-muted/80">
       <p>{t.footer.copyright}</p>
       <p class="mt-2">{t.footer.madeWith}</p>
     </div>

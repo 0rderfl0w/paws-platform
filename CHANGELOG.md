@@ -3,6 +3,7 @@
 ## 2026-06-21
 - Landing: added `/test-landing/` as a noindex production review page that preserves the current homepage copy and section flow while applying the Playful Impact design concept: cream canvas, Sora/Plus Jakarta Sans type, juicy orange CTAs, blob hero image treatment, pillowy cards, soft-brutalist rotations, and squishy interaction states.
 - Landing: removed the accidental translucent white card behind the hero dog image so the image blob now floats directly over the cream hero background.
+- Landing: added route-scoped scroll-reveal motion to `/test-landing/`: hero elements enter on load, section headers rise into view, cards pop/stagger as the user scrolls, dynamic dog cards are observed after React hydration, and reduced-motion users get static content.
 - Dogs: kept the test landing's featured dogs backed by the existing Hetzner API plus committed fallback data, preserving size filters and `/cao?id=` profile links.
 - Deploy: built with `PUBLIC_CAPA_API_URL=https://api.capapvl.org` and a fresh `CAPA_ASSET_VERSION`, synced `dist/` to `/home/deploy/apps/capapvl`, and verified live `/test-landing/` returns the new noindex page instead of the old 404 body while `/` remains the existing live homepage.
 
