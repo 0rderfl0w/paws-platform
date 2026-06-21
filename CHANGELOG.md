@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Sobre nós/About: redesigned the live `/sobre-nos/` and `/en/about/` pages directly with the CAPA Playful Impact system while preserving the bilingual origin, principles, community, rescue/rehabilitation, Zeus story, and dogs CTA copy.
+- Sobre nós/About: added a stronger poster-style real-photo hero, locale-aware Playful section components, local hero image derivatives, route-scoped scroll reveal, and a bilingual content-preservation smoke script.
 - Playful Impact: moved the shared scroll-reveal behavior into a reusable `PlayfulScrollReveal` component, kept MutationObserver support only for dynamic Playful routes, cleared long-lived `will-change` after reveal, and darkened the orange action token so white CTA text passes WCAG AA contrast.
 - Ajudar: redesigned the live `/ajudar/` page directly with the CAPA Playful Impact system while preserving all existing help, donation, volunteer, FAT, payment, email, and CTA copy; added a stronger poster-style hero using a local real-photo fallback after image generation was unavailable in this environment.
 - Ajudar: added route-aware Playful nav/footer chrome, tactile donation/volunteer/FAT/payment sections, route-scoped scroll reveal, a content-preservation smoke script, and desktop/mobile screenshot QA for the live help page redesign.

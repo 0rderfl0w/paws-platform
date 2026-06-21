@@ -8,11 +8,14 @@ interface Props {
 const { locale = 'pt' } = Astro.props;
 const t = getTranslations(locale);
 const currentPath = Astro.url.pathname;
+const normalizedCurrentPath = normalizePath(currentPath);
 
 const homePath = locale === 'pt' ? '/' : '/en/';
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
+const brandAriaLabel = locale === 'pt' ? 'CAPA Póvoa de Lanhoso — Página inicial' : 'CAPA Póvoa de Lanhoso — Home';
 
 const navLinks = [
   { href: homePath, label: t.nav.home, rotate: '-rotate-1' },
@@ -20,11 +23,23 @@ const navLinks = [
   { href: aboutPath, label: t.nav.about, rotate: '-rotate-1' },
   { href: helpPath, label: t.nav.help, rotate: 'rotate-1' },
 ];
+
+function normalizePath(path: string) {
+  return path.replace(/\/+$/, '') || '/';
+}
+
+function isActivePath(href: string) {
+  const normalizedHref = normalizePath(href);
+  if (normalizedHref === '/' || normalizedHref === '/en') {
+    return normalizedCurrentPath === normalizedHref;
+  }
+  return normalizedCurrentPath === normalizedHref || normalizedCurrentPath.startsWith(`${normalizedHref}/`);
+}
 ---
 
 <header class="sticky top-0 z-50 rounded-b-[2rem] border-b border-playful-line/70 bg-playful-canvas/92 shadow-pillowy backdrop-blur-md">
   <nav class="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8" aria-label={t.nav.mainNav}>
-    <a href={homePath} class="group playful-focus flex items-center gap-3 rounded-full" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
+    <a href={homePath} class="group playful-focus flex items-center gap-3 rounded-full" aria-label={brandAriaLabel}>
       <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="h-12 w-12 rounded-[1.35rem] border-2 border-white object-cover shadow-pillowy transition-transform group-hover:-rotate-3 group-hover:scale-105" width="48" height="48" />
       <div class="leading-none">
         <span class="block font-playful-display text-2xl font-extrabold tracking-tight text-playful-orange-dark">CAPAPVL</span>
@@ -34,7 +49,7 @@ const navLinks = [
 
     <ul class="hidden items-center gap-2 md:flex" role="list">
       {navLinks.map(({ href, label, rotate }) => {
-        const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+        const isActive = isActivePath(href);
         return (
           <li>
             <a
@@ -50,7 +65,7 @@ const navLinks = [
     </ul>
 
     <div class="hidden items-center gap-3 md:flex">
-      <div class="flex items-center gap-1 rounded-full border border-playful-line bg-white/70 p-1 shadow-sm" aria-label="Selecionar idioma">
+      <div class="flex items-center gap-1 rounded-full border border-playful-line bg-white/70 p-1 shadow-sm" aria-label={languageSelectorLabel}>
         {locales.map(({ code, label, flag }) => {
           const isActive = code === locale;
           const altPath = isActive ? currentPath : getAlternatePath(currentPath, code);
@@ -91,7 +106,7 @@ const navLinks = [
   </nav>
 
   <div id="playful-site-mobile-menu" class="hidden border-t border-playful-line bg-playful-canvas px-5 pb-5 md:hidden">
-    <div class="flex items-center gap-2 py-4" aria-label="Selecionar idioma">
+    <div class="flex items-center gap-2 py-4" aria-label={languageSelectorLabel}>
       {locales.map(({ code, label, flag }) => {
         const isActive = code === locale;
         const altPath = isActive ? currentPath : getAlternatePath(currentPath, code);
@@ -111,7 +126,7 @@ const navLinks = [
     </div>
     <ul class="flex flex-col gap-2" role="list">
       {navLinks.map(({ href, label }) => {
-        const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+        const isActive = isActivePath(href);
         return (
           <li>
             <a href={href} class={`playful-focus block rounded-full px-5 py-3 text-sm font-extrabold shadow-sm ${isActive ? 'bg-playful-peach text-playful-orange-dark' : 'bg-white/75 text-playful-muted hover:bg-playful-peach'}`} aria-current={isActive ? 'page' : undefined}>
