@@ -16,9 +16,11 @@ const brandAriaLabel = homePath === '/test-landing'
     : 'CAPA Póvoa de Lanhoso — Home';
 const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
 
+const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+
 const navLinks = [
   { href: '#inicio', label: t.nav.home },
-  { href: '#caes', label: t.nav.dogs },
+  { href: dogsPath, label: t.nav.dogs },
   { href: '#sobre-nos', label: t.nav.about },
   { href: '#ajudar', label: t.nav.help },
 ];

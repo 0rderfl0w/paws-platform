@@ -20,7 +20,7 @@ function assertNotIncludes(html, needle, context) {
   }
 }
 
-function checkLivePage({ page, htmlPath, title, ogUrl, localeNeedles }) {
+function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, localeNeedles }) {
   const html = readBuilt(htmlPath);
   const context = `${page} (${htmlPath})`;
 
@@ -30,7 +30,8 @@ function checkLivePage({ page, htmlPath, title, ogUrl, localeNeedles }) {
   assertIncludes(html, 'property="og:type" content="website"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertIncludes(html, 'href="#inicio"', context);
-  assertIncludes(html, 'href="#caes"', context);
+  assertIncludes(html, `href="${dogsHref}"`, context);
+  assertNotIncludes(html, 'href="#caes"', context);
   assertIncludes(html, 'href="#sobre-nos"', context);
   assertIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'name="robots" content="noindex, nofollow"', context);
@@ -40,7 +41,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, localeNeedles }) {
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 11 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 12 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -52,10 +53,12 @@ function checkTestLanding() {
   assertIncludes(html, '<title>CAPA Póvoa de Lanhoso — Test Landing</title>', context);
   assertIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertIncludes(html, 'href="/test-landing"', context);
+  assertIncludes(html, 'href="/caes"', context);
+  assertNotIncludes(html, 'href="#caes"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 6, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 8, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
@@ -64,6 +67,7 @@ const pages = [
     htmlPath: 'dist/index.html',
     title: 'CAPA Póvoa de Lanhoso — Adota um Cão',
     ogUrl: 'https://capapvl.org/',
+    dogsHref: '/caes',
     localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"'],
   }),
   checkLivePage({
@@ -71,6 +75,7 @@ const pages = [
     htmlPath: 'dist/en/index.html',
     title: 'CAPA Póvoa de Lanhoso — Adopt a Dog',
     ogUrl: 'https://capapvl.org/en/',
+    dogsHref: '/en/dogs',
     localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"'],
   }),
   checkTestLanding(),

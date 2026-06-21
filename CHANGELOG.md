@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Landing nav: changed the Playful landing menu's "Os Nossos Cães" / "Our Dogs" link from the in-page `#caes` anchor to the full listing routes `/caes` and `/en/dogs`.
 - Footer: moved the Playful footer donation IBAN into a wider support pill spanning the help/contact columns on desktop, restored the full `PT50` IBAN formatting, and fixed the live-home footer phone link href.
 - Accessibility: included adopted status in `/caes/` and `/en/dogs/` dog-card accessible names, changed Playful filter controls from fake tab semantics to pressed-button groups, and hardened live-home browser smoke cleanup/port allocation.
 - Landing: promoted the Playful Impact `/test-landing/` experience to the live `/` and `/en/` home routes with canonical metadata, route-aware home/language links, shared page assembly, hydrated featured-dog browser smoke, and preserved `/test-landing/` as a noindex review reference.
