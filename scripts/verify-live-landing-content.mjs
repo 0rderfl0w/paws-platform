@@ -28,7 +28,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, localeNeedles }) {
   assertIncludes(html, `<title>${title}</title>`, context);
   assertIncludes(html, `property="og:url" content="${ogUrl}"`, context);
   assertIncludes(html, 'property="og:type" content="website"', context);
-  assertIncludes(html, 'IBAN: 0010 0000 45914000001 49', context);
+  assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertIncludes(html, 'href="#inicio"', context);
   assertIncludes(html, 'href="#caes"', context);
   assertIncludes(html, 'href="#sobre-nos"', context);
@@ -52,7 +52,7 @@ function checkTestLanding() {
   assertIncludes(html, '<title>CAPA Póvoa de Lanhoso — Test Landing</title>', context);
   assertIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertIncludes(html, 'href="/test-landing"', context);
-  assertIncludes(html, 'IBAN: 0010 0000 45914000001 49', context);
+  assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
   return { page: 'test', checked: 6, htmlPath: resolve(root, htmlPath) };

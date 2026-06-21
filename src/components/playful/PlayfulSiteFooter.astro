@@ -16,6 +16,7 @@ const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 const footerAriaLabel = locale === 'pt' ? 'Rodapé' : 'Footer';
 const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
 const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
+const iban = 'PT50 0010 0000 4591 4000 0014 9';
 
 const quickLinks = [
   { href: homePath, label: t.nav.home },
@@ -79,9 +80,15 @@ const helpLinks = [
           <li><a href="tel:+351253690000" class="playful-focus hover:text-playful-orange-dark">+351 253 690 000</a></li>
           <li><a href="mailto:capa.geralpvl@gmail.com" class="playful-focus hover:text-playful-orange-dark">capa.geralpvl@gmail.com</a></li>
         </ul>
-        <div class="mt-5 rounded-full bg-white/70 px-5 py-3 text-sm shadow-sm">
-          <span class="font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</span><br />
-          <span class="font-mono font-bold">IBAN: 0010 0000 45914000001 49</span>
+      </div>
+
+      <div data-reveal="rise" class="lg:col-start-3 lg:col-span-2 lg:-mt-3">
+        <div class="w-full rounded-full bg-white/75 px-5 py-3 text-center text-[0.72rem] font-bold shadow-sm sm:px-6 sm:text-xs xl:text-sm">
+          <p class="overflow-x-auto whitespace-nowrap text-playful-ink">
+            <span class="font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</span>
+            <span class="mx-2 text-playful-orange/60" aria-hidden="true">·</span>
+            <span class="font-mono font-extrabold tracking-[-0.04em]">IBAN: {iban}</span>
+          </p>
         </div>
       </div>
     </div>
