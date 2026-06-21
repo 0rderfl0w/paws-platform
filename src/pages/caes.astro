@@ -1,8 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
 import DogListings from '../components/DogListings';
-import Footer from '../components/Footer.astro';
+import CaesPlayfulHero from '../components/caes/CaesPlayfulHero.astro';
+import PlayfulSiteNav from '../components/playful/PlayfulSiteNav.astro';
+import PlayfulSiteFooter from '../components/playful/PlayfulSiteFooter.astro';
+import PlayfulScrollReveal from '../components/playful/PlayfulScrollReveal.astro';
 
 const locale = 'pt' as const;
 ---
@@ -11,28 +13,20 @@ const locale = 'pt' as const;
   locale={locale}
   title="Os Nossos Cães — CAPA Póvoa de Lanhoso"
   description="Conheça os nossos cães disponíveis para adoção. Filtre por tamanho e encontre o seu novo companheiro."
-  ogUrl="https://capapvl.pt/caes"
+  ogImage="/images/caes/hero-playful-dogs-fallback.jpg"
+  ogUrl="https://capapvl.org/caes"
+  playfulFonts
 >
-  <Nav locale={locale} />
-  <main>
-    {/* Hero section */}
-    <section class="bg-gradient-to-b from-warm-100 to-warm-50 pt-16 pb-14 px-4 sm:px-6 lg:px-8 text-center">
-      <div class="max-w-3xl mx-auto">
-        <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-4">
-          Prontos para adoção
-        </span>
-        <h1 class="text-4xl sm:text-5xl font-bold text-warm-900 mb-5 leading-tight">
-          Os Nossos Cães
-        </h1>
-        <p class="text-warm-600 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto">
-          Cada um deles tem uma história, uma personalidade única e muito amor para dar.
-          Poderá o próximo lar ser o teu?
-        </p>
-      </div>
-    </section>
+  <div data-playful-scroll-reveal class="min-h-screen bg-playful-canvas text-playful-ink font-playful-body pattern-dots selection:bg-playful-orange selection:text-white">
+    <PlayfulSiteNav locale={locale} />
+    <div class="overflow-x-clip">
+      <main>
+        <CaesPlayfulHero locale={locale} />
+        <DogListings locale={locale} client:load />
+      </main>
+      <PlayfulSiteFooter locale={locale} />
+    </div>
+  </div>
 
-    {/* Dog listings — interactive React island */}
-    <DogListings locale={locale} client:load />
-  </main>
-  <Footer locale={locale} />
+  <PlayfulScrollReveal observeDynamic />
 </Layout>

@@ -1,86 +1,14 @@
-import { useState, useEffect } from 'react';
-import { capaApi } from '../lib/capaApi';
+import { useEffect, useMemo, useState } from 'react';
 import { capaDogs } from '../data/capaDogs';
-import { getTranslations, localizeDescription, type Locale } from '../i18n';
+import { capaApi } from '../lib/capaApi';
+import { getTranslations, type Locale } from '../i18n';
 import type { Dog } from '../lib/capaApi';
+import PlayfulDogCard from './dogs/PlayfulDogCard';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large';
 type SexFilter = 'all' | 'male' | 'female';
 
-const SIZE_BADGE_CLASSES: Record<string, string> = {
-  small: 'bg-nature-100 text-nature-700 border border-nature-200',
-  medium: 'bg-primary-100 text-primary-700 border border-primary-200',
-  large: 'bg-warm-100 text-warm-700 border border-warm-200',
-};
-
-function getCardDescription(description: string, locale: Locale): string {
-  const normalized = description.replace(/\\n/g, '\n');
-  const personality = normalized.match(/^Personalidade:\s*(.+)$/m)?.[1]?.trim();
-  const story = normalized.match(/^História:\s*([\s\S]+)/m)?.[1]?.trim();
-  const summary = [personality, story].filter(Boolean).join('. ');
-
-  return localizeDescription(summary || normalized, locale);
-}
-
-function DogCard({ dog, locale }: { dog: Dog; locale: Locale }) {
-  const t = getTranslations(locale);
-  const badgeClasses = SIZE_BADGE_CLASSES[dog.size] ?? 'bg-warm-100 text-warm-700 border border-warm-200';
-
-  const sizeLabels: Record<string, string> = {
-    small: t.sizes.small,
-    medium: t.sizes.medium,
-    large: t.sizes.large,
-  };
-  const sizeLabel = sizeLabels[dog.size] ?? dog.size;
-
-  const dogPath = locale === 'pt' ? `/cao?id=${dog.id}` : `/en/dog?id=${dog.id}`;
-
-  return (
-    <a href={dogPath} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg border border-warm-200 transition-all duration-200 group cursor-pointer">
-      {/* Photo */}
-      <div className="relative aspect-square overflow-hidden bg-warm-100">
-        {dog.photo_url ? (
-          <img
-            src={dog.photo_url}
-            alt={`${t.dogProfile.breadcrumbDogs} ${dog.name}`}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-warm-300">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-16 h-16" aria-hidden="true">
-              <path d="M12 2C10.9 2 10 2.9 10 4s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-4 4c-2.2 0-4 1.5-4 3.3 0 .8.3 1.6.9 2.3L7 15c-.6.6-1 1.5-1 2.4C6 19.4 7.6 21 9.6 21h4.8c2 0 3.6-1.6 3.6-3.6 0-.9-.4-1.8-1-2.4l-.9-1.4c.6-.7.9-1.5.9-2.3C17 9.5 15.2 8 13 8h-1z"/>
-            </svg>
-          </div>
-        )}
-        {/* Size badge overlay */}
-        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClasses}`}>
-          {sizeLabel}
-        </span>
-        {dog.is_adopted && (
-          <span className="absolute inset-x-0 bottom-0 bg-primary-500/95 py-2 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-md">
-            {t.status.adopted}
-          </span>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="p-5">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className="text-lg font-bold text-warm-900">{dog.name}</h3>
-          {dog.age && (
-            <span className="text-xs text-warm-500 font-medium bg-warm-50 px-2 py-1 rounded-lg border border-warm-200 flex-shrink-0 ml-2">
-              {dog.age}
-            </span>
-          )}
-        </div>
-        <p className="text-warm-600 text-sm leading-relaxed line-clamp-3">
-          {getCardDescription(dog.description ?? '', locale)}
-        </p>
-      </div>
-    </a>
-  );
-}
+const FILTER_BUTTON_BASE = 'playful-focus min-h-11 rounded-full px-5 py-2.5 text-sm font-extrabold transition-all';
 
 export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
   const t = getTranslations(locale);
@@ -124,20 +52,20 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
     fetchDogs();
   }, []);
 
-  const filteredDogs = (() => {
+  const filteredDogs = useMemo(() => {
     let result = dogs;
     if (filter !== 'all') {
-      result = result.filter((d) => d.size === filter);
+      result = result.filter((dog) => dog.size === filter);
     }
     if (sexFilter !== 'all') {
-      result = result.filter((d) => d.sex === sexFilter);
+      result = result.filter((dog) => dog.sex === sexFilter);
     }
     if (search.trim()) {
       const term = search.trim().toLowerCase();
-      result = result.filter((d) => d.name.toLowerCase().includes(term));
+      result = result.filter((dog) => dog.name.toLowerCase().includes(term));
     }
     return result;
-  })();
+  }, [dogs, filter, search, sexFilter]);
 
   function resetFilters() {
     setFilter('all');
@@ -149,119 +77,126 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
     ? t.dogListings.resultsOne
     : `${filteredDogs.length} ${t.dogListings.resultsMany}`;
 
+  const sizeLabelId = locale === 'pt' ? 'caes-size-filter-label' : 'dogs-size-filter-label';
+  const sexLabelId = locale === 'pt' ? 'caes-sex-filter-label' : 'dogs-sex-filter-label';
+
   return (
-    <section className="bg-warm-50 py-16" aria-label={t.dogListings.sectionLabel}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* Search + Filters */}
-        <div className="mb-10 space-y-5">
-          {/* Search input */}
-          <div className="relative max-w-md mx-auto">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 text-warm-400" aria-hidden="true">
-                <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
-              </svg>
+    <section id="lista-caes" className="relative overflow-hidden px-5 py-14 sm:px-8 lg:py-20" aria-label={t.dogListings.sectionLabel}>
+      <div className="ambient-blob left-1/2 top-10 h-80 w-80 -translate-x-1/2 bg-playful-peach/70" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div data-reveal="rise" className="mb-10 rounded-[2rem] border border-playful-line/80 bg-white/82 p-5 shadow-pillowy backdrop-blur sm:p-6 lg:p-8">
+          <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div>
+              <label htmlFor="dog-search" className="mb-3 block text-xs font-extrabold uppercase tracking-[0.22em] text-playful-orange-dark">
+                {t.dogListings.searchLabel}
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-5 text-playful-orange-dark" aria-hidden="true">
+                  ⌕
+                </div>
+                <input
+                  id="dog-search"
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder={t.dogListings.searchPlaceholder}
+                  aria-label={t.dogListings.searchLabel}
+                  className="playful-focus min-h-14 w-full rounded-full border-2 border-playful-line bg-playful-canvas py-3 pl-12 pr-5 text-base font-bold text-playful-ink placeholder:text-playful-muted/55 shadow-inner transition-colors focus:border-playful-orange"
+                />
+              </div>
             </div>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t.dogListings.searchPlaceholder}
-              aria-label={t.dogListings.searchLabel}
-              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-warm-200 text-warm-900 placeholder-warm-400 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition-colors"
-            />
+
+            {!loading && (
+              <p className="rounded-full bg-playful-peach px-5 py-3 text-center text-sm font-extrabold text-playful-orange-dark shadow-sm" aria-live="polite">
+                {resultsText}
+              </p>
+            )}
           </div>
 
-          {/* Size filter tabs */}
-          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label={t.dogListings.filterBySize}>
-            {filterTabs.map(({ id, label }) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={filter === id}
-                onClick={() => setFilter(id)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  filter === id
-                    ? 'bg-primary-500 text-white shadow-sm'
-                    : 'bg-white text-warm-700 border border-warm-200 hover:bg-warm-100 hover:border-warm-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            <div>
+              <p id={sizeLabelId} className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted/80">
+                {t.dogListings.filterBySize}
+              </p>
+              <div className="flex flex-wrap gap-2" role="tablist" aria-labelledby={sizeLabelId}>
+                {filterTabs.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={filter === id}
+                    onClick={() => setFilter(id)}
+                    className={`${FILTER_BUTTON_BASE} ${filter === id ? 'bg-playful-orange text-white shadow-squish' : 'border border-playful-line bg-white text-playful-muted shadow-sm hover:bg-playful-peach hover:text-playful-orange-dark'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Sex filter tabs */}
-          <div className="flex flex-wrap justify-center gap-2" role="tablist" aria-label={t.dogListings.filterBySex}>
-            {sexFilterTabs.map(({ id, label }) => (
-              <button
-                key={id}
-                role="tab"
-                aria-selected={sexFilter === id}
-                onClick={() => setSexFilter(id)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  sexFilter === id
-                    ? 'bg-warm-700 text-white shadow-sm'
-                    : 'bg-white text-warm-700 border border-warm-200 hover:bg-warm-100 hover:border-warm-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+            <div>
+              <p id={sexLabelId} className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted/80">
+                {t.dogListings.filterBySex}
+              </p>
+              <div className="flex flex-wrap gap-2" role="tablist" aria-labelledby={sexLabelId}>
+                {sexFilterTabs.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={sexFilter === id}
+                    onClick={() => setSexFilter(id)}
+                    className={`${FILTER_BUTTON_BASE} ${sexFilter === id ? 'bg-playful-orange-dark text-white shadow-squish' : 'border border-playful-line bg-white text-playful-muted shadow-sm hover:bg-playful-peach hover:text-playful-orange-dark'}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Results count */}
-        {!loading && (
-          <p className="text-warm-500 text-sm font-medium mb-6 text-center">
-            {resultsText}
-          </p>
-        )}
-
-        {/* Loading state — skeleton cards */}
         {loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-warm-200 animate-pulse">
-                <div className="aspect-square bg-warm-200" />
-                <div className="p-5 space-y-3">
-                  <div className="h-5 bg-warm-200 rounded-lg w-2/3" />
-                  <div className="h-4 bg-warm-100 rounded-lg w-full" />
-                  <div className="h-4 bg-warm-100 rounded-lg w-4/5" />
+          <div data-reveal-stagger="70" className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} data-reveal="pop" className="rounded-[1.85rem] border border-playful-line bg-white p-3 shadow-pillowy">
+                <div className="aspect-square animate-pulse rounded-[1.45rem] bg-playful-cream" />
+                <div className="space-y-3 p-5">
+                  <div className="mx-auto h-5 w-2/3 animate-pulse rounded-full bg-playful-line/50" />
+                  <div className="h-4 animate-pulse rounded-full bg-playful-line/35" />
+                  <div className="mx-auto h-4 w-4/5 animate-pulse rounded-full bg-playful-line/35" />
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Dogs grid */}
         {!loading && filteredDogs.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDogs.map((dog) => (
-              <DogCard key={dog.id} dog={dog} locale={locale} />
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredDogs.map((dog, index) => (
+              <PlayfulDogCard key={dog.id} dog={dog} locale={locale} index={index} />
             ))}
           </div>
         )}
 
-        {/* Empty state */}
         {!loading && filteredDogs.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🐾</div>
-            <p className="text-warm-700 text-xl font-semibold mb-2">
+          <div data-reveal="pop" className="rounded-playful border border-playful-line bg-white px-6 py-16 text-center shadow-pillowy">
+            <div className="mb-4 text-6xl" aria-hidden="true">🐾</div>
+            <p className="text-xl font-extrabold text-playful-orange-dark">
               {t.dogListings.emptyTitle}
             </p>
-            <p className="text-warm-500 text-sm mb-6">
+            <p className="mt-2 text-sm font-bold text-playful-muted">
               {t.dogListings.emptyDesc}
             </p>
             <button
+              type="button"
               onClick={resetFilters}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-200"
+              className="playful-focus squishy mt-6 inline-flex items-center justify-center rounded-full bg-playful-orange px-6 py-3 text-sm font-extrabold text-white shadow-squish"
             >
               {t.dogListings.clearFilters}
             </button>
           </div>
         )}
-
       </div>
     </section>
   );

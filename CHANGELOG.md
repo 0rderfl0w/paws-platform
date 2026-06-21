@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Cães/Dogs: redesigned the live `/caes/` and parity-safe `/en/dogs/` listing routes with the CAPA Playful Impact system while preserving hero copy, search/filter labels, result text, dog cards, profile links, API loading, and committed fallback data.
+- Cães/Dogs: added a stronger real-photo adoption-poster hero collage, route-aware Playful chrome, tactile search/filter controls, Playful dog cards with visible adopted banners, static content smoke, and hydrated browser smoke for 99 dog cards, 9 adopted badges, and Abby adopted search.
 - Sobre nós/About: redesigned the live `/sobre-nos/` and `/en/about/` pages directly with the CAPA Playful Impact system while preserving the bilingual origin, principles, community, rescue/rehabilitation, Zeus story, and dogs CTA copy.
 - Sobre nós/About: added a stronger poster-style real-photo hero, locale-aware Playful section components, local hero image derivatives, route-scoped scroll reveal, and a bilingual content-preservation smoke script.
 - Playful Impact: moved the shared scroll-reveal behavior into a reusable `PlayfulScrollReveal` component, kept MutationObserver support only for dynamic Playful routes, cleared long-lived `will-change` after reveal, and darkened the orange action token so white CTA text passes WCAG AA contrast.
