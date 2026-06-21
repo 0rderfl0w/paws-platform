@@ -8,6 +8,7 @@ export interface Props {
   ogImage?: string;
   ogUrl?: string;
   noindex?: boolean;
+  playfulFonts?: boolean;
   locale?: Locale;
 }
 
@@ -16,11 +17,15 @@ const {
   ogImage = '/images/hero-dog.jpg',
   ogUrl = 'https://capapvl.org',
   noindex = false,
+  playfulFonts = false,
 } = Astro.props;
 
 const t = getTranslations(locale);
 const title = Astro.props.title ?? t.layout.defaultTitle;
 const description = Astro.props.description ?? t.layout.defaultDescription;
+const fontHref = playfulFonts
+  ? 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@700;800&display=swap'
+  : 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap';
 
 const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.org${ogImage}`;
 ---
@@ -55,7 +60,7 @@ const ogImageAbsolute = ogImage.startsWith('http') ? ogImage : `https://capapvl.
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href={fontHref}
       rel="stylesheet"
     />
   </head>

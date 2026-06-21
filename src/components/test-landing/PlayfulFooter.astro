@@ -1,0 +1,91 @@
+---
+import { getTranslations, type Locale } from '../../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+
+const homePath = '/test-landing';
+const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
+const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+
+const quickLinks = [
+  { href: homePath, label: t.nav.home },
+  { href: dogsPath, label: t.nav.dogs },
+  { href: adoptPath, label: t.footer.adoption },
+  { href: aboutPath, label: t.nav.about },
+  { href: helpPath, label: t.footer.howToHelp },
+];
+
+const helpLinks = [
+  { href: adoptPath, label: t.footer.adoptDog },
+  { href: helpPath, label: t.footer.volunteering },
+  { href: helpPath, label: t.footer.fosterFamilies },
+  { href: helpPath, label: t.footer.donate },
+];
+---
+
+<footer class="relative overflow-hidden rounded-t-[3rem] bg-playful-peach text-playful-muted shadow-pillowy-lg" aria-label="Rodapé">
+  <div class="ambient-blob -left-24 top-10 h-72 w-72 bg-white"></div>
+  <div class="ambient-blob -right-16 bottom-6 h-80 w-80 bg-playful-orange/25"></div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 sm:px-8">
+    <div class="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr]">
+      <div>
+        <a href={homePath} class="playful-focus inline-flex items-center gap-4 rounded-full">
+          <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="h-20 w-20 rounded-[1.75rem] border-4 border-white object-cover shadow-pillowy" width="80" height="80" />
+          <div>
+            <div class="font-playful-display text-3xl font-extrabold tracking-[-0.04em] text-playful-orange-dark">CAPAPVL</div>
+            <div class="text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted">Póvoa de Lanhoso</div>
+          </div>
+        </a>
+        <p class="mt-5 max-w-sm text-sm font-medium leading-7">{t.footer.brandDesc}</p>
+        <div class="mt-5 flex gap-3">
+          <a href="https://facebook.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label="CAPA no Facebook" target="_blank" rel="noopener noreferrer">f</a>
+          <a href="https://instagram.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label="CAPA no Instagram" target="_blank" rel="noopener noreferrer">◎</a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.navHeading}</h3>
+        <ul class="mt-4 space-y-2" role="list">
+          {quickLinks.map(({ href, label }) => (
+            <li><a href={href} class="playful-focus inline-block rounded-full px-1 py-1 text-sm font-bold hover:text-playful-orange-dark">{label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.helpHeading}</h3>
+        <ul class="mt-4 space-y-2" role="list">
+          {helpLinks.map(({ href, label }) => (
+            <li><a href={href} class="playful-focus inline-block rounded-full px-1 py-1 text-sm font-bold hover:text-playful-orange-dark">{label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.contactHeading}</h3>
+        <ul class="mt-4 space-y-3 text-sm font-medium leading-6" role="list">
+          <li>EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal</li>
+          <li><a href="tel:+351****0000" class="playful-focus hover:text-playful-orange-dark">+351 253 690 000</a></li>
+          <li><a href="mailto:capa.geralpvl@gmail.com" class="playful-focus hover:text-playful-orange-dark">capa.geralpvl@gmail.com</a></li>
+        </ul>
+        <div class="mt-5 rounded-full bg-white/70 px-5 py-3 text-sm shadow-sm">
+          <span class="font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</span><br />
+          <span class="font-mono font-bold">IBAN: 0010 0000 45914000001 49</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-playful-orange/15 pt-8 text-center text-xs font-bold text-playful-muted/80">
+      <p>{t.footer.copyright}</p>
+      <p class="mt-2">{t.footer.madeWith}</p>
+    </div>
+  </div>
+</footer>

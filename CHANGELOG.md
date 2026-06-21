@@ -1,5 +1,10 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-06-21
+- Landing: added `/test-landing/` as a noindex production review page that preserves the current homepage copy and section flow while applying the Playful Impact design concept: cream canvas, Sora/Plus Jakarta Sans type, juicy orange CTAs, blob hero image treatment, pillowy cards, soft-brutalist rotations, and squishy interaction states.
+- Dogs: kept the test landing's featured dogs backed by the existing Hetzner API plus committed fallback data, preserving size filters and `/cao?id=` profile links.
+- Deploy: built with `PUBLIC_CAPA_API_URL=https://api.capapvl.org` and a fresh `CAPA_ASSET_VERSION`, synced `dist/` to `/home/deploy/apps/capapvl`, and verified live `/test-landing/` returns the new noindex page instead of the old 404 body while `/` remains the existing live homepage.
+
 ## 2026-06-19
 - Dogs: marked Abby, Bella, Bolt, Buggy, Farrusco, Kiki, Klein, Mickey, and Mouse as adopted, and added a visible adopted banner on dog listing/profile photos.
 - Dogs: removed deceased dogs Farrusca, Iman, Molly, Ringo, and Salsa from the public fallback dataset and public photo assets.

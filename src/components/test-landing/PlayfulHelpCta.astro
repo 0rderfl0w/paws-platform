@@ -1,0 +1,61 @@
+---
+import { getTranslations, type Locale } from '../../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+
+const ways = [
+  { title: t.helpCta.adoptTitle, description: t.helpCta.adoptDesc, icon: '⌂', href: locale === 'pt' ? '/adocao' : '/en/adopt', rotate: 'md:rotate-1', bg: 'bg-playful-peach' },
+  { title: t.helpCta.sponsorTitle, description: t.helpCta.sponsorDesc, icon: '🤝', href: helpPath, rotate: 'md:-rotate-1 md:translate-y-7', bg: 'bg-white' },
+  { title: t.helpCta.volunteerTitle, description: t.helpCta.volunteerDesc, icon: '✋', href: helpPath, rotate: 'md:rotate-2', bg: 'bg-white' },
+  { title: t.helpCta.donateTitle, description: t.helpCta.donateDesc, icon: '❤', href: helpPath, rotate: 'md:-rotate-2 md:translate-y-4', bg: 'bg-playful-cream' },
+];
+---
+
+<section id="ajudar" class="relative px-5 py-16 sm:px-8 lg:py-24" aria-labelledby="playful-help-heading">
+  <div class="ambient-blob right-0 top-16 h-72 w-72 bg-playful-peach"></div>
+  <div class="mx-auto max-w-7xl">
+    <header class="relative z-10 mb-12 text-center">
+      <span class="mb-3 inline-block text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">{t.helpCta.eyebrow}</span>
+      <h2 id="playful-help-heading" class="mx-auto max-w-4xl -rotate-1 font-playful-display text-4xl font-extrabold tracking-[-0.04em] text-playful-orange-dark sm:text-5xl">
+        {t.helpCta.heading}
+        <span aria-hidden="true"> 🐾</span>
+      </h2>
+      <p class="mx-auto mt-4 max-w-2xl text-lg font-medium leading-8 text-playful-muted">{t.helpCta.subheading}</p>
+    </header>
+
+    <div class="relative z-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {ways.map(({ title, description, icon, href, rotate, bg }, index) => (
+        <a href={href} class={`${bg} ${rotate} card-pillowy playful-focus rounded-playful border border-playful-line/70 p-7 text-center shadow-pillowy`}>
+          <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-playful-orange/14 text-2xl shadow-sm" aria-hidden="true">{icon}</div>
+          <div class="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-playful-orange-dark">{index + 1}. {title}</div>
+          <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+        </a>
+      ))}
+    </div>
+
+    <div class="relative z-10 mx-auto mt-12 max-w-3xl rounded-[2rem] border-2 border-playful-orange/15 bg-white p-6 shadow-pillowy-lg sm:p-8">
+      <div class="grid items-center gap-6 sm:grid-cols-[auto_1fr]">
+        <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-playful-orange text-4xl text-white shadow-squish" aria-hidden="true">❤</div>
+        <div class="text-center sm:text-left">
+          <h3 class="font-playful-display text-2xl font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</h3>
+          <p class="mt-2 text-sm font-medium text-playful-muted">{t.helpCta.ctaFooter}</p>
+          <div class="mt-4 inline-block rounded-full border-2 border-dashed border-playful-line bg-playful-cream px-4 py-3 font-mono text-[11px] font-extrabold tracking-tight text-playful-orange-dark whitespace-nowrap sm:px-5 sm:text-sm sm:tracking-wide">
+            IBAN: 0010 0000 45914000001 49
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 mt-10 text-center">
+      <a href={helpPath} class="squishy playful-focus inline-flex items-center justify-center rounded-full bg-playful-orange px-8 py-4 font-playful-display font-extrabold text-white shadow-squish">
+        {t.helpCta.ctaButton}
+      </a>
+    </div>
+  </div>
+</section>
