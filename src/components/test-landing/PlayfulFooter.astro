@@ -3,16 +3,19 @@ import { getTranslations, type Locale } from '../../i18n';
 
 interface Props {
   locale?: Locale;
+  homePath?: string;
 }
 
-const { locale = 'pt' } = Astro.props;
+const { locale = 'pt', homePath = '/test-landing' } = Astro.props;
 const t = getTranslations(locale);
 
-const homePath = '/test-landing';
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+const footerAriaLabel = locale === 'pt' ? 'Rodapé' : 'Footer';
+const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
+const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
 
 const quickLinks = [
   { href: homePath, label: t.nav.home },
@@ -30,7 +33,7 @@ const helpLinks = [
 ];
 ---
 
-<footer data-reveal="rise" class="relative overflow-hidden rounded-t-[3rem] bg-playful-peach text-playful-muted shadow-pillowy-lg" aria-label="Rodapé">
+<footer data-reveal="rise" class="relative overflow-hidden rounded-t-[3rem] bg-playful-peach text-playful-muted shadow-pillowy-lg" aria-label={footerAriaLabel}>
   <div class="ambient-blob -left-24 top-10 h-72 w-72 bg-white"></div>
   <div class="ambient-blob -right-16 bottom-6 h-80 w-80 bg-playful-orange/25"></div>
 
@@ -46,8 +49,8 @@ const helpLinks = [
         </a>
         <p class="mt-5 max-w-sm text-sm font-medium leading-7">{t.footer.brandDesc}</p>
         <div class="mt-5 flex gap-3">
-          <a href="https://facebook.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label="CAPA no Facebook" target="_blank" rel="noopener noreferrer">f</a>
-          <a href="https://instagram.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label="CAPA no Instagram" target="_blank" rel="noopener noreferrer">◎</a>
+          <a href="https://facebook.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer">f</a>
+          <a href="https://instagram.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer">◎</a>
         </div>
       </div>
 

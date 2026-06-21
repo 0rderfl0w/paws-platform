@@ -4,14 +4,16 @@
 
 CAPA's current redesign direction is **Playful Impact**: a warm, emotional, dog-rescue landing-page system that feels like a tactile charity poster rather than a generic SaaS template.
 
-The direction is currently implemented on the noindex production review route:
+The direction is implemented on the live home routes and retained on the noindex production review route:
 
-- Live review: `https://capapvl.org/test-landing/`
-- Source route: `src/pages/test-landing.astro`
+- Live PT home: `https://capapvl.org/`
+- Live EN home: `https://capapvl.org/en/`
+- Noindex review: `https://capapvl.org/test-landing/`
+- Source routes: `src/pages/index.astro`, `src/pages/en/index.astro`, `src/pages/test-landing.astro`
 - Components: `src/components/test-landing/*`
-- Tokens/helpers: `src/styles/global.css` under “Playful Impact test-landing tokens”
+- Tokens/helpers: `src/styles/global.css` under “Playful Impact route tokens”
 
-Use this document as the design reference for future CAPA landing-page redesign work. The existing live `/` route may still use the older warm-earth system until Z approves a full replacement.
+Use this document as the design reference for future CAPA landing-page redesign work.
 
 ---
 

@@ -1,0 +1,79 @@
+#!/usr/bin/env node
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const root = process.cwd();
+
+function readBuilt(relativePath) {
+  return readFileSync(resolve(root, relativePath), 'utf8');
+}
+
+function assertIncludes(html, needle, context) {
+  if (!html.includes(needle)) {
+    throw new Error(`${context}: expected to include ${JSON.stringify(needle)}`);
+  }
+}
+
+function assertNotIncludes(html, needle, context) {
+  if (html.includes(needle)) {
+    throw new Error(`${context}: expected not to include ${JSON.stringify(needle)}`);
+  }
+}
+
+function checkLivePage({ page, htmlPath, title, ogUrl, localeNeedles }) {
+  const html = readBuilt(htmlPath);
+  const context = `${page} (${htmlPath})`;
+
+  assertIncludes(html, 'data-playful-scroll-reveal', context);
+  assertIncludes(html, `<title>${title}</title>`, context);
+  assertIncludes(html, `property="og:url" content="${ogUrl}"`, context);
+  assertIncludes(html, 'property="og:type" content="website"', context);
+  assertIncludes(html, 'IBAN: 0010 0000 45914000001 49', context);
+  assertIncludes(html, 'href="#inicio"', context);
+  assertIncludes(html, 'href="#caes"', context);
+  assertIncludes(html, 'href="#sobre-nos"', context);
+  assertIncludes(html, 'href="#ajudar"', context);
+  assertNotIncludes(html, 'name="robots" content="noindex, nofollow"', context);
+  assertNotIncludes(html, 'CAPA Póvoa de Lanhoso — Test Landing', context);
+
+  for (const needle of localeNeedles) {
+    assertIncludes(html, needle, context);
+  }
+
+  return { page, checked: 11 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+}
+
+function checkTestLanding() {
+  const htmlPath = 'dist/test-landing/index.html';
+  const html = readBuilt(htmlPath);
+  const context = `test (${htmlPath})`;
+
+  assertIncludes(html, 'data-playful-scroll-reveal', context);
+  assertIncludes(html, '<title>CAPA Póvoa de Lanhoso — Test Landing</title>', context);
+  assertIncludes(html, 'name="robots" content="noindex, nofollow"', context);
+  assertIncludes(html, 'href="/test-landing"', context);
+  assertIncludes(html, 'IBAN: 0010 0000 45914000001 49', context);
+  assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
+
+  return { page: 'test', checked: 6, htmlPath: resolve(root, htmlPath) };
+}
+
+const pages = [
+  checkLivePage({
+    page: 'pt',
+    htmlPath: 'dist/index.html',
+    title: 'CAPA Póvoa de Lanhoso — Adota um Cão',
+    ogUrl: 'https://capapvl.org/',
+    localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"'],
+  }),
+  checkLivePage({
+    page: 'en',
+    htmlPath: 'dist/en/index.html',
+    title: 'CAPA Póvoa de Lanhoso — Adopt a Dog',
+    ogUrl: 'https://capapvl.org/en/',
+    localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"'],
+  }),
+  checkTestLanding(),
+];
+
+console.log(JSON.stringify({ ok: true, pages }, null, 2));

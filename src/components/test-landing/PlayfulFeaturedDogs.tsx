@@ -39,6 +39,7 @@ function DogCard({ dog, locale, index }: { dog: Dog; locale: Locale; index: numb
   return (
     <a
       href={dogPath}
+      data-featured-dog-card
       data-reveal="tilt"
       className={`group block rounded-[1.75rem] border border-playful-line/80 bg-white p-3 shadow-pillowy transition-transform duration-300 hover:-translate-y-2 hover:rotate-0 hover:shadow-pillowy-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-playful-orange/35 ${rotation}`}
     >
