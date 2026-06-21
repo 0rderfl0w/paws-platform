@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Footer: linked the CAPA address to Google Maps in a new tab across Playful and legacy footers, and normalized the footer phone `tel:` href.
 - Landing nav: changed the Playful landing menu's "Os Nossos Cães" / "Our Dogs" link from the in-page `#caes` anchor to the full listing routes `/caes` and `/en/dogs`.
 - Footer: moved the Playful footer donation IBAN into a wider support pill spanning the help/contact columns on desktop, restored the full `PT50` IBAN formatting, and fixed the live-home footer phone link href.
 - Accessibility: included adopted status in `/caes/` and `/en/dogs/` dog-card accessible names, changed Playful filter controls from fake tab semantics to pressed-button groups, and hardened live-home browser smoke cleanup/port allocation.

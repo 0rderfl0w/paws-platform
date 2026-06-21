@@ -13,6 +13,8 @@ const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+const mapsHref = 'https://maps.app.goo.gl/vjuwcaWTdFS4YzARA';
+const mapsLabel = locale === 'pt' ? 'Abrir localização da CAPA no Google Maps' : 'Open CAPA location in Google Maps';
 
 const quickLinks = [
   { href: homePath, label: t.nav.home },
@@ -121,7 +123,9 @@ const helpLinks = [
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" aria-hidden="true">
               <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
-            <span class="text-warm-400 text-sm">EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal</span>
+            <a href={mapsHref} class="text-warm-400 hover:text-white text-sm transition-colors" target="_blank" rel="noopener noreferrer" aria-label={mapsLabel}>
+              EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal
+            </a>
           </li>
           <li class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-primary-400 flex-shrink-0" aria-hidden="true">

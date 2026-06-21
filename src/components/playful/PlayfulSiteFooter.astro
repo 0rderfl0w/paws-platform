@@ -17,6 +17,8 @@ const footerAriaLabel = locale === 'pt' ? 'Rodapé' : 'Footer';
 const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
 const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
 const iban = 'PT50 0010 0000 4591 4000 0014 9';
+const mapsHref = 'https://maps.app.goo.gl/vjuwcaWTdFS4YzARA';
+const mapsLabel = locale === 'pt' ? 'Abrir localização da CAPA no Google Maps' : 'Open CAPA location in Google Maps';
 
 const quickLinks = [
   { href: homePath, label: t.nav.home },
@@ -76,7 +78,11 @@ const helpLinks = [
       <div data-reveal="right">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.contactHeading}</h3>
         <ul class="mt-4 space-y-3 text-sm font-medium leading-6" role="list">
-          <li>EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal</li>
+          <li>
+            <a href={mapsHref} class="playful-focus inline-block rounded-2xl hover:text-playful-orange-dark" target="_blank" rel="noopener noreferrer" aria-label={mapsLabel}>
+              EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal
+            </a>
+          </li>
           <li><a href="tel:+351253690000" class="playful-focus hover:text-playful-orange-dark">+351 253 690 000</a></li>
           <li><a href="mailto:capa.geralpvl@gmail.com" class="playful-focus hover:text-playful-orange-dark">capa.geralpvl@gmail.com</a></li>
         </ul>

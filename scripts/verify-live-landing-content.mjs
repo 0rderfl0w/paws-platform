@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
+const mapsHref = 'https://maps.app.goo.gl/vjuwcaWTdFS4YzARA';
 
 function readBuilt(relativePath) {
   return readFileSync(resolve(root, relativePath), 'utf8');
@@ -29,6 +30,9 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, localeNeedles }
   assertIncludes(html, `property="og:url" content="${ogUrl}"`, context);
   assertIncludes(html, 'property="og:type" content="website"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
+  assertIncludes(html, `href="${mapsHref}"`, context);
+  assertIncludes(html, 'target="_blank"', context);
+  assertIncludes(html, 'rel="noopener noreferrer"', context);
   assertIncludes(html, 'href="#inicio"', context);
   assertIncludes(html, `href="${dogsHref}"`, context);
   assertNotIncludes(html, 'href="#caes"', context);
@@ -41,7 +45,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, localeNeedles }
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 12 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 15 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -55,10 +59,13 @@ function checkTestLanding() {
   assertIncludes(html, 'href="/test-landing"', context);
   assertIncludes(html, 'href="/caes"', context);
   assertNotIncludes(html, 'href="#caes"', context);
+  assertIncludes(html, `href="${mapsHref}"`, context);
+  assertIncludes(html, 'target="_blank"', context);
+  assertIncludes(html, 'rel="noopener noreferrer"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 8, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 11, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
