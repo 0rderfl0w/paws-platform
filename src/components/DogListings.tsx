@@ -118,13 +118,12 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
               <p id={sizeLabelId} className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted/80">
                 {t.dogListings.filterBySize}
               </p>
-              <div className="flex flex-wrap gap-2" role="tablist" aria-labelledby={sizeLabelId}>
+              <div className="flex flex-wrap gap-2" role="group" aria-labelledby={sizeLabelId}>
                 {filterTabs.map(({ id, label }) => (
                   <button
                     key={id}
                     type="button"
-                    role="tab"
-                    aria-selected={filter === id}
+                    aria-pressed={filter === id}
                     onClick={() => setFilter(id)}
                     className={`${FILTER_BUTTON_BASE} ${filter === id ? 'bg-playful-orange text-white shadow-squish' : 'border border-playful-line bg-white text-playful-muted shadow-sm hover:bg-playful-peach hover:text-playful-orange-dark'}`}
                   >
@@ -138,13 +137,12 @@ export default function DogListings({ locale = 'pt' }: { locale?: Locale }) {
               <p id={sexLabelId} className="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted/80">
                 {t.dogListings.filterBySex}
               </p>
-              <div className="flex flex-wrap gap-2" role="tablist" aria-labelledby={sexLabelId}>
+              <div className="flex flex-wrap gap-2" role="group" aria-labelledby={sexLabelId}>
                 {sexFilterTabs.map(({ id, label }) => (
                   <button
                     key={id}
                     type="button"
-                    role="tab"
-                    aria-selected={sexFilter === id}
+                    aria-pressed={sexFilter === id}
                     onClick={() => setSexFilter(id)}
                     className={`${FILTER_BUTTON_BASE} ${sexFilter === id ? 'bg-playful-orange-dark text-white shadow-squish' : 'border border-playful-line bg-white text-playful-muted shadow-sm hover:bg-playful-peach hover:text-playful-orange-dark'}`}
                   >

@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Accessibility: included adopted status in `/caes/` and `/en/dogs/` dog-card accessible names, changed Playful filter controls from fake tab semantics to pressed-button groups, and hardened live-home browser smoke cleanup/port allocation.
 - Landing: promoted the Playful Impact `/test-landing/` experience to the live `/` and `/en/` home routes with canonical metadata, route-aware home/language links, shared page assembly, hydrated featured-dog browser smoke, and preserved `/test-landing/` as a noindex review reference.
 - Cães/Dogs: redesigned the live `/caes/` and parity-safe `/en/dogs/` listing routes with the CAPA Playful Impact system while preserving hero copy, search/filter labels, result text, dog cards, profile links, API loading, and committed fallback data.
 - Cães/Dogs: added a stronger real-photo adoption-poster hero collage, route-aware Playful chrome, tactile search/filter controls, Playful dog cards with visible adopted banners, static content smoke, and hydrated browser smoke for 99 dog cards, 9 adopted badges, and Abby adopted search.

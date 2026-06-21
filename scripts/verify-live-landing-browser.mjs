@@ -1,17 +1,44 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
+import { createServer } from 'node:net';
 
 const chromium = process.env.CHROMIUM || '/snap/bin/chromium';
 const url = process.argv[2];
 const locale = process.argv[3] || 'pt';
 const width = Number(process.argv[4] || 1440);
 const height = Number(process.argv[5] || 1000);
-const port = Number(process.argv[6] || 9460);
+const portArg = process.argv[6];
 
 if (!url) {
   console.error('usage: node scripts/verify-live-landing-browser.mjs <url> [pt|en] [width] [height] [port]');
   process.exit(2);
+}
+
+if (!Number.isFinite(width) || !Number.isFinite(height)) {
+  throw new Error(`Invalid viewport: ${width}x${height}`);
+}
+
+async function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    server.unref();
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      if (!address || typeof address === 'string') {
+        server.close(() => reject(new Error('Could not allocate a local CDP port')));
+        return;
+      }
+      const freePort = address.port;
+      server.close(() => resolve(freePort));
+    });
+  });
+}
+
+const port = portArg ? Number(portArg) : await getFreePort();
+if (!Number.isInteger(port) || port <= 0) {
+  throw new Error(`Invalid CDP port: ${portArg}`);
 }
 
 const expected = locale === 'en'
@@ -19,23 +46,39 @@ const expected = locale === 'en'
   : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', helpText: 'Saiba como ajudar', filter: 'Médios' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
-const browser = spawn(chromium, [
-  '--headless=new',
-  '--disable-gpu',
-  '--no-sandbox',
-  '--hide-scrollbars',
-  `--remote-debugging-port=${port}`,
-  `--user-data-dir=${profileDir}`,
-  'about:blank',
-], { stdio: ['ignore', 'ignore', 'pipe'] });
-
+let browser = null;
+let browserExit = null;
+let browserError = null;
 let stderr = '';
-browser.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+let ws = null;
+let loaded = false;
+let nextId = 1;
+const pending = new Map();
 
 async function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 
+function waitForExit(proc, timeoutMs) {
+  if (!proc || proc.exitCode !== null) return Promise.resolve();
+  return Promise.race([
+    new Promise((resolve) => proc.once('exit', resolve)),
+    sleep(timeoutMs),
+  ]);
+}
+
+async function stopBrowser() {
+  if (!browser || browser.exitCode !== null) return;
+  browser.kill('SIGTERM');
+  await waitForExit(browser, 2000);
+  if (browser.exitCode === null) {
+    browser.kill('SIGKILL');
+    await waitForExit(browser, 1000);
+  }
+}
+
 async function getJsonVersion() {
   for (let i = 0; i < 90; i += 1) {
+    if (browserError) throw browserError;
+    if (browserExit) throw new Error(`Chrome exited before CDP became ready: ${JSON.stringify(browserExit)}\nstderr:\n${stderr}`);
     try {
       const res = await fetch(`http://127.0.0.1:${port}/json/version`);
       if (res.ok) return await res.json();
@@ -45,9 +88,8 @@ async function getJsonVersion() {
   throw new Error(`Chrome CDP not ready. stderr:\n${stderr}`);
 }
 
-let nextId = 1;
-const pending = new Map();
-function send(ws, method, params = {}) {
+function send(method, params = {}) {
+  if (!ws) throw new Error(`Cannot call ${method}: websocket is not connected`);
   const id = nextId++;
   ws.send(JSON.stringify({ id, method, params }));
   return new Promise((resolve, reject) => {
@@ -55,46 +97,59 @@ function send(ws, method, params = {}) {
   });
 }
 
-const version = await getJsonVersion();
-const targetsRes = await fetch(`http://127.0.0.1:${port}/json/list`);
-const targets = await targetsRes.json();
-const pageTarget = targets.find((target) => target.type === 'page' && target.webSocketDebuggerUrl);
-if (!pageTarget) throw new Error(`No page CDP target. Browser version: ${JSON.stringify(version)}`);
-const ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
-
-await new Promise((resolve, reject) => {
-  ws.addEventListener('open', resolve, { once: true });
-  ws.addEventListener('error', reject, { once: true });
-});
-
-let loaded = false;
-ws.addEventListener('message', (event) => {
-  const msg = JSON.parse(event.data);
-  if (msg.id && pending.has(msg.id)) {
-    const { resolve, reject, method } = pending.get(msg.id);
-    pending.delete(msg.id);
-    if (msg.error) reject(new Error(`${method}: ${JSON.stringify(msg.error)}`));
-    else resolve(msg.result);
-  }
-  if (msg.method === 'Page.loadEventFired') loaded = true;
-});
-
 async function evaluate(expression) {
-  const result = await send(ws, 'Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+  const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
   if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
   return result.result.value;
 }
 
 try {
-  await send(ws, 'Page.enable');
-  await send(ws, 'Runtime.enable');
-  await send(ws, 'Emulation.setDeviceMetricsOverride', {
+  browser = spawn(chromium, [
+    '--headless=new',
+    '--disable-gpu',
+    '--no-sandbox',
+    '--hide-scrollbars',
+    `--remote-debugging-port=${port}`,
+    `--user-data-dir=${profileDir}`,
+    'about:blank',
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+  browser.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+  browser.once('error', (error) => { browserError = error; });
+  browser.once('exit', (code, signal) => { browserExit = { code, signal }; });
+
+  const version = await getJsonVersion();
+  const targetsRes = await fetch(`http://127.0.0.1:${port}/json/list`);
+  const targets = await targetsRes.json();
+  const pageTarget = targets.find((target) => target.type === 'page' && target.webSocketDebuggerUrl);
+  if (!pageTarget) throw new Error(`No page CDP target. Browser version: ${JSON.stringify(version)}`);
+
+  ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => {
+    ws.addEventListener('open', resolve, { once: true });
+    ws.addEventListener('error', reject, { once: true });
+  });
+
+  ws.addEventListener('message', (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.id && pending.has(msg.id)) {
+      const { resolve, reject, method } = pending.get(msg.id);
+      pending.delete(msg.id);
+      if (msg.error) reject(new Error(`${method}: ${JSON.stringify(msg.error)}`));
+      else resolve(msg.result);
+    }
+    if (msg.method === 'Page.loadEventFired') loaded = true;
+  });
+
+  await send('Page.enable');
+  await send('Runtime.enable');
+  await send('Emulation.setDeviceMetricsOverride', {
     width,
     height,
     deviceScaleFactor: 1,
     mobile: width < 700,
   });
-  await send(ws, 'Page.navigate', { url });
+  await send('Page.navigate', { url });
   for (let i = 0; i < 120 && !loaded; i += 1) await sleep(100);
   await sleep(1200);
 
@@ -147,20 +202,20 @@ try {
   }
 
   const filterResult = await evaluate(`(async () => {
-    const buttons = [...document.querySelectorAll('button[role="tab"]')];
+    const buttons = [...document.querySelectorAll('button[aria-pressed]')];
     const target = buttons.find((button) => button.textContent.trim() === ${JSON.stringify(expected.filter)});
     if (!target) return { clicked: false, cardCount: document.querySelectorAll('[data-featured-dog-card]').length };
     target.click();
     await new Promise((resolve) => setTimeout(resolve, 500));
     return {
       clicked: true,
-      selected: target.getAttribute('aria-selected'),
+      pressed: target.getAttribute('aria-pressed'),
       cardCount: document.querySelectorAll('[data-featured-dog-card]').length,
     };
   })()`);
 
   if (!filterResult.clicked) throw new Error(`Missing filter ${expected.filter}`);
-  if (filterResult.selected !== 'true') throw new Error(`Filter ${expected.filter} was not selected`);
+  if (filterResult.pressed !== 'true') throw new Error(`Filter ${expected.filter} was not pressed`);
   if (filterResult.cardCount < 1 || filterResult.cardCount > 6) throw new Error(`Filter returned invalid card count: ${filterResult.cardCount}`);
 
   const reveal = await evaluate(`(async () => {
@@ -184,9 +239,13 @@ try {
   if (reveal.hidden !== 0) throw new Error(`Reveal left ${reveal.hidden} hidden element(s)`);
   if (reveal.overflow) throw new Error('Page has horizontal overflow after scrolling');
 
-  console.log(JSON.stringify({ ok: true, url, locale, width, initial, mobileMenu, filterResult, reveal }, null, 2));
+  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, mobileMenu, filterResult, reveal }, null, 2));
 } finally {
-  try { ws.close(); } catch {}
-  browser.kill('SIGTERM');
+  for (const { reject, method } of pending.values()) {
+    reject(new Error(`${method}: browser verifier shutting down`));
+  }
+  pending.clear();
+  try { ws?.close(); } catch {}
+  await stopBrowser();
   rmSync(profileDir, { recursive: true, force: true });
 }

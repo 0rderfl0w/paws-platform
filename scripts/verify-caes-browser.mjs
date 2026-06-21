@@ -104,9 +104,11 @@ try {
       if (cards >= 90) break;
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
+    const cards = [...document.querySelectorAll('[data-dog-card]')];
     return {
-      cards: document.querySelectorAll('[data-dog-card]').length,
-      adopted: [...document.querySelectorAll('[data-dog-card]')].filter((card) => card.textContent.includes(${JSON.stringify(expected.adopted)})).length,
+      cards: cards.length,
+      adopted: cards.filter((card) => card.textContent.includes(${JSON.stringify(expected.adopted)})).length,
+      adoptedAria: cards.filter((card) => card.getAttribute('aria-label')?.includes(${JSON.stringify(expected.adopted)})).length,
       hasSearch: Boolean(document.querySelector('#dog-search')),
       hasAllLabel: document.body.innerText.includes(${JSON.stringify(expected.all)}),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
@@ -115,6 +117,7 @@ try {
 
   if (initial.cards !== 99) throw new Error(`Expected 99 dog cards, got ${initial.cards}`);
   if (initial.adopted !== 9) throw new Error(`Expected 9 adopted badges, got ${initial.adopted}`);
+  if (initial.adoptedAria !== 9) throw new Error(`Expected 9 adopted accessible labels, got ${initial.adoptedAria}`);
   if (!initial.hasSearch) throw new Error('Missing #dog-search input');
   if (!initial.hasAllLabel) throw new Error(`Missing filter label ${expected.all}`);
   if (initial.overflow) throw new Error('Page has horizontal overflow');
@@ -131,6 +134,7 @@ try {
       cards: cards.length,
       hasOneResultText: document.body.innerText.includes(${JSON.stringify(expected.one)}),
       adopted: cards.filter((card) => card.textContent.includes(${JSON.stringify(expected.adopted)})).length,
+      adoptedAria: cards.filter((card) => card.getAttribute('aria-label')?.includes(${JSON.stringify(expected.adopted)})).length,
       abby: cards.some((card) => card.textContent.includes('Abby')),
     };
   })()`);
@@ -138,6 +142,7 @@ try {
   if (searchResult.cards !== 1) throw new Error(`Search expected 1 card, got ${searchResult.cards}`);
   if (!searchResult.hasOneResultText) throw new Error(`Search missing results text ${expected.one}`);
   if (searchResult.adopted !== 1) throw new Error(`Search expected one adopted badge, got ${searchResult.adopted}`);
+  if (searchResult.adoptedAria !== 1) throw new Error(`Search expected one adopted accessible label, got ${searchResult.adoptedAria}`);
   if (!searchResult.abby) throw new Error('Search did not keep Abby card visible');
 
   const reveal = await evaluate(`(async () => {

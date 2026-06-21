@@ -20,7 +20,7 @@ export default function PlayfulDogCard({ dog, locale, index }: { dog: Dog; local
   const rotation = DOG_CARD_ROTATIONS[index % DOG_CARD_ROTATIONS.length];
   const dogPath = locale === 'pt' ? `/cao?id=${dog.id}` : `/en/dog?id=${dog.id}`;
   const photoAlt = locale === 'pt' ? `Fotografia de ${dog.name}` : `Photo of ${dog.name}`;
-  const cardLabel = [dog.name, sizeLabel, sexLabel, dog.age].filter(Boolean).join(', ');
+  const cardLabel = [dog.name, dog.is_adopted ? t.status.adopted : '', sizeLabel, sexLabel, dog.age].filter(Boolean).join(', ');
 
   return (
     <a

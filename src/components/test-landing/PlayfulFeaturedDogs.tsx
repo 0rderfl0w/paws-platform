@@ -138,13 +138,12 @@ export default function PlayfulFeaturedDogs({ locale = 'pt' }: { locale?: Locale
           </p>
         </div>
 
-        <div data-reveal="pop" className="mb-10 flex flex-wrap justify-center gap-3" role="tablist" aria-label={t.featuredDogs.filterBySize}>
+        <div data-reveal="pop" className="mb-10 flex flex-wrap justify-center gap-3" role="group" aria-label={t.featuredDogs.filterBySize}>
           {filterTabs.map(({ id, label }) => (
             <button
               key={id}
-              role="tab"
               type="button"
-              aria-selected={filter === id}
+              aria-pressed={filter === id}
               onClick={() => setFilter(id)}
               className={`rounded-full px-5 py-2.5 text-sm font-extrabold shadow-sm transition-all focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-playful-orange/35 ${
                 filter === id
