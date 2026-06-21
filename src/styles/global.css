@@ -72,7 +72,7 @@ html {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Playful Impact helpers used by /test-landing only */
+/* Playful Impact helpers used by Playful redesign routes */
 @layer utilities {
   .pattern-dots {
     background-image: radial-gradient(rgb(220 193 177 / 0.58) 1.3px, transparent 1.3px);

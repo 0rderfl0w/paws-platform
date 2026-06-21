@@ -1,0 +1,58 @@
+---
+const paymentMethods = [
+  {
+    title: 'MB Way',
+    icon: '▯',
+    description: 'Contacte-nos por email para obter o número de telefone para pagamento via MB Way.',
+  },
+  {
+    title: 'PayPal',
+    icon: '◈',
+    description: 'Aceitamos doações via PayPal. Contacte-nos para obter o link de pagamento direto.',
+  },
+];
+---
+
+<section id="apoio-financeiro" class="relative px-5 py-16 sm:px-8 lg:py-24" aria-labelledby="financeiro-heading">
+  <div class="ambient-blob right-0 top-10 h-72 w-72 bg-playful-peach"></div>
+  <div class="mx-auto max-w-5xl">
+    <header data-reveal="rise" class="relative z-10 mb-12 text-center">
+      <span class="mb-3 inline-block text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">Apoio Financeiro</span>
+      <h2 id="financeiro-heading" class="mx-auto max-w-3xl font-playful-display text-4xl font-extrabold tracking-[-0.04em] text-playful-orange-dark sm:text-5xl">
+        Doações Financeiras
+      </h2>
+      <p class="mx-auto mt-4 max-w-2xl text-lg font-medium leading-8 text-playful-muted">
+        As doações financeiras permitem-nos pagar cirurgias, tratamentos veterinários e as despesas correntes do abrigo.
+      </p>
+    </header>
+
+    <div data-reveal="pop" class="relative z-10 rounded-[2.4rem] border-2 border-playful-orange/15 bg-white p-6 shadow-pillowy-lg sm:p-9">
+      <div class="grid items-center gap-6 lg:grid-cols-[auto_1fr]">
+        <div class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-playful-orange text-4xl text-white shadow-squish" aria-hidden="true">❤</div>
+        <div class="text-center lg:text-left">
+          <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">Transferência Bancária</p>
+          <p class="text-sm font-bold text-playful-muted">IBAN</p>
+          <p class="mt-3 break-words font-mono text-xl font-extrabold tracking-tight text-playful-orange-dark sm:text-3xl sm:tracking-wide">
+            PT50 0010 0000 4591 4000 0014 9
+          </p>
+          <p class="mt-3 text-sm font-medium leading-6 text-playful-muted">Clube de Adoção e Proteção Animal de Póvoa de Lanhoso</p>
+        </div>
+      </div>
+    </div>
+
+    <div data-reveal-stagger="90" class="relative z-10 mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+      {paymentMethods.map(({ title, icon, description }, index) => (
+        <article data-reveal="tilt" class={`card-pillowy rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
+          <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
+          <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
+          <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+        </article>
+      ))}
+    </div>
+
+    <p data-reveal="rise" class="relative z-10 mx-auto mt-10 max-w-2xl rounded-full border border-playful-line bg-white/80 px-5 py-4 text-center text-sm font-bold leading-6 text-playful-muted shadow-sm">
+      Para qualquer dúvida sobre pagamentos, contacte-nos em
+      <a href="mailto:capa.geralpvl@gmail.com" class="playful-focus rounded-full text-playful-orange-dark underline decoration-playful-orange/40 decoration-2 underline-offset-4 hover:text-playful-orange">capa.geralpvl@gmail.com</a>
+    </p>
+  </div>
+</section>

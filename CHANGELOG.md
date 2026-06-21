@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-21
+- Ajudar: redesigned the live `/ajudar/` page directly with the CAPA Playful Impact system while preserving all existing help, donation, volunteer, FAT, payment, email, and CTA copy; added a stronger poster-style hero using a local real-photo fallback after image generation was unavailable in this environment.
+- Ajudar: added route-aware Playful nav/footer chrome, tactile donation/volunteer/FAT/payment sections, route-scoped scroll reveal, a content-preservation smoke script, and desktop/mobile screenshot QA for the live help page redesign.
 - Landing: added `/test-landing/` as a noindex production review page that preserves the current homepage copy and section flow while applying the Playful Impact design concept: cream canvas, Sora/Plus Jakarta Sans type, juicy orange CTAs, blob hero image treatment, pillowy cards, soft-brutalist rotations, and squishy interaction states.
 - Landing: removed the accidental translucent white card behind the hero dog image so the image blob now floats directly over the cream hero background.
 - Landing: added route-scoped scroll-reveal motion to `/test-landing/`: hero elements enter on load, section headers rise into view, cards pop/stagger as the user scrolls, dynamic dog cards are observed after React hydration, and reduced-motion users get static content.

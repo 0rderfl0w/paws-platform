@@ -1,0 +1,155 @@
+---
+import { getTranslations, getAlternatePath, locales, type Locale } from '../../i18n';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = 'pt' } = Astro.props;
+const t = getTranslations(locale);
+const currentPath = Astro.url.pathname;
+
+const homePath = locale === 'pt' ? '/' : '/en/';
+const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+
+const navLinks = [
+  { href: homePath, label: t.nav.home, rotate: '-rotate-1' },
+  { href: dogsPath, label: t.nav.dogs, rotate: 'rotate-1' },
+  { href: aboutPath, label: t.nav.about, rotate: '-rotate-1' },
+  { href: helpPath, label: t.nav.help, rotate: 'rotate-1' },
+];
+---
+
+<header class="sticky top-0 z-50 rounded-b-[2rem] border-b border-playful-line/70 bg-playful-canvas/92 shadow-pillowy backdrop-blur-md">
+  <nav class="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8" aria-label={t.nav.mainNav}>
+    <a href={homePath} class="group playful-focus flex items-center gap-3 rounded-full" aria-label="CAPA Póvoa de Lanhoso — Página inicial">
+      <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="h-12 w-12 rounded-[1.35rem] border-2 border-white object-cover shadow-pillowy transition-transform group-hover:-rotate-3 group-hover:scale-105" width="48" height="48" />
+      <div class="leading-none">
+        <span class="block font-playful-display text-2xl font-extrabold tracking-tight text-playful-orange-dark">CAPAPVL</span>
+        <span class="block pt-1 text-xs font-bold uppercase tracking-[0.18em] text-playful-muted">Póvoa de Lanhoso</span>
+      </div>
+    </a>
+
+    <ul class="hidden items-center gap-2 md:flex" role="list">
+      {navLinks.map(({ href, label, rotate }) => {
+        const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+        return (
+          <li>
+            <a
+              href={href}
+              class={`squishy playful-focus rounded-full px-4 py-2 text-sm font-extrabold transition-colors ${rotate} ${isActive ? 'bg-playful-peach text-playful-orange-dark shadow-sm' : 'text-playful-muted hover:bg-playful-peach hover:text-playful-orange-dark'}`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {label}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+
+    <div class="hidden items-center gap-3 md:flex">
+      <div class="flex items-center gap-1 rounded-full border border-playful-line bg-white/70 p-1 shadow-sm" aria-label="Selecionar idioma">
+        {locales.map(({ code, label, flag }) => {
+          const isActive = code === locale;
+          const altPath = isActive ? currentPath : getAlternatePath(currentPath, code);
+          return (
+            <a
+              href={altPath}
+              title={label}
+              aria-label={label}
+              aria-current={isActive ? 'true' : undefined}
+              class={`playful-focus flex h-9 w-9 items-center justify-center rounded-full text-base transition-all ${isActive ? 'bg-playful-peach shadow-sm' : 'opacity-60 hover:opacity-100'}`}
+            >
+              {flag}
+            </a>
+          );
+        })}
+      </div>
+      <a href={helpPath} class="squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish">
+        {t.nav.helpNow}
+        <span aria-hidden="true">❤</span>
+      </a>
+    </div>
+
+    <button
+      id="playful-site-mobile-menu-btn"
+      type="button"
+      class="playful-focus rounded-full border-2 border-playful-line bg-white/80 p-3 text-playful-orange-dark shadow-pillowy md:hidden"
+      aria-label={t.nav.openMenu}
+      aria-expanded="false"
+      aria-controls="playful-site-mobile-menu"
+    >
+      <svg id="playful-site-hamburger-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-6 w-6" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+      <svg id="playful-site-close-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="hidden h-6 w-6" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </nav>
+
+  <div id="playful-site-mobile-menu" class="hidden border-t border-playful-line bg-playful-canvas px-5 pb-5 md:hidden">
+    <div class="flex items-center gap-2 py-4" aria-label="Selecionar idioma">
+      {locales.map(({ code, label, flag }) => {
+        const isActive = code === locale;
+        const altPath = isActive ? currentPath : getAlternatePath(currentPath, code);
+        return (
+          <a
+            href={altPath}
+            title={label}
+            aria-label={label}
+            aria-current={isActive ? 'true' : undefined}
+            class={`playful-focus flex items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold ${isActive ? 'bg-playful-peach text-playful-orange-dark shadow-sm' : 'bg-white/70 text-playful-muted'}`}
+          >
+            <span>{flag}</span>
+            <span>{label}</span>
+          </a>
+        );
+      })}
+    </div>
+    <ul class="flex flex-col gap-2" role="list">
+      {navLinks.map(({ href, label }) => {
+        const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+        return (
+          <li>
+            <a href={href} class={`playful-focus block rounded-full px-5 py-3 text-sm font-extrabold shadow-sm ${isActive ? 'bg-playful-peach text-playful-orange-dark' : 'bg-white/75 text-playful-muted hover:bg-playful-peach'}`} aria-current={isActive ? 'page' : undefined}>
+              {label}
+            </a>
+          </li>
+        );
+      })}
+      <li class="pt-2">
+        <a href={helpPath} class="playful-focus block rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish">
+          {t.nav.helpNow}
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  const playfulSiteBtn = document.getElementById('playful-site-mobile-menu-btn');
+  const playfulSiteMenu = document.getElementById('playful-site-mobile-menu');
+  const playfulSiteHamburger = document.getElementById('playful-site-hamburger-icon');
+  const playfulSiteClose = document.getElementById('playful-site-close-icon');
+
+  if (playfulSiteBtn && playfulSiteMenu && playfulSiteHamburger && playfulSiteClose) {
+    playfulSiteBtn.addEventListener('click', () => {
+      const isOpen = playfulSiteMenu.classList.toggle('hidden') === false;
+      playfulSiteBtn.setAttribute('aria-expanded', String(isOpen));
+      playfulSiteHamburger.classList.toggle('hidden', isOpen);
+      playfulSiteClose.classList.toggle('hidden', !isOpen);
+    });
+
+    playfulSiteMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        playfulSiteMenu.classList.add('hidden');
+        playfulSiteBtn.setAttribute('aria-expanded', 'false');
+        playfulSiteHamburger.classList.remove('hidden');
+        playfulSiteClose.classList.add('hidden');
+      });
+    });
+  }
+</script>
