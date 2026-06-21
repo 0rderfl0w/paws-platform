@@ -5,6 +5,7 @@
 - Landing: removed the accidental translucent white card behind the hero dog image so the image blob now floats directly over the cream hero background.
 - Landing: added route-scoped scroll-reveal motion to `/test-landing/`: hero elements enter on load, section headers rise into view, cards pop/stagger as the user scrolls, dynamic dog cards are observed after React hydration, and reduced-motion users get static content.
 - Dogs: kept the test landing's featured dogs backed by the existing Hetzner API plus committed fallback data, preserving size filters and `/cao?id=` profile links.
+- Design docs: added `DESIGN.md` as the CAPA Playful Impact reference covering palette, typography, layout, motion, component rules, implementation notes, and QA checklist.
 - Deploy: built with `PUBLIC_CAPA_API_URL=https://api.capapvl.org` and a fresh `CAPA_ASSET_VERSION`, synced `dist/` to `/home/deploy/apps/capapvl`, and verified live `/test-landing/` returns the new noindex page instead of the old 404 body while `/` remains the existing live homepage.
 
 ## 2026-06-19
