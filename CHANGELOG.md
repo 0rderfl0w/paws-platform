@@ -1,5 +1,9 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-06-22
+- Adoção/Adoption: redesigned the live `/adocao/` and `/en/adopt/` pages directly with the CAPA Playful Impact system while preserving the existing adoption benefits, process, fees, contact, and final CTA copy.
+- Adoção/Adoption: added a stronger real-photo adoption-poster hero, locale-aware Playful section components, local hero image derivatives, route-scoped scroll reveal, bilingual content-preservation smoke coverage, and desktop/mobile screenshot QA.
+
 ## 2026-06-21
 - Footer: linked the CAPA address to Google Maps in a new tab across Playful and legacy footers, and normalized the footer phone `tel:` href.
 - Landing nav: changed the Playful landing menu's "Os Nossos Cães" / "Our Dogs" link from the in-page `#caes` anchor to the full listing routes `/caes` and `/en/dogs`.
