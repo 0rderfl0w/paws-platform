@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Site chrome: replaced placeholder social/payment glyphs with real Facebook, Instagram, PayPal, and official MB WAY icons; the mobile burger menu now starts below 1000px and includes Facebook/Instagram links.
 - Help: fixed the FAT / foster-family block on narrow mobile screens so the peach card, badge, and large heading stay aligned instead of clipping or forcing broken word wraps.
 - Forms/API: added a backend-backed `/forms/submit` flow through the Hetzner Bun API for sponsorship, MB Way, visit scheduling, and dog adoption-interest requests; submissions persist to PostgreSQL, attempt SMTP email to CAPA when configured, and keep prepared-email fallback when delivery is unavailable.
 - Dog profiles: replaced the adoption email CTA with a structured adoption-interest popup that sends dog context, visitor contact details, and notes through the backend form endpoint.

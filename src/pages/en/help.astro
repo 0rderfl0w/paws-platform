@@ -4,6 +4,7 @@ import PlayfulSiteNav from '../../components/playful/PlayfulSiteNav.astro';
 import PlayfulSiteFooter from '../../components/playful/PlayfulSiteFooter.astro';
 import PlayfulScrollReveal from '../../components/playful/PlayfulScrollReveal.astro';
 import PlayfulDonateMenu from '../../components/playful/PlayfulDonateMenu.astro';
+import BrandIcon from '../../components/BrandIcon.astro';
 
 const locale = 'en' as const;
 
@@ -76,8 +77,8 @@ const fosterStats = [
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 
 const paymentMethods = [
-  { title: 'MB Way', icon: '▯', description: 'Use the Donate menu, choose MB Way, and leave your phone number. We will message you with the phone number where you can send the donation.', cta: 'Request MB Way number' },
-  { title: 'PayPal', icon: '◈', description: 'You can donate directly through CAPA\'s secure PayPal donation page.', href: paypalDonateUrl, cta: 'Donate with PayPal' },
+  { title: 'MB Way', icon: 'mbway', description: 'Use the Donate menu, choose MB Way, and leave your phone number. We will message you with the phone number where you can send the donation.', cta: 'Request MB Way number' },
+  { title: 'PayPal', icon: 'paypal', description: 'You can donate directly through CAPA\'s secure PayPal donation page.', href: paypalDonateUrl, cta: 'Donate with PayPal' },
 ];
 ---
 
@@ -272,14 +273,14 @@ const paymentMethods = [
               {paymentMethods.map(({ title, icon, description, href, cta }, index) => (
                 href ? (
                   <a data-reveal="tilt" href={href} target="_blank" rel="noopener noreferrer" class={`card-pillowy playful-focus block rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
-                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
+                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark" aria-hidden="true"><BrandIcon name={icon} class={icon === 'mbway' ? 'h-9 w-9' : 'h-7 w-7'} /></div>
                     <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
                     <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
                     <span class="mt-5 inline-flex rounded-full bg-playful-orange px-5 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">{cta}</span>
                   </a>
                 ) : (
                   <article data-reveal="tilt" class={`card-pillowy rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
-                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
+                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark" aria-hidden="true"><BrandIcon name={icon} class={icon === 'mbway' ? 'h-9 w-9' : 'h-7 w-7'} /></div>
                     <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
                     <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
                     {cta && <PlayfulDonateMenu locale="en" mode="mbway-button" instanceId="help-en-mbway-card" buttonLabel={cta} />}

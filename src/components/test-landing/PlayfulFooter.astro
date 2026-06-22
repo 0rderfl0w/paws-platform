@@ -1,6 +1,7 @@
 ---
 import { getTranslations, type Locale } from '../../i18n';
 import VisitSchedule from '../VisitSchedule';
+import BrandIcon from '../BrandIcon.astro';
 
 interface Props {
   locale?: Locale;
@@ -53,8 +54,8 @@ const helpLinks = [
         </a>
         <p class="mt-5 max-w-sm text-sm font-medium leading-7">{t.footer.brandDesc}</p>
         <div class="mt-5 flex gap-3">
-          <a href="https://facebook.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer">f</a>
-          <a href="https://instagram.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer">◎</a>
+          <a href="https://facebook.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="facebook" class="h-5 w-5" /></a>
+          <a href="https://instagram.com/capapvl" class="squishy playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="instagram" class="h-5 w-5" /></a>
         </div>
       </div>
 

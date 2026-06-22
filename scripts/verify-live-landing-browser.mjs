@@ -382,7 +382,7 @@ try {
   if (donateCardResult.overflow) throw new Error('#4 donate card caused horizontal overflow');
 
   let mobileMenu = null;
-  if (width < 700) {
+  if (width < 1000) {
     mobileMenu = await evaluate(`(async () => {
       const button = document.querySelector('#playful-mobile-menu-btn');
       const menu = document.querySelector('#playful-mobile-menu');

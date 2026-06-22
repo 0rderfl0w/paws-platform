@@ -74,8 +74,10 @@ const requiredSnippets = [
   'data-mbway-open="help-pt-mbway-card"',
   'data-mbway-modal="help-pt-mbway-card"',
   'data-mbway-form="help-pt-mbway-card"',
+  'data-brand-icon="mbway"',
   'PayPal',
   'Pode fazer o seu donativo diretamente através da página segura de donativos PayPal da CAPA.',
+  'data-brand-icon="paypal"',
   'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360',
   'Doar via PayPal',
   'Para qualquer dúvida sobre pagamentos, contacte-nos em',
@@ -99,6 +101,8 @@ const forbiddenSnippets = [
   'https://capapvl.pt/ajudar',
   'Aceitamos doações via PayPal. Contacte-nos para obter o link de pagamento direto.',
   'Contacte-nos por email para obter o número de telefone para pagamento via MB Way.',
+  '>◈<',
+  '>▯<',
 ];
 const forbiddenPresent = forbiddenSnippets.filter((snippet) => html.includes(snippet));
 if (forbiddenPresent.length) {

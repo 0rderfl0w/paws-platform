@@ -1,5 +1,6 @@
 ---
 import type { Locale } from '../../i18n';
+import BrandIcon from '../BrandIcon.astro';
 
 interface Props {
   locale?: Locale;
@@ -117,7 +118,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
 
     <div id={menuId} data-donate-panel class={`${panelClass} hidden`} role="menu" aria-labelledby={buttonId}>
       <a data-donate-paypal role="menuitem" href={paypalDonateUrl} target="_blank" rel="noopener noreferrer" class={itemClass}>
-        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">◈</span>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark" aria-hidden="true"><BrandIcon name="paypal" class="h-5 w-5" /></span>
         <span>
           <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.paypal}</span>
           <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.paypalDesc}</span>
@@ -125,7 +126,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
       </a>
 
       <button data-mbway-open={instanceId} role="menuitem" type="button" class={itemClass}>
-        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">▯</span>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14" aria-hidden="true"><BrandIcon name="mbway" class="h-6 w-6" /></span>
         <span>
           <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.mbway}</span>
           <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.mbwayDesc}</span>
@@ -133,7 +134,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
       </button>
 
       <a data-donate-bank role="menuitem" href={bankTransferHref} class={itemClass}>
-        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">↴</span>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark" aria-hidden="true"><BrandIcon name="bank-transfer" class="h-5 w-5" /></span>
         <span>
           <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.bankTransfer}</span>
           <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.bankTransferDesc}</span>
@@ -148,7 +149,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
     class="squishy playful-focus mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-5 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish"
   >
     <span>{standaloneButtonLabel}</span>
-    <span aria-hidden="true">▯</span>
+    <BrandIcon name="mbway" class="h-5 w-5 brightness-0 invert" />
   </button>
 )}
 

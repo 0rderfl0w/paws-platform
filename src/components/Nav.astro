@@ -1,5 +1,6 @@
 ---
 import { getTranslations, getAlternatePath, locales, type Locale } from '../i18n';
+import BrandIcon from './BrandIcon.astro';
 
 interface Props {
   locale?: Locale;
@@ -13,6 +14,9 @@ const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
+const socialMenuLabel = locale === 'pt' ? 'Redes sociais' : 'Social links';
+const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
+const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
 
 const navLinks = [
   { href: homePath, label: t.nav.home },
@@ -39,7 +43,7 @@ const currentPath = Astro.url.pathname;
       </a>
 
       <!-- Desktop Nav Links -->
-      <ul class="hidden md:flex items-center gap-1" role="list">
+      <ul class="hidden min-[1000px]:flex items-center gap-1" role="list">
         {navLinks.map(({ href, label }) => (
           <li>
             <a
@@ -58,7 +62,7 @@ const currentPath = Astro.url.pathname;
       </ul>
 
       <!-- Desktop: Language Switcher + CTA -->
-      <div class="hidden md:flex items-center gap-3">
+      <div class="hidden min-[1000px]:flex items-center gap-3">
         <!-- Language Switcher -->
         <div class="flex items-center gap-1 bg-warm-100 rounded-lg p-1">
           {locales.map(({ code, label, flag }) => {
@@ -95,7 +99,7 @@ const currentPath = Astro.url.pathname;
       <button
         id="mobile-menu-btn"
         type="button"
-        class="md:hidden p-2 rounded-lg text-warm-600 hover:bg-warm-100 hover:text-warm-900 transition-colors"
+        class="min-[1000px]:hidden p-2 rounded-lg text-warm-600 hover:bg-warm-100 hover:text-warm-900 transition-colors"
         aria-label={t.nav.openMenu}
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -110,7 +114,7 @@ const currentPath = Astro.url.pathname;
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden border-t border-warm-200 py-3 pb-4">
+    <div id="mobile-menu" class="hidden min-[1000px]:hidden border-t border-warm-200 py-3 pb-4">
       <!-- Mobile Language Switcher -->
       <div class="flex items-center gap-2 px-4 py-2 mb-1">
         {locales.map(({ code, label, flag }) => {
@@ -158,6 +162,15 @@ const currentPath = Astro.url.pathname;
           >
             {t.nav.helpNow}
           </a>
+        </li>
+        <li class="pt-3">
+          <div data-mobile-socials class="flex items-center justify-between gap-3 rounded-lg bg-warm-100 px-4 py-3">
+            <span class="text-xs font-bold uppercase tracking-[0.14em] text-warm-500">{socialMenuLabel}</span>
+            <span class="flex items-center gap-2">
+              <a href="https://facebook.com/capapvl" class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-600" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="facebook" class="h-4 w-4" /></a>
+              <a href="https://instagram.com/capapvl" class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-600" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="instagram" class="h-4 w-4" /></a>
+            </span>
+          </div>
         </li>
       </ul>
     </div>
