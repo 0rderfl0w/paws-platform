@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Dog profiles: added a bilingual Schedule a visit / Agendar visita popup below the dog photo carousel and above the info card for available dogs; the form collects name, email, phone, preferred visit time, and notes, then prepares an email to `capa.geralpvl@gmail.com`.
 - Mobile nav: made the mobile menu vertically scrollable within the viewport and auto-scroll the Donate dropdown into view so PayPal, MB Way, and bank-transfer options remain reachable on short phone screens.
 - Footer: fixed the Playful footer donation IBAN on mobile so the full `PT50 0010 0000 4591 4000 0014 9` wraps visibly instead of being hidden behind horizontal scrolling.
 - Dog profiles: moved mobile gallery previous/next arrows out from on top of dog photos into a smaller control row below the image, while keeping desktop overlay arrows; the browser verifier now checks mobile controls do not overlap the image.

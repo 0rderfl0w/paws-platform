@@ -170,6 +170,9 @@ async function runProfile(profile) {
     const title = document.querySelector('#dog-profile-heading')?.textContent?.trim() || '';
     const mainImage = gallery?.querySelector('img');
     const galleryFrame = gallery?.querySelector('[data-dog-profile-gallery-frame]');
+    const visitCta = document.querySelector('[data-visit-cta]');
+    const visitButton = document.querySelector('[data-visit-open]');
+    const heading = document.querySelector('#dog-profile-heading');
     const mobileControls = gallery?.querySelector('[data-gallery-mobile-controls]');
     const mobilePrev = gallery?.querySelector('[data-gallery-prev="mobile"]');
     const mobileNext = gallery?.querySelector('[data-gallery-next="mobile"]');
@@ -195,6 +198,11 @@ async function runProfile(profile) {
       profileRect: rect(profile),
       galleryRect: rect(gallery),
       galleryFrameRect: rect(galleryFrame),
+      visitCtaRect: rect(visitCta),
+      visitButtonRect: rect(visitButton),
+      visitButtonText: visitButton?.textContent?.trim() || '',
+      visitButtonVisible: isVisible(visitButton),
+      headingRect: rect(heading),
       mainImageRect: rect(mainImage),
       mobileControlsRect: rect(mobileControls),
       mobilePrevRect: rect(mobilePrev),
@@ -249,8 +257,61 @@ async function runProfile(profile) {
   if (profile.adoptedLabel && !result.galleryLabels.includes(profile.adoptedLabel)) {
     failures.push(`missing adopted label ${profile.adoptedLabel}`);
   }
+  if (profile.adoptedLabel) {
+    if (result.visitButtonVisible) failures.push('visit scheduling button is visible for an adopted dog');
+  } else {
+    const expectedVisitLabel = profile.path.startsWith('/en/') ? 'Schedule a visit' : 'Agendar visita';
+    if (!result.visitButtonVisible) failures.push('missing visit scheduling button');
+    if (!result.visitButtonText.includes(expectedVisitLabel)) failures.push(`visit button label missing ${expectedVisitLabel}: ${result.visitButtonText}`);
+    if (result.galleryRect && result.visitCtaRect && result.visitCtaRect.y < result.galleryRect.y + result.galleryRect.h - 1) {
+      failures.push(`visit CTA is not below the gallery ${result.visitCtaRect.y} < ${result.galleryRect.y + result.galleryRect.h}`);
+    }
+    if (profile.width < 700 && result.headingRect && result.visitCtaRect && result.headingRect.y < result.visitCtaRect.y + result.visitCtaRect.h - 1) {
+      failures.push(`visit CTA is not above the dog info heading on mobile ${result.headingRect.y} < ${result.visitCtaRect.y + result.visitCtaRect.h}`);
+    }
+  }
   if (profile.alternatePath && !result.languageHrefs.includes(profile.alternatePath)) {
     failures.push(`missing language switch href ${profile.alternatePath}; got ${result.languageHrefs.join(', ')}`);
+  }
+
+  let visitSubmission = null;
+  if (!profile.adoptedLabel && result.visitButtonVisible) {
+    visitSubmission = await evaluate(`(async () => {
+      const openButton = document.querySelector('[data-visit-open]');
+      openButton?.click();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const modal = document.querySelector('[data-visit-modal]');
+      const form = document.querySelector('[data-visit-form]');
+      if (!modal || !form) return { ok: false, reason: 'missing visit modal/form' };
+      form.dataset.skipMailLaunch = 'true';
+      form.querySelector('[name="visit_name"]').value = 'QA Visitor';
+      form.querySelector('[name="visit_email"]').value = 'qa-visitor@example.com';
+      form.querySelector('[name="visit_phone"]').value = '+351 930 000 000';
+      form.querySelector('[name="visit_time"]').value = '2026-07-05T10:30';
+      form.querySelector('[name="visit_message"]').value = 'Browser smoke test visit request';
+      form.requestSubmit();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const mailto = document.querySelector('[data-visit-mailto]')?.getAttribute('href') || '';
+      const noteVisible = Boolean(document.querySelector('[data-visit-mailto-note]'));
+      document.querySelector('[data-visit-close]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return {
+        ok: true,
+        modalOpen: Boolean(modal),
+        noteVisible,
+        mailto,
+        modalClosed: !document.querySelector('[data-visit-modal]'),
+      };
+    })()`);
+
+    if (!visitSubmission.ok) failures.push(`visit modal failed: ${visitSubmission.reason}`);
+    if (!visitSubmission.noteVisible) failures.push('visit fallback mailto note did not appear');
+    if (!visitSubmission.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) failures.push(`unexpected visit mailto target: ${visitSubmission.mailto}`);
+    const decodedVisitMailto = decodeURIComponent(visitSubmission.mailto || '');
+    for (const needle of [profile.dog, 'QA Visitor', 'qa-visitor@example.com', '+351 930 000 000', '2026-07-05T10:30', 'Browser smoke test visit request']) {
+      if (!decodedVisitMailto.includes(needle)) failures.push(`visit mailto missing ${needle}: ${decodedVisitMailto}`);
+    }
+    if (!visitSubmission.modalClosed) failures.push('visit modal did not close after verifier');
   }
 
   return {
@@ -262,6 +323,11 @@ async function runProfile(profile) {
     galleryWidth: result.galleryRect?.w,
     profileWidth: result.profileRect?.w,
     imageWidth: result.mainImageRect?.w,
+    visitCtaRect: result.visitCtaRect,
+    visitButtonRect: result.visitButtonRect,
+    visitButtonVisible: result.visitButtonVisible,
+    visitButtonText: result.visitButtonText,
+    visitSubmission,
     galleryFrameRect: result.galleryFrameRect,
     mobileControlsRect: result.mobileControlsRect,
     mobilePrevRect: result.mobilePrevRect,
