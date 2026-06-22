@@ -89,11 +89,11 @@ const helpLinks = [
       </div>
 
       <div data-reveal="rise" class="lg:col-start-3 lg:col-span-2 lg:-mt-3">
-        <div class="w-full rounded-full bg-white/75 px-5 py-3 text-center text-[0.72rem] font-bold shadow-sm sm:px-6 sm:text-xs xl:text-sm">
-          <p class="overflow-x-auto whitespace-nowrap text-playful-ink">
+        <div class="w-full rounded-[2rem] bg-white/75 px-4 py-4 text-center text-xs font-bold leading-relaxed shadow-sm sm:rounded-full sm:px-6 sm:py-3 xl:text-sm" data-footer-iban>
+          <p class="mx-auto flex max-w-full flex-col items-center justify-center gap-1.5 text-playful-ink sm:flex-row sm:gap-0">
             <span class="font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</span>
-            <span class="mx-2 text-playful-orange/60" aria-hidden="true">·</span>
-            <span class="font-mono font-extrabold tracking-[-0.04em]">IBAN: {iban}</span>
+            <span class="hidden mx-2 text-playful-orange/60 sm:inline" aria-hidden="true">·</span>
+            <span class="max-w-full whitespace-normal break-words font-mono text-[0.82rem] font-extrabold leading-6 tracking-[-0.03em] sm:whitespace-nowrap sm:text-xs sm:tracking-[-0.04em] xl:text-sm" data-footer-iban-value>IBAN: {iban}</span>
           </p>
         </div>
       </div>

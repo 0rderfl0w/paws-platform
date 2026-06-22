@@ -31,6 +31,8 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertIncludes(html, `property="og:url" content="${ogUrl}"`, context);
   assertIncludes(html, 'property="og:type" content="website"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
+  assertIncludes(html, 'data-footer-iban', context);
+  assertIncludes(html, 'data-footer-iban-value', context);
   assertIncludes(html, `href="${mapsHref}"`, context);
   assertIncludes(html, 'target="_blank"', context);
   assertIncludes(html, 'rel="noopener noreferrer"', context);
@@ -62,7 +64,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 29 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 31 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -81,6 +83,8 @@ function checkTestLanding() {
   assertIncludes(html, 'target="_blank"', context);
   assertIncludes(html, 'rel="noopener noreferrer"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
+  assertIncludes(html, 'data-footer-iban', context);
+  assertIncludes(html, 'data-footer-iban-value', context);
   assertIncludes(html, 'href="/ajudar"', context);
   assertIncludes(html, 'data-sponsor-modal-open', context);
   assertIncludes(html, 'data-sponsor-modal', context);
@@ -100,7 +104,7 @@ function checkTestLanding() {
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 29, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 31, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [

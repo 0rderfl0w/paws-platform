@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Footer: fixed the Playful footer donation IBAN on mobile so the full `PT50 0010 0000 4591 4000 0014 9` wraps visibly instead of being hidden behind horizontal scrolling.
 - Dog profiles: moved mobile gallery previous/next arrows out from on top of dog photos into a smaller control row below the image, while keeping desktop overlay arrows; the browser verifier now checks mobile controls do not overlap the image.
 - Home donations: changed homepage help card #4 into a card-shaped Donate dropdown with PayPal, MB Way, and bank-transfer options, matching the top-nav Donate behavior.
 - Help donations: added a direct MB Way CTA button inside the financial-support MB Way card on `/ajudar/` and `/en/help/`, reusing the same phone-number request popup as the Donate menu.

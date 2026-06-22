@@ -402,10 +402,39 @@ try {
     };
   })()`);
 
+  const footerIban = await evaluate(`(() => {
+    const pill = document.querySelector('[data-footer-iban]');
+    const value = document.querySelector('[data-footer-iban-value]');
+    const pillRect = pill?.getBoundingClientRect();
+    const valueRect = value?.getBoundingClientRect();
+    return {
+      present: Boolean(pill && value),
+      text: value?.textContent?.trim() || '',
+      viewportWidth: window.innerWidth,
+      pillRect: pillRect ? { x: pillRect.x, y: pillRect.y, w: pillRect.width, h: pillRect.height, right: pillRect.right } : null,
+      valueRect: valueRect ? { x: valueRect.x, y: valueRect.y, w: valueRect.width, h: valueRect.height, right: valueRect.right } : null,
+      valueScrollWidth: value?.scrollWidth || 0,
+      valueClientWidth: value?.clientWidth || 0,
+      pillScrollWidth: pill?.scrollWidth || 0,
+      pillClientWidth: pill?.clientWidth || 0,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+    };
+  })()`);
+
+  if (!footerIban.present) throw new Error('Missing footer IBAN marker');
+  if (!footerIban.text.includes('IBAN: PT50 0010 0000 4591 4000 0014 9')) throw new Error(`Footer IBAN text incomplete: ${footerIban.text}`);
+  if (footerIban.overflow) throw new Error('Footer IBAN caused page horizontal overflow');
+  if (footerIban.pillRect && (footerIban.pillRect.x < -1 || footerIban.pillRect.right > footerIban.viewportWidth + 1)) {
+    throw new Error(`Footer IBAN pill extends outside viewport: ${JSON.stringify(footerIban)}`);
+  }
+  if (footerIban.valueScrollWidth > footerIban.valueClientWidth + 2) {
+    throw new Error(`Footer IBAN value is horizontally clipped: ${JSON.stringify(footerIban)}`);
+  }
+
   if (reveal.hidden !== 0) throw new Error(`Reveal left ${reveal.hidden} hidden element(s)`);
   if (reveal.overflow) throw new Error('Page has horizontal overflow after scrolling');
 
-  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, donateCardResult, mobileMenu, filterResult, reveal }, null, 2));
+  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, donateCardResult, mobileMenu, filterResult, reveal, footerIban }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));
