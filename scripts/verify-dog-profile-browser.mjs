@@ -172,6 +172,7 @@ async function runProfile(profile) {
     const galleryFrame = gallery?.querySelector('[data-dog-profile-gallery-frame]');
     const visitCta = document.querySelector('[data-dog-profile] [data-visit-source="dog"]');
     const visitButton = document.querySelector('[data-dog-profile] [data-visit-open="dog"]');
+    const adoptionButton = document.querySelector('[data-adoption-open]');
     const heading = document.querySelector('#dog-profile-heading');
     const mobileControls = gallery?.querySelector('[data-gallery-mobile-controls]');
     const mobilePrev = gallery?.querySelector('[data-gallery-prev="mobile"]');
@@ -202,6 +203,8 @@ async function runProfile(profile) {
       visitButtonRect: rect(visitButton),
       visitButtonText: visitButton?.textContent?.trim() || '',
       visitButtonVisible: isVisible(visitButton),
+      adoptionButtonText: adoptionButton?.textContent?.trim() || '',
+      adoptionButtonVisible: isVisible(adoptionButton),
       headingRect: rect(heading),
       mainImageRect: rect(mainImage),
       mobileControlsRect: rect(mobileControls),
@@ -259,10 +262,14 @@ async function runProfile(profile) {
   }
   if (profile.adoptedLabel) {
     if (result.visitButtonVisible) failures.push('visit scheduling button is visible for an adopted dog');
+    if (result.adoptionButtonVisible) failures.push('adoption request button is visible for an adopted dog');
   } else {
     const expectedVisitLabel = profile.path.startsWith('/en/') ? 'Schedule a visit' : 'Agendar visita';
     if (!result.visitButtonVisible) failures.push('missing visit scheduling button');
     if (!result.visitButtonText.includes(expectedVisitLabel)) failures.push(`visit button label missing ${expectedVisitLabel}: ${result.visitButtonText}`);
+    const expectedAdoptionLabel = profile.path.startsWith('/en/') ? 'Send adoption request' : 'Enviar pedido de adoção';
+    if (!result.adoptionButtonVisible) failures.push('missing adoption request button');
+    if (!result.adoptionButtonText.includes(expectedAdoptionLabel)) failures.push(`adoption button label missing ${expectedAdoptionLabel}: ${result.adoptionButtonText}`);
     if (result.galleryRect && result.visitCtaRect && result.visitCtaRect.y < result.galleryRect.y + result.galleryRect.h - 1) {
       failures.push(`visit CTA is not below the gallery ${result.visitCtaRect.y} < ${result.galleryRect.y + result.galleryRect.h}`);
     }
@@ -272,6 +279,27 @@ async function runProfile(profile) {
   }
   if (profile.alternatePath && !result.languageHrefs.includes(profile.alternatePath)) {
     failures.push(`missing language switch href ${profile.alternatePath}; got ${result.languageHrefs.join(', ')}`);
+  }
+
+  if (!profile.adoptedLabel) {
+    await evaluate(`(() => {
+      window.__capaFormSubmissions = [];
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = (input, init = {}) => {
+        const requestUrl = typeof input === 'string' ? input : input?.url || '';
+        if (String(requestUrl).includes('/forms/submit')) {
+          let payload = {};
+          try { payload = JSON.parse(init?.body || '{}'); } catch {}
+          window.__capaFormSubmissions.push(payload);
+          return Promise.resolve(new Response(JSON.stringify({ ok: true, submissionId: 'profile-browser-smoke', emailSent: true }), {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          }));
+        }
+        return originalFetch(input, init);
+      };
+      return true;
+    })()`);
   }
 
   let visitSubmission = null;
@@ -298,9 +326,11 @@ async function runProfile(profile) {
       form.querySelector('[name="visit_time"]').value = '2026-07-05T10:30';
       form.querySelector('[name="visit_message"]').value = 'Browser smoke test visit request';
       form.requestSubmit();
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      await new Promise((resolve) => setTimeout(resolve, 550));
       const mailto = document.querySelector('[data-visit-mailto]')?.getAttribute('href') || '';
       const noteVisible = Boolean(document.querySelector('[data-visit-mailto-note]'));
+      const successVisible = Boolean(document.querySelector('[data-visit-success]'));
+      const payload = window.__capaFormSubmissions.find((entry) => entry.kind === 'visit' && entry.source === 'dog') || null;
       const openGeometry = {
         modalRect: rect(modal),
         panelRect: rect(panel),
@@ -315,6 +345,8 @@ async function runProfile(profile) {
         modalOpen: Boolean(modal),
         ...openGeometry,
         noteVisible,
+        successVisible,
+        payload,
         mailto,
         modalClosed: !document.querySelector('[data-visit-modal]'),
       };
@@ -324,13 +356,63 @@ async function runProfile(profile) {
     if (visitSubmission.panelRect && visitSubmission.panelRect.top < -1) failures.push(`visit modal panel is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
     if (visitSubmission.closeRect && visitSubmission.closeRect.top < -1) failures.push(`visit modal close button is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
     if (visitSubmission.titleRect && visitSubmission.titleRect.top < -1) failures.push(`visit modal title is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
-    if (!visitSubmission.noteVisible) failures.push('visit fallback mailto note did not appear');
-    if (!visitSubmission.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) failures.push(`unexpected visit mailto target: ${visitSubmission.mailto}`);
-    const decodedVisitMailto = decodeURIComponent(visitSubmission.mailto || '');
-    for (const needle of [profile.dog, 'QA Visitor', 'qa-visitor@example.com', '+351 930 000 000', '2026-07-05T10:30', 'Browser smoke test visit request']) {
-      if (!decodedVisitMailto.includes(needle)) failures.push(`visit mailto missing ${needle}: ${decodedVisitMailto}`);
-    }
+    if (!visitSubmission.successVisible) failures.push(`visit backend success state did not appear: ${JSON.stringify(visitSubmission)}`);
+    if (visitSubmission.noteVisible) failures.push(`visit fallback note appeared despite backend success: ${JSON.stringify(visitSubmission)}`);
+    if (!visitSubmission.payload || visitSubmission.payload.kind !== 'visit' || visitSubmission.payload.contextValue !== profile.dog) failures.push(`visit backend payload missing dog context: ${JSON.stringify(visitSubmission)}`);
     if (!visitSubmission.modalClosed) failures.push('visit modal did not close after verifier');
+  }
+
+  let adoptionSubmission = null;
+  if (!profile.adoptedLabel && result.adoptionButtonVisible) {
+    adoptionSubmission = await evaluate(`(async () => {
+      const openButton = document.querySelector('[data-adoption-open]');
+      openButton?.click();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      const modal = document.querySelector('[data-adoption-modal]');
+      const form = document.querySelector('[data-adoption-form]');
+      if (!modal || !form) return { ok: false, reason: 'missing adoption modal/form' };
+      const rect = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom, h: r.height };
+      };
+      const panel = document.querySelector('[data-adoption-modal-panel]');
+      const close = document.querySelector('[data-adoption-close]');
+      form.dataset.skipMailLaunch = 'true';
+      form.querySelector('[name="adoption_name"]').value = 'QA Adopter';
+      form.querySelector('[name="adoption_email"]').value = 'qa-adopter@example.com';
+      form.querySelector('[name="adoption_phone"]').value = '+351 931 000 000';
+      form.querySelector('[name="adoption_message"]').value = 'Browser smoke test adoption request';
+      form.requestSubmit();
+      await new Promise((resolve) => setTimeout(resolve, 550));
+      const mailto = document.querySelector('[data-adoption-mailto]')?.getAttribute('href') || '';
+      const noteVisible = Boolean(document.querySelector('[data-adoption-mailto-note]'));
+      const successVisible = Boolean(document.querySelector('[data-adoption-success]'));
+      const payload = window.__capaFormSubmissions.find((entry) => entry.kind === 'adoption_interest') || null;
+      const openGeometry = {
+        panelRect: rect(panel),
+        closeRect: rect(close),
+      };
+      close?.click();
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      return {
+        ok: true,
+        ...openGeometry,
+        noteVisible,
+        successVisible,
+        payload,
+        mailto,
+        modalClosed: !document.querySelector('[data-adoption-modal]'),
+      };
+    })()`);
+
+    if (!adoptionSubmission.ok) failures.push(`adoption modal failed: ${adoptionSubmission.reason}`);
+    if (adoptionSubmission.panelRect && adoptionSubmission.panelRect.top < -1) failures.push(`adoption modal panel is clipped above viewport: ${JSON.stringify(adoptionSubmission)}`);
+    if (adoptionSubmission.closeRect && adoptionSubmission.closeRect.top < -1) failures.push(`adoption modal close button is clipped above viewport: ${JSON.stringify(adoptionSubmission)}`);
+    if (!adoptionSubmission.successVisible) failures.push(`adoption backend success state did not appear: ${JSON.stringify(adoptionSubmission)}`);
+    if (adoptionSubmission.noteVisible) failures.push(`adoption fallback note appeared despite backend success: ${JSON.stringify(adoptionSubmission)}`);
+    if (!adoptionSubmission.payload || adoptionSubmission.payload.kind !== 'adoption_interest' || adoptionSubmission.payload.contextValue !== profile.dog) failures.push(`adoption backend payload missing dog context: ${JSON.stringify(adoptionSubmission)}`);
+    if (!adoptionSubmission.modalClosed) failures.push('adoption modal did not close after verifier');
   }
 
   return {
@@ -346,7 +428,10 @@ async function runProfile(profile) {
     visitButtonRect: result.visitButtonRect,
     visitButtonVisible: result.visitButtonVisible,
     visitButtonText: result.visitButtonText,
+    adoptionButtonVisible: result.adoptionButtonVisible,
+    adoptionButtonText: result.adoptionButtonText,
     visitSubmission,
+    adoptionSubmission,
     galleryFrameRect: result.galleryFrameRect,
     mobileControlsRect: result.mobileControlsRect,
     mobilePrevRect: result.mobilePrevRect,

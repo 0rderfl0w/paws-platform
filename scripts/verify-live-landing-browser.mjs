@@ -226,6 +226,25 @@ try {
   if (initial.hasNoindex) throw new Error('Live landing page has noindex');
   if (initial.overflow) throw new Error('Initial page has horizontal overflow');
 
+  await evaluate(`(() => {
+    window.__capaFormSubmissions = [];
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (input, init = {}) => {
+      const requestUrl = typeof input === 'string' ? input : input?.url || '';
+      if (String(requestUrl).includes('/forms/submit')) {
+        let payload = {};
+        try { payload = JSON.parse(init?.body || '{}'); } catch {}
+        window.__capaFormSubmissions.push(payload);
+        return Promise.resolve(new Response(JSON.stringify({ ok: true, submissionId: 'browser-smoke', emailSent: true }), {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return originalFetch(input, init);
+    };
+    return true;
+  })()`);
+
   const sponsorResult = await evaluate(`(async () => {
     const openButton = document.querySelector('[data-sponsor-modal-open]');
     const dialog = document.querySelector('[data-sponsor-modal]');
@@ -243,16 +262,25 @@ try {
     form.querySelector('[name="sponsor_method"]').value = form.querySelector('[name="sponsor_method"] option:nth-child(2)').value;
     form.querySelector('[name="sponsor_message"]').value = 'Browser smoke test sponsorship note';
     form.requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 550));
     const mailto = document.querySelector('[data-sponsor-mailto]')?.getAttribute('href') || '';
     const noteVisible = !document.querySelector('[data-sponsor-mailto-note]')?.classList.contains('hidden');
+    const successVisible = !document.querySelector('[data-sponsor-success]')?.classList.contains('hidden');
+    const payload = window.__capaFormSubmissions.find((entry) => entry.kind === 'sponsorship') || null;
     dialog.close?.();
-    return { ok: true, opened, mailto, noteVisible };
+    return { ok: true, opened, mailto, noteVisible, successVisible, payload };
   })()`);
 
   if (!sponsorResult.ok) throw new Error(`Sponsor modal failed: ${sponsorResult.reason}`);
   if (!sponsorResult.opened) throw new Error('Sponsor modal did not open');
-  if (!sponsorResult.noteVisible) throw new Error('Sponsor fallback mailto note did not appear');
+  if (!sponsorResult.successVisible) throw new Error(`Sponsor backend success state did not appear: ${JSON.stringify(sponsorResult)}`);
+  if (sponsorResult.noteVisible) throw new Error(`Sponsor fallback note appeared despite backend success: ${JSON.stringify(sponsorResult)}`);
+  if (!sponsorResult.payload || sponsorResult.payload.kind !== 'sponsorship') throw new Error(`Sponsor backend payload missing: ${JSON.stringify(sponsorResult)}`);
+  for (const [key, expectedValue] of Object.entries({ name: 'QA Sponsor', email: 'qa-sponsor@example.com', phone: '+351 912 345 678', business: locale === 'en' ? 'Yes, this is a business' : 'Sim, é uma empresa', contributionMethod: locale === 'en' ? 'Bank transfer' : 'Transferência bancária' })) {
+    if (sponsorResult.payload[key] !== expectedValue) throw new Error(`Sponsor payload ${key} mismatch: ${JSON.stringify(sponsorResult.payload)}`);
+  }
+  if (!String(sponsorResult.payload.amount || '').includes('25')) throw new Error(`Sponsor payload missing amount: ${JSON.stringify(sponsorResult.payload)}`);
+  if (!String(sponsorResult.payload.message || '').includes('Browser smoke test sponsorship note')) throw new Error(`Sponsor payload missing message: ${JSON.stringify(sponsorResult.payload)}`);
   if (!sponsorResult.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected sponsor mailto target: ${sponsorResult.mailto}`);
   const decodedSponsorMailto = decodeURIComponent(sponsorResult.mailto);
   for (const needle of ['QA Sponsor', 'qa-sponsor@example.com', '+351 912 345 678', '€25', 'Browser smoke test sponsorship note']) {
@@ -280,9 +308,11 @@ try {
     form.dataset.skipMailLaunch = 'true';
     form.querySelector('[name="mbway_phone"]').value = '+351 919 000 000';
     form.requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 550));
     const mailto = document.querySelector('[data-mbway-mailto=${JSON.stringify(expected.donateInstance).slice(1, -1)}]')?.getAttribute('href') || '';
     const noteVisible = !document.querySelector('[data-mbway-mailto-note=${JSON.stringify(expected.donateInstance).slice(1, -1)}]')?.classList.contains('hidden');
+    const successVisible = !document.querySelector('[data-mbway-success=${JSON.stringify(expected.donateInstance).slice(1, -1)}]')?.classList.contains('hidden');
+    const payload = window.__capaFormSubmissions.find((entry) => entry.kind === 'mbway' && entry.source === 'mbway-${JSON.stringify(expected.donateInstance).slice(1, -1)}') || null;
     dialog.close?.();
     return {
       ok: true,
@@ -294,6 +324,8 @@ try {
       dialogOpen,
       mailto,
       noteVisible,
+      successVisible,
+      payload,
     };
   })()`);
 
@@ -305,7 +337,9 @@ try {
   }
   if (donateResult.bankHref !== expected.bankHref) throw new Error(`Unexpected bank transfer href: ${donateResult.bankHref}`);
   if (!donateResult.dialogOpen) throw new Error('MB Way dialog did not open');
-  if (!donateResult.noteVisible) throw new Error('MB Way fallback mailto note did not appear');
+  if (!donateResult.successVisible) throw new Error(`MB Way backend success state did not appear: ${JSON.stringify(donateResult)}`);
+  if (donateResult.noteVisible) throw new Error(`MB Way fallback note appeared despite backend success: ${JSON.stringify(donateResult)}`);
+  if (!donateResult.payload || donateResult.payload.phone !== '+351 919 000 000') throw new Error(`MB Way backend payload missing phone: ${JSON.stringify(donateResult)}`);
   if (!donateResult.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected MB Way mailto target: ${donateResult.mailto}`);
   const decodedMbwayMailto = decodeURIComponent(donateResult.mailto);
   if (!decodedMbwayMailto.includes('+351 919 000 000')) throw new Error(`MB Way mailto missing phone: ${decodedMbwayMailto}`);
@@ -504,9 +538,11 @@ try {
     form.querySelector('[name="visit_time"]').value = '2026-07-06T11:45';
     form.querySelector('[name="visit_message"]').value = 'Footer browser smoke visit request';
     form.requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    await new Promise((resolve) => setTimeout(resolve, 550));
     const mailto = document.querySelector('[data-visit-mailto]')?.getAttribute('href') || '';
     const noteVisible = Boolean(document.querySelector('[data-visit-mailto-note]'));
+    const successVisible = Boolean(document.querySelector('[data-visit-success]'));
+    const payload = window.__capaFormSubmissions.find((entry) => entry.kind === 'visit' && entry.source === 'footer') || null;
     const openGeometry = {
       panelRect: rect(panel),
       closeRect: rect(close),
@@ -526,6 +562,8 @@ try {
       buttonText: visitButton.textContent.trim(),
       ...openGeometry,
       noteVisible,
+      successVisible,
+      payload,
       mailto,
       modalClosed: !document.querySelector('[data-visit-modal="footer"]'),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
@@ -546,15 +584,9 @@ try {
   if (footerVisit.contactText.includes('EN310') || footerVisit.contactText.includes('Póvoa de Lanhoso, Braga')) {
     throw new Error(`Footer Contact still contains address text: ${footerVisit.contactText}`);
   }
-  if (!footerVisit.noteVisible) throw new Error('Footer visit fallback mailto note did not appear');
-  if (!footerVisit.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected footer visit mailto target: ${footerVisit.mailto}`);
-  const decodedFooterVisitMailto = decodeURIComponent(footerVisit.mailto || '');
-  for (const needle of ['Footer QA Visitor', 'footer-qa@example.com', '+351 930 111 111', '2026-07-06T11:45', 'Footer browser smoke visit request']) {
-    if (!decodedFooterVisitMailto.includes(needle)) throw new Error(`Footer visit mailto missing ${needle}: ${decodedFooterVisitMailto}`);
-  }
-  if (!decodedFooterVisitMailto.includes(locale === 'en' ? 'CAPA Póvoa de Lanhoso shelter' : 'Abrigo CAPA Póvoa de Lanhoso')) {
-    throw new Error(`Footer visit mailto missing shelter context: ${decodedFooterVisitMailto}`);
-  }
+  if (!footerVisit.successVisible) throw new Error(`Footer visit backend success state did not appear: ${JSON.stringify(footerVisit)}`);
+  if (footerVisit.noteVisible) throw new Error(`Footer visit fallback note appeared despite backend success: ${JSON.stringify(footerVisit)}`);
+  if (!footerVisit.payload || footerVisit.payload.kind !== 'visit' || footerVisit.payload.source !== 'footer') throw new Error(`Footer visit backend payload missing: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.panelRect && footerVisit.panelRect.top < -1) throw new Error(`Footer visit modal panel is clipped: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.closeRect && footerVisit.closeRect.top < -1) throw new Error(`Footer visit modal close button is clipped: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.titleRect && footerVisit.titleRect.top < -1) throw new Error(`Footer visit modal title is clipped: ${JSON.stringify(footerVisit)}`);

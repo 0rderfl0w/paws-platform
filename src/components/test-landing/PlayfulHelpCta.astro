@@ -10,6 +10,7 @@ const { locale = 'pt' } = Astro.props;
 const t = getTranslations(locale);
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 const shelterEmail = 'capa.geralpvl@gmail.com';
+const formApiBaseUrl = (import.meta.env.PUBLIC_CAPA_API_URL || '').replace(/\/$/, '');
 
 const sponsorModal = locale === 'pt'
   ? {
@@ -29,9 +30,11 @@ const sponsorModal = locale === 'pt'
       message: 'Mensagem ou notas (opcional)',
       messagePlaceholder: 'Ex.: gostava de apadrinhar um cão específico, receber recibo, ou combinar os detalhes.',
       close: 'Fechar',
-      submit: 'Preparar email para CAPA',
+      submit: 'Enviar pedido à CAPA',
+      sending: 'A enviar…',
+      sent: 'Pedido enviado. A equipa da CAPA recebeu os dados e responderá por email.',
       fallback: 'Abrir email preparado',
-      fallbackNote: 'Se o email não abriu automaticamente, usa este botão para abrir o email preenchido.',
+      fallbackNote: 'Não conseguimos confirmar o envio automático. Usa este botão para enviar o email preparado à CAPA.',
       subject: 'Novo pedido de apadrinhamento mensal',
       bodyIntro: 'Novo pedido de apadrinhamento mensal através do site CAPA.',
       labels: {
@@ -64,9 +67,11 @@ const sponsorModal = locale === 'pt'
       message: 'Message or notes (optional)',
       messagePlaceholder: 'Example: I would like to sponsor a specific dog, receive a receipt, or discuss details.',
       close: 'Close',
-      submit: 'Prepare email to CAPA',
+      submit: 'Send request to CAPA',
+      sending: 'Sending…',
+      sent: 'Request sent. CAPA received the details and will reply by email.',
       fallback: 'Open prepared email',
-      fallbackNote: 'If the email did not open automatically, use this button to open the prepared email.',
+      fallbackNote: 'We could not confirm automatic sending. Use this button to send the prepared email to CAPA.',
       subject: 'New monthly sponsorship request',
       bodyIntro: 'New monthly sponsorship request from the CAPA website.',
       labels: {
@@ -176,6 +181,10 @@ const ways = [
     </div>
 
     <form data-sponsor-form class="mt-7 grid gap-5" novalidate>
+      <label class="hidden" aria-hidden="true">
+        Website
+        <input name="website" tabindex="-1" autocomplete="off" />
+      </label>
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="grid gap-2 text-sm font-extrabold text-playful-orange-dark">
           {sponsorModal.name}
@@ -225,6 +234,10 @@ const ways = [
         <textarea name="sponsor_message" rows="4" placeholder={sponsorModal.messagePlaceholder} class="playful-focus rounded-2xl border border-playful-line bg-white px-4 py-3 font-semibold leading-6 text-playful-ink shadow-sm"></textarea>
       </label>
 
+      <div data-sponsor-success class="hidden rounded-2xl border border-green-200 bg-green-50 p-4 text-sm font-bold leading-6 text-green-800" aria-live="polite">
+        {sponsorModal.sent}
+      </div>
+
       <div data-sponsor-mailto-note class="hidden rounded-2xl border border-playful-line bg-white p-4 text-sm font-bold leading-6 text-playful-muted">
         <p>{sponsorModal.fallbackNote}</p>
         <a data-sponsor-mailto href={`mailto:${shelterEmail}`} class="playful-focus mt-3 inline-flex rounded-full bg-playful-orange px-5 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">
@@ -236,7 +249,7 @@ const ways = [
         <button data-sponsor-modal-close type="button" class="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
           {sponsorModal.close}
         </button>
-        <button type="submit" class="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">
+        <button data-sponsor-submit type="submit" class="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
           {sponsorModal.submit}
         </button>
       </div>
@@ -251,13 +264,15 @@ const ways = [
   }
 </style>
 
-<script define:vars={{ shelterEmail, sponsorModal }}>
+<script define:vars={{ shelterEmail, sponsorModal, formApiBaseUrl }}>
   const sponsorDialog = document.querySelector('[data-sponsor-modal]');
   const sponsorOpenButtons = document.querySelectorAll('[data-sponsor-modal-open]');
   const sponsorCloseButtons = document.querySelectorAll('[data-sponsor-modal-close]');
   const sponsorForm = document.querySelector('[data-sponsor-form]');
   const sponsorMailtoLink = document.querySelector('[data-sponsor-mailto]');
   const sponsorMailtoNote = document.querySelector('[data-sponsor-mailto-note]');
+  const sponsorSuccess = document.querySelector('[data-sponsor-success]');
+  const sponsorSubmitButton = document.querySelector('[data-sponsor-submit]');
 
   const sponsorOpenDialog = () => {
     if (!sponsorDialog) return;
@@ -278,7 +293,7 @@ const ways = [
     if (event.target === sponsorDialog) sponsorCloseDialog();
   });
 
-  sponsorForm?.addEventListener('submit', (event) => {
+  sponsorForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!sponsorForm.reportValidity()) return;
 
@@ -305,6 +320,55 @@ const ways = [
 
     const mailto = `mailto:${shelterEmail}?subject=${encodeURIComponent(sponsorModal.subject)}&body=${encodeURIComponent(body)}`;
     sponsorMailtoLink?.setAttribute('href', mailto);
+    sponsorMailtoNote?.classList.add('hidden');
+    sponsorSuccess?.classList.add('hidden');
+    if (sponsorSubmitButton) {
+      sponsorSubmitButton.disabled = true;
+      sponsorSubmitButton.textContent = sponsorModal.sending;
+    }
+
+    let sent = false;
+    if (formApiBaseUrl && sponsorForm.dataset.skipBackend !== 'true') {
+      try {
+        const response = await fetch(`${formApiBaseUrl}/forms/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            kind: 'sponsorship',
+            locale: document.documentElement.lang === 'en' ? 'en' : 'pt',
+            source: 'home-sponsor-modal',
+            pageUrl: window.location.href,
+            contextLabel: sponsorModal.eyebrow,
+            contextValue: sponsorModal.title,
+            name: get('sponsor_name'),
+            email: get('sponsor_email'),
+            phone,
+            amount: `€${amount}${sponsorModal.perMonth}`,
+            business: businessValue,
+            contributionMethod: get('sponsor_method'),
+            message,
+            website: get('website'),
+          }),
+        });
+        const result = await response.json().catch(() => ({}));
+        sent = response.ok && Boolean(result?.ok);
+      } catch {
+        sent = false;
+      }
+    }
+
+    if (sponsorSubmitButton) {
+      sponsorSubmitButton.disabled = false;
+      sponsorSubmitButton.textContent = sponsorModal.submit;
+    }
+
+    if (sent) {
+      sponsorForm.reset();
+      sponsorSuccess?.classList.remove('hidden');
+      sponsorSuccess?.focus?.();
+      return;
+    }
+
     sponsorMailtoNote?.classList.remove('hidden');
     sponsorMailtoLink?.focus();
 

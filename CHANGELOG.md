@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Forms/API: added a backend-backed `/forms/submit` flow through the Hetzner Bun API for sponsorship, MB Way, visit scheduling, and dog adoption-interest requests; submissions persist to PostgreSQL, attempt SMTP email to CAPA when configured, and keep prepared-email fallback when delivery is unavailable.
+- Dog profiles: replaced the adoption email CTA with a structured adoption-interest popup that sends dog context, visitor contact details, and notes through the backend form endpoint.
 - Footer: added a Visit/Visita section under Navigation with a Google Maps map-pin card, schedule-first guidance, and a shared Schedule a visit form; Contact now only lists phone and email.
 - Visit scheduling: extracted the dog-profile Schedule a visit form into a reusable popup and fixed it to render above the sticky nav on mobile so the top of the form is no longer cut off.
 - Dog profiles: added a bilingual Schedule a visit / Agendar visita popup below the dog photo carousel and above the info card for available dogs; the form collects name, email, phone, preferred visit time, and notes, then prepares an email to `capa.geralpvl@gmail.com`.

@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { capaApi } from '../lib/capaApi';
 import { capaDogs } from '../data/capaDogs';
 import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/capaApi';
 import VisitSchedule from './VisitSchedule';
+import { submitFormSubmission } from '../lib/formSubmission';
+
+const SHELTER_EMAIL = 'capa.geralpvl@gmail.com';
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-playful-peach text-playful-orange-dark border border-playful-orange/20',
@@ -284,6 +288,187 @@ function NotFound({ locale }: { locale: Locale }) {
   );
 }
 
+/* ── Adoption interest modal ── */
+function AdoptionInterest({ dogName, locale }: { dogName: string; locale: Locale }) {
+  const t = getTranslations(locale);
+  const [isOpen, setIsOpen] = useState(false);
+  const [mailtoHref, setMailtoHref] = useState('');
+  const [showMailtoNote, setShowMailtoNote] = useState(false);
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'sent' | 'fallback'>('idle');
+
+  useEffect(() => {
+    if (!isOpen || typeof document === 'undefined') return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  const openModal = () => {
+    setShowMailtoNote(false);
+    setSubmitState('idle');
+    setIsOpen(true);
+  };
+  const closeModal = () => setIsOpen(false);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+
+    const data = new FormData(form);
+    const get = (name: string) => String(data.get(name) ?? '').trim();
+    const phone = get('adoption_phone') || t.dogProfile.visitNotProvided;
+    const message = get('adoption_message') || t.dogProfile.visitNotProvided;
+
+    const body = [
+      t.dogProfile.adoptionBodyIntro,
+      '',
+      `${t.dogProfile.visitDogLabel}: ${dogName}`,
+      `${t.dogProfile.visitNameLabel}: ${get('adoption_name')}`,
+      `${t.dogProfile.visitEmailLabel}: ${get('adoption_email')}`,
+      `${t.dogProfile.visitPhoneLabel}: ${phone}`,
+      `${t.dogProfile.visitMessageLabel}: ${message}`,
+      '',
+      `${t.dogProfile.visitPageLabel}: ${window.location.href}`,
+    ].join('\n');
+
+    const mailto = `mailto:${SHELTER_EMAIL}?subject=${encodeURIComponent(`${t.dogProfile.emailSubject} — ${dogName}`)}&body=${encodeURIComponent(body)}`;
+    setMailtoHref(mailto);
+    setShowMailtoNote(false);
+    setSubmitState('submitting');
+
+    const result = await submitFormSubmission({
+      kind: 'adoption_interest',
+      locale,
+      source: 'dog-adoption-modal',
+      pageUrl: window.location.href,
+      contextLabel: t.dogProfile.visitDogLabel,
+      contextValue: dogName,
+      name: get('adoption_name'),
+      email: get('adoption_email'),
+      phone,
+      message,
+      website: get('website'),
+    }, { skipBackend: form.dataset.skipBackend === 'true' });
+
+    if (result.status === 'sent') {
+      setSubmitState('sent');
+      form.reset();
+      return;
+    }
+
+    setSubmitState('fallback');
+    setShowMailtoNote(true);
+
+    if (form.dataset.skipMailLaunch !== 'true') {
+      window.location.href = mailto;
+    }
+  };
+
+  const modal: ReactNode = (
+    <div
+      data-adoption-modal
+      className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto bg-playful-ink/55 px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur-sm sm:items-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="adoption-modal-title"
+      aria-describedby="adoption-modal-intro"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) closeModal();
+      }}
+    >
+      <div data-adoption-modal-panel className="relative w-full max-w-2xl overflow-y-auto rounded-[2rem] border-2 border-playful-line bg-playful-canvas p-5 text-left text-playful-ink shadow-pillowy-lg sm:max-h-[calc(100svh-2rem)] sm:p-7" style={{ maxHeight: 'calc(100svh - 2rem)' }}>
+        <button
+          data-adoption-close
+          type="button"
+          onClick={closeModal}
+          className="playful-focus absolute right-4 top-4 rounded-full border border-playful-line bg-white px-3 py-2 text-sm font-extrabold text-playful-orange-dark shadow-sm"
+          aria-label={t.dogProfile.visitClose}
+        >
+          ×
+        </button>
+        <span className="text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">{dogName}</span>
+        <h2 id="adoption-modal-title" className="mt-2 pr-10 font-playful-display text-3xl font-extrabold tracking-[-0.03em] text-playful-orange-dark">
+          {t.dogProfile.adoptionFormTitle}
+        </h2>
+        <p id="adoption-modal-intro" className="mt-3 text-sm font-semibold leading-7 text-playful-muted sm:text-base">
+          {t.dogProfile.adoptionFormIntro}
+        </p>
+
+        <form data-adoption-form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <label className="hidden" aria-hidden="true">
+            Website
+            <input name="website" tabIndex={-1} autoComplete="off" />
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-extrabold text-playful-orange-dark">
+              {t.dogProfile.visitNameLabel}
+              <input name="adoption_name" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="name" />
+            </label>
+            <label className="block text-sm font-extrabold text-playful-orange-dark">
+              {t.dogProfile.visitEmailLabel}
+              <input name="adoption_email" type="email" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="email" />
+            </label>
+            <label className="block text-sm font-extrabold text-playful-orange-dark sm:col-span-2">
+              {t.dogProfile.visitPhoneLabel}
+              <input name="adoption_phone" type="tel" className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="tel" placeholder={t.dogProfile.visitPhonePlaceholder} />
+            </label>
+          </div>
+          <label className="block text-sm font-extrabold text-playful-orange-dark">
+            {t.dogProfile.visitMessageLabel}
+            <textarea name="adoption_message" rows={4} className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" placeholder={t.dogProfile.adoptionMessagePlaceholder} />
+          </label>
+
+          {submitState === 'sent' && (
+            <p data-adoption-success className="rounded-[1.25rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-800" aria-live="polite">
+              {t.dogProfile.adoptionSent}
+            </p>
+          )}
+
+          {showMailtoNote && mailtoHref && (
+            <p data-adoption-mailto-note className="rounded-[1.25rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted">
+              {t.dogProfile.adoptionFallbackNote}{' '}
+              <a data-adoption-mailto href={mailtoHref} className="playful-focus text-playful-orange-dark underline decoration-playful-orange/40 decoration-2 underline-offset-4 hover:text-playful-orange">
+                {t.dogProfile.adoptionOpenEmail}
+              </a>
+            </p>
+          )}
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <button data-adoption-close type="button" onClick={closeModal} className="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
+              {t.dogProfile.visitClose}
+            </button>
+            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
+              {submitState === 'submitting' ? t.dogProfile.adoptionSubmitting : t.dogProfile.adoptionSubmit}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        data-adoption-open
+        onClick={openModal}
+        className="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display font-extrabold text-white shadow-squish"
+        aria-haspopup="dialog"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5" aria-hidden="true">
+          <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
+          <path d="M19 8.839l-7.616 3.808a2.75 2.75 0 01-2.768 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
+        </svg>
+        {t.dogProfile.sendEmail}
+      </button>
+      {isOpen && typeof document !== 'undefined' ? createPortal(modal, document.body) : null}
+    </>
+  );
+}
+
 /* ── Main Profile Component ── */
 export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
   const t = getTranslations(locale);
@@ -445,16 +630,7 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
           <h2 id="dog-adopt-heading" className="font-playful-display text-3xl font-extrabold tracking-[-0.04em]">{t.dogProfile.adoptTitle} {dog.name}?</h2>
           <p className="mt-3 max-w-3xl text-base font-medium leading-7 text-white/82">{t.dogProfile.adoptDesc}</p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={`mailto:capa.geralpvl@gmail.com?subject=${t.dogProfile.emailSubject} — ${dog.name}`}
-              className="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display font-extrabold text-white shadow-squish"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5" aria-hidden="true">
-                <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
-                <path d="M19 8.839l-7.616 3.808a2.75 2.75 0 01-2.768 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
-              </svg>
-              {t.dogProfile.sendEmail}
-            </a>
+            <AdoptionInterest dogName={dog.name} locale={locale} />
             <a href={adoptPath} className="squishy playful-focus inline-flex items-center justify-center rounded-full bg-white px-7 py-4 font-playful-display font-extrabold text-playful-orange-dark shadow-pillowy">
               {t.dogProfile.adoptionProcess}
             </a>

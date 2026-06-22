@@ -3,6 +3,7 @@ import { mkdir, readdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
 import pg from 'pg';
+import nodemailer from 'nodemailer';
 
 const { Pool } = pg;
 
@@ -29,6 +30,44 @@ type DogPayload = {
   is_adopted?: boolean;
 };
 
+type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest';
+
+type FormSubmissionPayload = {
+  kind?: string;
+  locale?: string;
+  source?: string;
+  pageUrl?: string;
+  contextLabel?: string;
+  contextValue?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  preferredTime?: string;
+  amount?: string;
+  business?: string;
+  contributionMethod?: string;
+  message?: string;
+  website?: string;
+};
+
+type NormalizedFormSubmission = {
+  kind: FormSubmissionKind;
+  locale: 'pt' | 'en';
+  source: string;
+  pageUrl: string;
+  contextLabel: string;
+  contextValue: string;
+  name: string;
+  email: string;
+  phone: string;
+  preferredTime: string;
+  amount: string;
+  business: string;
+  contributionMethod: string;
+  message: string;
+  payload: Record<string, string>;
+};
+
 const PORT = Number(process.env.PORT ?? 3314);
 const DATABASE_URL = process.env.DATABASE_URL ?? '';
 const ADMIN_EMAIL = process.env.CAPA_ADMIN_EMAIL ?? '';
@@ -41,6 +80,14 @@ const ALLOWED_ORIGINS = (process.env.CAPA_ALLOWED_ORIGINS ?? 'https://capapvl.pt
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+const FORM_RECIPIENT_EMAIL = (process.env.CAPA_FORM_RECIPIENT_EMAIL || ADMIN_EMAIL || 'capa.geralpvl@gmail.com').trim();
+const FORM_FROM_EMAIL = (process.env.CAPA_FORM_FROM_EMAIL || FORM_RECIPIENT_EMAIL).trim();
+const FORM_SMTP_HOST = (process.env.CAPA_FORM_SMTP_HOST || '').trim();
+const FORM_SMTP_PORT = Number(process.env.CAPA_FORM_SMTP_PORT || 587);
+const FORM_SMTP_USER = (process.env.CAPA_FORM_SMTP_USER || '').trim();
+const FORM_SMTP_PASSWORD = process.env.CAPA_FORM_SMTP_PASSWORD || '';
+const FORM_SMTP_SECURE = process.env.CAPA_FORM_SMTP_SECURE === 'true';
+const FORM_EMAIL_DRY_RUN = process.env.CAPA_FORM_EMAIL_DRY_RUN === 'true';
 
 if (!DATABASE_URL) throw new Error('DATABASE_URL is required');
 if (!ADMIN_EMAIL || !ADMIN_PASSWORD_SHA256 || !SESSION_SECRET) {
@@ -196,6 +243,225 @@ async function getDogRow(id: string): Promise<DogRow | null> {
   return result.rows[0] ?? null;
 }
 
+
+async function ensureFormSubmissionsTable(): Promise<void> {
+  const result = await pool.query<{ exists: boolean }>(`select to_regclass('public.form_submissions') is not null as exists`);
+  if (!result.rows[0]?.exists) {
+    throw new Error('form_submissions table is missing; run scripts/create-form-submissions-table.sql before starting the API');
+  }
+}
+
+function cleanFormString(value: unknown, maxLength = 500): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\s+/g, ' ').trim().slice(0, maxLength);
+}
+
+function cleanMultiline(value: unknown, maxLength = 3000): string {
+  if (typeof value !== 'string') return '';
+  return value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().slice(0, maxLength);
+}
+
+function isValidEmail(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSubmission | 'bot' {
+  if (cleanFormString(input.website, 200)) return 'bot';
+
+  const kind = cleanFormString(input.kind, 40) as FormSubmissionKind;
+  if (!['sponsorship', 'mbway', 'visit', 'adoption_interest'].includes(kind)) throw new Error('Invalid form type');
+
+  const normalized: NormalizedFormSubmission = {
+    kind,
+    locale: cleanFormString(input.locale, 5) === 'en' ? 'en' : 'pt',
+    source: cleanFormString(input.source, 80),
+    pageUrl: cleanFormString(input.pageUrl, 500),
+    contextLabel: cleanFormString(input.contextLabel, 80),
+    contextValue: cleanFormString(input.contextValue, 160),
+    name: cleanFormString(input.name, 160),
+    email: cleanFormString(input.email, 200).toLowerCase(),
+    phone: cleanFormString(input.phone, 80),
+    preferredTime: cleanFormString(input.preferredTime, 120),
+    amount: cleanFormString(input.amount, 80),
+    business: cleanFormString(input.business, 120),
+    contributionMethod: cleanFormString(input.contributionMethod, 160),
+    message: cleanMultiline(input.message, 3000),
+    payload: {},
+  };
+
+  normalized.payload = {
+    kind: normalized.kind,
+    locale: normalized.locale,
+    source: normalized.source,
+    pageUrl: normalized.pageUrl,
+    contextLabel: normalized.contextLabel,
+    contextValue: normalized.contextValue,
+    name: normalized.name,
+    email: normalized.email,
+    phone: normalized.phone,
+    preferredTime: normalized.preferredTime,
+    amount: normalized.amount,
+    business: normalized.business,
+    contributionMethod: normalized.contributionMethod,
+    message: normalized.message,
+  };
+
+  if (normalized.kind === 'mbway') {
+    if (!normalized.phone) throw new Error('Phone is required');
+    return normalized;
+  }
+
+  if (!normalized.name) throw new Error('Name is required');
+  if (!normalized.email || !isValidEmail(normalized.email)) throw new Error('Valid email is required');
+
+  if (normalized.kind === 'sponsorship') {
+    if (!normalized.amount) throw new Error('Monthly amount is required');
+    if (!normalized.business) throw new Error('Business status is required');
+    if (!normalized.contributionMethod) throw new Error('Contribution method is required');
+  }
+
+  if (normalized.kind === 'visit' && !normalized.preferredTime) {
+    throw new Error('Preferred visit time is required');
+  }
+
+  if (normalized.kind === 'adoption_interest' && !normalized.contextValue) {
+    throw new Error('Dog name is required');
+  }
+
+  return normalized;
+}
+
+function formSubject(submission: NormalizedFormSubmission): string {
+  if (submission.kind === 'sponsorship') return 'Novo pedido de apadrinhamento mensal';
+  if (submission.kind === 'mbway') return 'Pedido de número MB Way para donativo';
+  if (submission.kind === 'adoption_interest') return `Interesse em adoção — ${submission.contextValue}`;
+  return `Pedido de visita — ${submission.contextValue || 'Abrigo CAPA Póvoa de Lanhoso'}`;
+}
+
+function formBody(submission: NormalizedFormSubmission): string {
+  const label = submission.kind === 'adoption_interest'
+    ? 'Cão'
+    : submission.kind === 'visit'
+      ? (submission.contextLabel || 'Visita')
+      : 'Origem';
+  const lines = [
+    `Novo pedido recebido através do site CAPA.`,
+    '',
+    `Tipo: ${submission.kind}`,
+    label && submission.contextValue ? `${label}: ${submission.contextValue}` : '',
+    `Nome: ${submission.name || 'Não indicado'}`,
+    `Email: ${submission.email || 'Não indicado'}`,
+    `Telefone: ${submission.phone || 'Não indicado'}`,
+    submission.preferredTime ? `Dia/hora pretendidos: ${submission.preferredTime}` : '',
+    submission.amount ? `Contributo mensal pretendido: ${submission.amount}` : '',
+    submission.business ? `Empresa: ${submission.business}` : '',
+    submission.contributionMethod ? `Forma preferida para contribuir: ${submission.contributionMethod}` : '',
+    `Mensagem: ${submission.message || 'Não indicada'}`,
+    '',
+    `Página: ${submission.pageUrl || 'Não indicada'}`,
+    `Fonte: ${submission.source || 'Não indicada'}`,
+    `Idioma: ${submission.locale}`,
+  ].filter(Boolean);
+  return lines.join('\n');
+}
+
+function smtpConfigured(): boolean {
+  return Boolean(FORM_SMTP_HOST && FORM_FROM_EMAIL && FORM_RECIPIENT_EMAIL);
+}
+
+async function sendSubmissionEmail(submission: NormalizedFormSubmission): Promise<{ sent: boolean; dryRun: boolean; error?: string }> {
+  if (FORM_EMAIL_DRY_RUN) return { sent: true, dryRun: true };
+  if (!smtpConfigured()) return { sent: false, dryRun: false, error: 'Email delivery is not configured' };
+
+  try {
+    const transporter = nodemailer.createTransport({
+      host: FORM_SMTP_HOST,
+      port: FORM_SMTP_PORT,
+      secure: FORM_SMTP_SECURE,
+      auth: FORM_SMTP_USER || FORM_SMTP_PASSWORD ? {
+        user: FORM_SMTP_USER,
+        pass: FORM_SMTP_PASSWORD,
+      } : undefined,
+    });
+    await transporter.sendMail({
+      from: FORM_FROM_EMAIL,
+      to: FORM_RECIPIENT_EMAIL,
+      replyTo: submission.email || undefined,
+      subject: formSubject(submission),
+      text: formBody(submission),
+    });
+    return { sent: true, dryRun: false };
+  } catch (err) {
+    console.error('form email delivery failed', err);
+    return { sent: false, dryRun: false, error: err instanceof Error ? err.message : 'Email delivery failed' };
+  }
+}
+
+async function insertFormSubmission(submission: NormalizedFormSubmission): Promise<string> {
+  const id = randomUUID();
+  await pool.query(
+    `insert into form_submissions (
+      id, kind, locale, source, page_url, context_label, context_value, name, email, phone,
+      preferred_time, amount, business, contribution_method, message, payload
+    ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+    [
+      id,
+      submission.kind,
+      submission.locale,
+      submission.source,
+      submission.pageUrl,
+      submission.contextLabel,
+      submission.contextValue,
+      submission.name,
+      submission.email,
+      submission.phone,
+      submission.preferredTime,
+      submission.amount,
+      submission.business,
+      submission.contributionMethod,
+      submission.message,
+      submission.payload,
+    ],
+  );
+  return id;
+}
+
+async function markFormEmailResult(id: string, result: { sent: boolean; error?: string }): Promise<void> {
+  await pool.query('update form_submissions set email_sent = $1, email_error = $2 where id = $3', [result.sent, result.error ?? null, id]);
+}
+
+async function handleFormSubmit(request: Request, origin: string | null): Promise<Response> {
+  const payload = await request.json().catch(() => null) as FormSubmissionPayload | null;
+  if (!payload || typeof payload !== 'object') return error('Invalid JSON payload', 400, origin);
+
+  let submission: NormalizedFormSubmission | 'bot';
+  try {
+    submission = normalizeFormSubmission(payload);
+  } catch (err) {
+    return error(err instanceof Error ? err.message : 'Invalid form submission', 400, origin);
+  }
+
+  if (submission === 'bot') {
+    return json({ ok: true, ignored: true }, {}, origin);
+  }
+
+  const id = await insertFormSubmission(submission);
+  const mail = await sendSubmissionEmail(submission);
+  await markFormEmailResult(id, { sent: mail.sent, error: mail.error });
+
+  if (!mail.sent) {
+    return json({
+      ok: false,
+      submissionId: id,
+      emailSent: false,
+      fallbackRequired: true,
+      error: mail.error ?? 'Email delivery failed',
+    }, { status: 503 }, origin);
+  }
+
+  return json({ ok: true, submissionId: id, emailSent: true, dryRun: mail.dryRun }, { status: 201 }, origin);
+}
+
 async function handleListDogs(url: URL, origin: string | null) {
   const includeAdopted = url.searchParams.get('includeAdopted') === 'true';
   const result = includeAdopted
@@ -327,6 +593,8 @@ async function serveImage(slug: string, filename: string, origin: string | null)
   });
 }
 
+await ensureFormSubmissionsTable();
+
 Bun.serve({
   port: PORT,
   hostname: '127.0.0.1',
@@ -339,6 +607,7 @@ Bun.serve({
       const parts = url.pathname.split('/').filter(Boolean);
 
       if (url.pathname === '/health') return json({ ok: true }, {}, origin);
+      if (url.pathname === '/forms/submit' && request.method === 'POST') return handleFormSubmit(request, origin);
 
       if (url.pathname === '/auth/login' && request.method === 'POST') {
         const body = await request.json().catch(() => ({})) as { email?: string; password?: string };

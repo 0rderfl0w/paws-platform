@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { getTranslations, type Locale } from '../i18n';
+import { submitFormSubmission } from '../lib/formSubmission';
 
 const SHELTER_EMAIL = 'capa.geralpvl@gmail.com';
 
@@ -18,6 +19,7 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
   const [isOpen, setIsOpen] = useState(false);
   const [mailtoHref, setMailtoHref] = useState('');
   const [showMailtoNote, setShowMailtoNote] = useState(false);
+  const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'sent' | 'fallback'>('idle');
 
   const isFooter = source === 'footer';
   const contextLabel = isFooter ? t.footer.visitEmailContextLabel : t.dogProfile.visitDogLabel;
@@ -42,11 +44,12 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
 
   const openModal = () => {
     setShowMailtoNote(false);
+    setSubmitState('idle');
     setIsOpen(true);
   };
   const closeModal = () => setIsOpen(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.reportValidity()) return;
@@ -71,6 +74,31 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
 
     const mailto = `mailto:${SHELTER_EMAIL}?subject=${encodeURIComponent(`${emailSubject} — ${contextValue}`)}&body=${encodeURIComponent(body)}`;
     setMailtoHref(mailto);
+    setShowMailtoNote(false);
+    setSubmitState('submitting');
+
+    const result = await submitFormSubmission({
+      kind: 'visit',
+      locale,
+      source,
+      pageUrl: window.location.href,
+      contextLabel,
+      contextValue,
+      name: get('visit_name'),
+      email: get('visit_email'),
+      phone,
+      preferredTime: get('visit_time'),
+      message,
+      website: get('website'),
+    }, { skipBackend: form.dataset.skipBackend === 'true' });
+
+    if (result.status === 'sent') {
+      setSubmitState('sent');
+      form.reset();
+      return;
+    }
+
+    setSubmitState('fallback');
     setShowMailtoNote(true);
 
     if (form.dataset.skipMailLaunch !== 'true') {
@@ -109,6 +137,10 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
         </p>
 
         <form data-visit-form={source} className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <label className="hidden" aria-hidden="true">
+            Website
+            <input name="website" tabIndex={-1} autoComplete="off" />
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-extrabold text-playful-orange-dark">
               {t.dogProfile.visitNameLabel}
@@ -132,6 +164,12 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
             <textarea name="visit_message" rows={4} className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" placeholder={t.dogProfile.visitMessagePlaceholder} />
           </label>
 
+          {submitState === 'sent' && (
+            <p data-visit-success className="rounded-[1.25rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-800" aria-live="polite">
+              {t.dogProfile.visitSent}
+            </p>
+          )}
+
           {showMailtoNote && mailtoHref && (
             <p data-visit-mailto-note className="rounded-[1.25rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted">
               {t.dogProfile.visitFallbackNote}{' '}
@@ -145,8 +183,8 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
             <button data-visit-close type="button" onClick={closeModal} className="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
               {t.dogProfile.visitClose}
             </button>
-            <button type="submit" className="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">
-              {t.dogProfile.visitSubmit}
+            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
+              {submitState === 'submitting' ? t.dogProfile.visitSubmitting : t.dogProfile.visitSubmit}
             </button>
           </div>
         </form>

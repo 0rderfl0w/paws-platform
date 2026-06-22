@@ -21,6 +21,7 @@ const {
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 const shelterEmail = 'capa.geralpvl@gmail.com';
+const formApiBaseUrl = (import.meta.env.PUBLIC_CAPA_API_URL || '').replace(/\/$/, '');
 const bankTransferHref = locale === 'pt' ? '/ajudar#apoio-financeiro' : '/en/help#financial-support';
 
 const labels = locale === 'pt'
@@ -38,8 +39,10 @@ const labels = locale === 'pt'
       phoneLabel: 'O seu número de telefone',
       phonePlaceholder: '+351 912 345 678',
       submit: 'Pedir número MB Way',
+      sending: 'A enviar…',
+      sent: 'Pedido enviado. A equipa da CAPA recebeu os dados e responderá por mensagem.',
       close: 'Fechar',
-      fallbackNote: 'Se o email não abriu automaticamente, use este botão para enviar o pedido à CAPA.',
+      fallbackNote: 'Não conseguimos confirmar o envio automático. Use este botão para enviar o pedido à CAPA.',
       fallback: 'Abrir email preparado',
       subject: 'Pedido de número MB Way para donativo',
       bodyIntro: 'Pedido de número MB Way para donativo através do site CAPA.',
@@ -60,8 +63,10 @@ const labels = locale === 'pt'
       phoneLabel: 'Your phone number',
       phonePlaceholder: '+351 912 345 678',
       submit: 'Request MB Way number',
+      sending: 'Sending…',
+      sent: 'Request sent. CAPA received the details and will reply by message.',
       close: 'Close',
-      fallbackNote: 'If the email did not open automatically, use this button to send the request to CAPA.',
+      fallbackNote: 'We could not confirm automatic sending. Use this button to send the request to CAPA.',
       fallback: 'Open prepared email',
       subject: 'MB Way donation number request',
       bodyIntro: 'MB Way donation number request from the CAPA website.',
@@ -158,10 +163,18 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
     <p id={`${dialogId}-intro`} class="mt-3 text-sm font-semibold leading-7 text-playful-muted sm:text-base">{labels.mbwayIntro}</p>
 
     <form data-mbway-form={instanceId} class="mt-6 grid gap-4" novalidate>
+      <label class="hidden" aria-hidden="true">
+        Website
+        <input name="website" tabindex="-1" autocomplete="off" />
+      </label>
       <label class="grid gap-2 text-sm font-extrabold text-playful-orange-dark">
         {labels.phoneLabel}
         <input name="mbway_phone" required type="tel" autocomplete="tel" placeholder={labels.phonePlaceholder} class="playful-focus rounded-2xl border border-playful-line bg-white px-4 py-3 font-semibold text-playful-ink shadow-sm" />
       </label>
+
+      <div data-mbway-success={instanceId} class="hidden rounded-2xl border border-green-200 bg-green-50 p-4 text-sm font-bold leading-6 text-green-800" aria-live="polite">
+        {labels.sent}
+      </div>
 
       <div data-mbway-mailto-note={instanceId} class="hidden rounded-2xl border border-playful-line bg-white p-4 text-sm font-bold leading-6 text-playful-muted">
         <p>{labels.fallbackNote}</p>
@@ -174,7 +187,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
         <button data-mbway-close={instanceId} type="button" class="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
           {labels.close}
         </button>
-        <button type="submit" class="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">
+        <button data-mbway-submit={instanceId} type="submit" class="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
           {labels.submit}
         </button>
       </div>
@@ -189,7 +202,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
   }
 </style>
 
-<script define:vars={{ instanceId, shelterEmail, labels, variant }}>
+<script define:vars={{ instanceId, shelterEmail, labels, variant, formApiBaseUrl }}>
   const donateRoot = document.querySelector(`[data-donate-menu="${instanceId}"]`);
   const donateToggle = donateRoot?.querySelector('[data-donate-toggle]');
   const donatePanel = donateRoot?.querySelector('[data-donate-panel]');
@@ -198,6 +211,8 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
   const mbwayForm = document.querySelector(`[data-mbway-form="${instanceId}"]`);
   const mbwayMailto = document.querySelector(`[data-mbway-mailto="${instanceId}"]`);
   const mbwayMailtoNote = document.querySelector(`[data-mbway-mailto-note="${instanceId}"]`);
+  const mbwaySuccess = document.querySelector(`[data-mbway-success="${instanceId}"]`);
+  const mbwaySubmitButton = document.querySelector(`[data-mbway-submit="${instanceId}"]`);
   const mbwayOpenButton = document.querySelector(`[data-mbway-open="${instanceId}"]`);
 
   const setDonateOpen = (isOpen) => {
@@ -254,11 +269,12 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
     }
   });
 
-  mbwayForm?.addEventListener('submit', (event) => {
+  mbwayForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!mbwayForm.reportValidity()) return;
     const data = new FormData(mbwayForm);
-    const phone = String(data.get('mbway_phone') ?? '').trim();
+    const get = (name) => String(data.get(name) ?? '').trim();
+    const phone = get('mbway_phone');
     const body = [
       labels.bodyIntro,
       '',
@@ -267,6 +283,49 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
     ].join('\n');
     const mailto = `mailto:${shelterEmail}?subject=${encodeURIComponent(labels.subject)}&body=${encodeURIComponent(body)}`;
     mbwayMailto?.setAttribute('href', mailto);
+    mbwayMailtoNote?.classList.add('hidden');
+    mbwaySuccess?.classList.add('hidden');
+    if (mbwaySubmitButton) {
+      mbwaySubmitButton.disabled = true;
+      mbwaySubmitButton.textContent = labels.sending;
+    }
+
+    let sent = false;
+    if (formApiBaseUrl && mbwayForm.dataset.skipBackend !== 'true') {
+      try {
+        const response = await fetch(`${formApiBaseUrl}/forms/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            kind: 'mbway',
+            locale: document.documentElement.lang === 'en' ? 'en' : 'pt',
+            source: `mbway-${instanceId}`,
+            pageUrl: window.location.href,
+            contextLabel: 'MB Way',
+            contextValue: labels.mbwayTitle,
+            phone,
+            message: labels.bodyIntro,
+            website: get('website'),
+          }),
+        });
+        const result = await response.json().catch(() => ({}));
+        sent = response.ok && Boolean(result?.ok);
+      } catch {
+        sent = false;
+      }
+    }
+
+    if (mbwaySubmitButton) {
+      mbwaySubmitButton.disabled = false;
+      mbwaySubmitButton.textContent = labels.submit;
+    }
+
+    if (sent) {
+      mbwayForm.reset();
+      mbwaySuccess?.classList.remove('hidden');
+      return;
+    }
+
     mbwayMailtoNote?.classList.remove('hidden');
     mbwayMailto?.focus();
 
