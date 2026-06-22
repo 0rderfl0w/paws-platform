@@ -169,6 +169,18 @@ async function runProfile(profile) {
     const gallery = document.querySelector('[data-dog-profile-gallery]');
     const title = document.querySelector('#dog-profile-heading')?.textContent?.trim() || '';
     const mainImage = gallery?.querySelector('img');
+    const galleryFrame = gallery?.querySelector('[data-dog-profile-gallery-frame]');
+    const mobileControls = gallery?.querySelector('[data-gallery-mobile-controls]');
+    const mobilePrev = gallery?.querySelector('[data-gallery-prev="mobile"]');
+    const mobileNext = gallery?.querySelector('[data-gallery-next="mobile"]');
+    const desktopPrev = gallery?.querySelector('[data-gallery-prev="desktop"]');
+    const desktopNext = gallery?.querySelector('[data-gallery-next="desktop"]');
+    const isVisible = (el) => {
+      if (!el) return false;
+      const style = getComputedStyle(el);
+      const box = el.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && box.width > 0 && box.height > 0;
+    };
     const galleryLabels = [...(gallery?.querySelectorAll('span') || [])]
       .map((node) => node.textContent.trim())
       .filter(Boolean);
@@ -182,7 +194,18 @@ async function runProfile(profile) {
       hasGallery: Boolean(gallery),
       profileRect: rect(profile),
       galleryRect: rect(gallery),
+      galleryFrameRect: rect(galleryFrame),
       mainImageRect: rect(mainImage),
+      mobileControlsRect: rect(mobileControls),
+      mobilePrevRect: rect(mobilePrev),
+      mobileNextRect: rect(mobileNext),
+      desktopPrevRect: rect(desktopPrev),
+      desktopNextRect: rect(desktopNext),
+      mobileControlsVisible: isVisible(mobileControls),
+      mobilePrevVisible: isVisible(mobilePrev),
+      mobileNextVisible: isVisible(mobileNext),
+      desktopPrevVisible: isVisible(desktopPrev),
+      desktopNextVisible: isVisible(desktopNext),
       scrollWidth: document.documentElement.scrollWidth,
       innerWidth: window.innerWidth,
       galleryLabels,
@@ -201,6 +224,28 @@ async function runProfile(profile) {
   if (result.mainImageRect && result.galleryRect && result.mainImageRect.w > result.galleryRect.w + 1) {
     failures.push(`main image wider than gallery ${result.mainImageRect.w} > ${result.galleryRect.w}`);
   }
+  if (profile.width < 700) {
+    if (!result.mobileControlsVisible || !result.mobilePrevVisible || !result.mobileNextVisible) {
+      failures.push('mobile gallery controls are not visible below the photo');
+    }
+    if (result.desktopPrevVisible || result.desktopNextVisible) {
+      failures.push('desktop overlay arrows are visible on mobile');
+    }
+    if (result.galleryFrameRect && result.mobileControlsRect && result.mobileControlsRect.y < result.galleryFrameRect.y + result.galleryFrameRect.h - 1) {
+      failures.push(`mobile gallery controls overlap image frame ${result.mobileControlsRect.y} < ${result.galleryFrameRect.y + result.galleryFrameRect.h}`);
+    }
+    for (const [label, buttonRect] of [['mobile previous', result.mobilePrevRect], ['mobile next', result.mobileNextRect]]) {
+      if (!buttonRect) failures.push(`${label} button missing rect`);
+      else if (buttonRect.w > 48 || buttonRect.h > 48) failures.push(`${label} button too large on mobile ${buttonRect.w}x${buttonRect.h}`);
+    }
+  } else {
+    if (!result.desktopPrevVisible || !result.desktopNextVisible) {
+      failures.push('desktop gallery overlay arrows are not visible on desktop');
+    }
+    if (result.mobileControlsVisible) {
+      failures.push('mobile gallery controls are visible on desktop');
+    }
+  }
   if (profile.adoptedLabel && !result.galleryLabels.includes(profile.adoptedLabel)) {
     failures.push(`missing adopted label ${profile.adoptedLabel}`);
   }
@@ -217,6 +262,13 @@ async function runProfile(profile) {
     galleryWidth: result.galleryRect?.w,
     profileWidth: result.profileRect?.w,
     imageWidth: result.mainImageRect?.w,
+    galleryFrameRect: result.galleryFrameRect,
+    mobileControlsRect: result.mobileControlsRect,
+    mobilePrevRect: result.mobilePrevRect,
+    mobileNextRect: result.mobileNextRect,
+    mobileControlsVisible: result.mobileControlsVisible,
+    desktopPrevVisible: result.desktopPrevVisible,
+    desktopNextVisible: result.desktopNextVisible,
     scrollWidth: result.scrollWidth,
     innerWidth: result.innerWidth,
     galleryLabels: result.galleryLabels,

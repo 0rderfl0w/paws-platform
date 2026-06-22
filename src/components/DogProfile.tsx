@@ -148,9 +148,12 @@ function PhotoGallery({ photos, name, locale, adoptedLabel }: { photos: string[]
 
   if (photos.length === 0) return null;
 
+  const goToPreviousPhoto = () => setSelected((selected - 1 + photos.length) % photos.length);
+  const goToNextPhoto = () => setSelected((selected + 1) % photos.length);
+
   return (
     <div className="min-w-0 max-w-full space-y-4" data-dog-profile-gallery>
-      <div className="relative aspect-[4/3] min-w-0 max-w-full overflow-hidden rounded-[2.4rem] border-[10px] border-white bg-playful-cream shadow-pillowy-lg lg:rotate-1">
+      <div className="relative aspect-[4/3] min-w-0 max-w-full overflow-hidden rounded-[2.4rem] border-[10px] border-white bg-playful-cream shadow-pillowy-lg lg:rotate-1" data-dog-profile-gallery-frame>
         <img
           src={photos[selected]}
           alt={`${t.dogProfile.breadcrumbDogs} ${name}`}
@@ -164,29 +167,59 @@ function PhotoGallery({ photos, name, locale, adoptedLabel }: { photos: string[]
         {photos.length > 1 && (
           <>
             <button
-              onClick={() => setSelected((selected - 1 + photos.length) % photos.length)}
-              className="playful-focus absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-playful-orange-dark shadow-pillowy transition-transform hover:scale-105"
+              onClick={goToPreviousPhoto}
+              className="playful-focus absolute left-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-playful-orange-dark shadow-pillowy transition-transform hover:scale-105 md:flex"
               aria-label={t.dogProfile.prevPhoto}
+              data-gallery-prev="desktop"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                 <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
               </svg>
             </button>
             <button
-              onClick={() => setSelected((selected + 1) % photos.length)}
-              className="playful-focus absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-playful-orange-dark shadow-pillowy transition-transform hover:scale-105"
+              onClick={goToNextPhoto}
+              className="playful-focus absolute right-4 top-1/2 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/88 text-playful-orange-dark shadow-pillowy transition-transform hover:scale-105 md:flex"
               aria-label={t.dogProfile.nextPhoto}
+              data-gallery-next="desktop"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
                 <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
               </svg>
             </button>
-            <div className="absolute bottom-4 right-4 rounded-full bg-playful-orange-dark/82 px-4 py-2 text-sm font-extrabold text-white shadow-sm backdrop-blur-sm">
+            <div className="absolute bottom-4 right-4 hidden rounded-full bg-playful-orange-dark/82 px-4 py-2 text-sm font-extrabold text-white shadow-sm backdrop-blur-sm md:block">
               {selected + 1} / {photos.length}
             </div>
           </>
         )}
       </div>
+
+      {photos.length > 1 && (
+        <div className="flex items-center justify-center gap-4 md:hidden" data-gallery-mobile-controls>
+          <button
+            onClick={goToPreviousPhoto}
+            className="playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-white text-playful-orange-dark shadow-pillowy transition-transform active:scale-95"
+            aria-label={t.dogProfile.prevPhoto}
+            data-gallery-prev="mobile"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+              <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
+            </svg>
+          </button>
+          <span className="rounded-full bg-playful-orange-dark/88 px-4 py-2 text-sm font-extrabold text-white shadow-sm" data-gallery-mobile-count>
+            {selected + 1} / {photos.length}
+          </span>
+          <button
+            onClick={goToNextPhoto}
+            className="playful-focus flex h-11 w-11 items-center justify-center rounded-full bg-white text-playful-orange-dark shadow-pillowy transition-transform active:scale-95"
+            aria-label={t.dogProfile.nextPhoto}
+            data-gallery-next="mobile"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+              <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {photos.length > 1 && (
         <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
