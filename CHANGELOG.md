@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Full-site Playful audit: moved the remaining public legacy surfaces (`/en/help/`, `/cao/`, `/en/dog/`, and `404.html`) onto CAPA's Playful Impact shell while leaving the noindex admin app routes as admin-only islands.
+- Dog profiles: restyled the shared React profile island with Playful photo gallery, profile cards, compatibility chips, adopted/available CTA panels, and route-aware Playful nav/footer wrappers for Portuguese and English profile routes.
 - Adoção/Adoption: redesigned the live `/adocao/` and `/en/adopt/` pages directly with the CAPA Playful Impact system while preserving the existing adoption benefits, process, fees, contact, and final CTA copy.
 - Adoção/Adoption: added a stronger real-photo adoption-poster hero, locale-aware Playful section components, local hero image derivatives, route-scoped scroll reveal, bilingual content-preservation smoke coverage, and desktop/mobile screenshot QA.
 

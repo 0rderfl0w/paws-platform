@@ -1,7 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
+import PlayfulSiteNav from '../components/playful/PlayfulSiteNav.astro';
+import PlayfulSiteFooter from '../components/playful/PlayfulSiteFooter.astro';
+import PlayfulScrollReveal from '../components/playful/PlayfulScrollReveal.astro';
 import DogProfile from '../components/DogProfile';
 
 const locale = 'pt' as const;
@@ -11,11 +12,18 @@ const locale = 'pt' as const;
   locale={locale}
   title="Conhecer Cão — CAPA Póvoa de Lanhoso"
   description="Conheça este cão do abrigo CAPA e considere dar-lhe um lar cheio de amor."
-  ogUrl="https://capapvl.pt/cao"
+  ogUrl="https://capapvl.org/cao"
+  playfulFonts
 >
-  <Nav locale={locale} />
-  <main class="px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-    <DogProfile locale={locale} client:load />
-  </main>
-  <Footer locale={locale} />
+  <div data-playful-scroll-reveal class="min-h-screen bg-playful-canvas text-playful-ink font-playful-body pattern-dots selection:bg-playful-orange selection:text-white">
+    <PlayfulSiteNav locale={locale} />
+    <div class="overflow-x-clip">
+      <main class="px-5 py-10 sm:px-8 lg:py-14">
+        <DogProfile locale={locale} client:load />
+      </main>
+      <PlayfulSiteFooter locale={locale} />
+    </div>
+  </div>
+
+  <PlayfulScrollReveal />
 </Layout>

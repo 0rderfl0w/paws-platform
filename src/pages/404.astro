@@ -1,73 +1,55 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
+import PlayfulSiteNav from '../components/playful/PlayfulSiteNav.astro';
+import PlayfulSiteFooter from '../components/playful/PlayfulSiteFooter.astro';
+import PlayfulScrollReveal from '../components/playful/PlayfulScrollReveal.astro';
+
+const locale = 'pt' as const;
 ---
 
 <Layout
-  locale="pt"
+  locale={locale}
   title="Página Não Encontrada — CAPA Póvoa de Lanhoso"
   description="A página que procura não existe. Volte à página inicial do CAPA Póvoa de Lanhoso."
-  ogUrl="https://capapvl.pt/404"
+  ogUrl="https://capapvl.org/404"
+  playfulFonts
 >
-  <Nav locale="pt" />
+  <div data-playful-scroll-reveal class="min-h-screen bg-playful-canvas text-playful-ink font-playful-body pattern-dots selection:bg-playful-orange selection:text-white">
+    <PlayfulSiteNav locale={locale} />
+    <div class="overflow-x-clip">
+      <main class="relative flex min-h-[72vh] items-center justify-center overflow-hidden px-5 py-20 sm:px-8">
+        <div class="ambient-blob -left-24 top-20 h-96 w-96 bg-playful-peach/80"></div>
+        <div class="ambient-blob -right-20 bottom-10 h-80 w-80 bg-playful-orange/25"></div>
 
-  <main class="min-h-[70vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
-    <div class="max-w-lg mx-auto text-center">
+        <section data-reveal="pop" class="relative z-10 mx-auto max-w-3xl rounded-[2.8rem] border border-playful-line bg-white/88 px-6 py-14 text-center shadow-pillowy-lg sm:px-10" aria-labelledby="not-found-heading">
+          <div class="mx-auto mb-8 flex h-28 w-28 -rotate-6 items-center justify-center rounded-full bg-playful-peach text-6xl shadow-pillowy" aria-hidden="true">🐾</div>
+          <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.24em] text-playful-orange-dark">Erro 404</p>
+          <h1 id="not-found-heading" class="font-playful-display text-5xl font-extrabold leading-[0.98] tracking-[-0.06em] text-playful-orange-dark sm:text-6xl">
+            Página não encontrada
+          </h1>
+          <p class="mx-auto mt-6 max-w-2xl text-xl font-extrabold leading-8 text-playful-muted">
+            Até os cães perdidos encontram o caminho de casa.
+          </p>
+          <p class="mx-auto mt-3 max-w-xl text-base font-medium leading-7 text-playful-muted/85">
+            A página que procura não existe ou foi movida. Não se preocupe — a nossa página inicial está mesmo aqui.
+          </p>
 
-      <!-- Paw print icon -->
-      <div class="flex justify-center mb-8">
-        <div class="w-24 h-24 rounded-full bg-primary-100 flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" class="w-14 h-14" aria-hidden="true">
-            <!-- Paw print SVG -->
-            <ellipse cx="32" cy="44" rx="14" ry="11" fill="#f17a13" opacity="0.9"/>
-            <ellipse cx="16" cy="34" rx="6" ry="8" fill="#f17a13" opacity="0.75"/>
-            <ellipse cx="48" cy="34" rx="6" ry="8" fill="#f17a13" opacity="0.75"/>
-            <ellipse cx="23" cy="23" rx="5" ry="6.5" fill="#f17a13" opacity="0.65"/>
-            <ellipse cx="41" cy="23" rx="5" ry="6.5" fill="#f17a13" opacity="0.65"/>
-          </svg>
-        </div>
-      </div>
+          <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+            <a href="/" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display font-extrabold text-white shadow-squish">
+              Voltar à página inicial
+              <span aria-hidden="true">→</span>
+            </a>
+            <a href="/caes" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full border-2 border-playful-orange bg-white px-7 py-4 font-playful-display font-extrabold text-playful-orange-dark shadow-pillowy">
+              Ver os nossos cães
+              <span aria-hidden="true">🐶</span>
+            </a>
+          </div>
+        </section>
+      </main>
 
-      <!-- 404 badge -->
-      <span class="inline-block text-primary-600 text-sm font-semibold tracking-wider uppercase mb-3">
-        Erro 404
-      </span>
-
-      <!-- Heading -->
-      <h1 class="text-4xl sm:text-5xl font-extrabold text-warm-900 mb-4 leading-tight">
-        Página não encontrada
-      </h1>
-
-      <!-- Friendly message -->
-      <p class="text-lg text-warm-600 mb-3 leading-relaxed">
-        Até os cães perdidos encontram o caminho de casa.
-      </p>
-      <p class="text-warm-500 mb-10">
-        A página que procura não existe ou foi movida. Não se preocupe — a nossa página inicial está mesmo aqui.
-      </p>
-
-      <!-- CTA -->
-      <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <a
-          href="/"
-          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-semibold text-base transition-colors duration-200 shadow-sm"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5" aria-hidden="true">
-            <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clip-rule="evenodd" />
-          </svg>
-          Voltar à página inicial
-        </a>
-        <a
-          href="/caes"
-          class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-warm-300 hover:border-warm-400 bg-white text-warm-800 font-semibold text-base transition-colors duration-200"
-        >
-          Ver os nossos cães
-        </a>
-      </div>
-
+      <PlayfulSiteFooter locale={locale} />
     </div>
-  </main>
+  </div>
 
-  <Footer locale="pt" />
+  <PlayfulScrollReveal />
 </Layout>
