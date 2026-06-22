@@ -27,7 +27,7 @@ const profiles = [
     dog: 'Abby',
     width: 390,
     height: 900,
-    adopted: true,
+    adoptedLabel: 'Adotado!',
   },
   {
     name: 'alana-long-story-desktop',
@@ -47,173 +47,229 @@ const profiles = [
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function freePort() {
+async function getFreePort() {
   return new Promise((resolve, reject) => {
     const server = createServer();
+    server.unref();
+    server.on('error', reject);
     server.listen(0, '127.0.0.1', () => {
       const address = server.address();
+      if (!address || typeof address === 'string') {
+        server.close(() => reject(new Error('Could not allocate a local CDP port')));
+        return;
+      }
       server.close(() => resolve(address.port));
     });
-    server.on('error', reject);
   });
 }
 
-async function openCdp(port) {
-  for (let i = 0; i < 100; i += 1) {
+function waitForExit(proc, timeoutMs) {
+  if (!proc || proc.exitCode !== null) return Promise.resolve();
+  return Promise.race([
+    new Promise((resolve) => proc.once('exit', resolve)),
+    sleep(timeoutMs),
+  ]);
+}
+
+const port = await getFreePort();
+const profileDir = `/tmp/capa-profile-browser-${port}-${Date.now()}`;
+let browser = null;
+let browserExit = null;
+let browserError = null;
+let stderr = '';
+let ws = null;
+let nextId = 1;
+const pending = new Map();
+const loadWaiters = new Set();
+
+async function stopBrowser() {
+  if (!browser || browser.exitCode !== null) return;
+  browser.kill('SIGTERM');
+  await waitForExit(browser, 2000);
+  if (browser.exitCode === null) {
+    browser.kill('SIGKILL');
+    await waitForExit(browser, 1000);
+  }
+}
+
+async function getJsonVersion() {
+  for (let i = 0; i < 90; i += 1) {
+    if (browserError) throw browserError;
+    if (browserExit) throw new Error(`Chrome exited before CDP became ready: ${JSON.stringify(browserExit)}\nstderr:\n${stderr}`);
     try {
-      const response = await fetch(`http://127.0.0.1:${port}/json/list`);
-      const pages = await response.json();
-      const page = pages.find((entry) => entry.type === 'page');
-      if (page?.webSocketDebuggerUrl) {
-        const ws = new WebSocket(page.webSocketDebuggerUrl);
-        await new Promise((resolve, reject) => {
-          ws.addEventListener('open', resolve, { once: true });
-          ws.addEventListener('error', reject, { once: true });
-        });
-        return ws;
-      }
+      const res = await fetch(`http://127.0.0.1:${port}/json/version`);
+      if (res.ok) return await res.json();
     } catch {
       // Retry until Chromium exposes CDP.
     }
     await sleep(100);
   }
-  throw new Error('Could not connect to Chromium CDP');
+  throw new Error(`Chrome CDP not ready. stderr:\n${stderr}`);
+}
+
+function send(method, params = {}) {
+  if (!ws) throw new Error(`Cannot call ${method}: websocket is not connected`);
+  if (browserError) throw browserError;
+  if (browserExit) throw new Error(`Chrome exited during verifier run: ${JSON.stringify(browserExit)}\nstderr:\n${stderr}`);
+
+  const id = nextId++;
+  ws.send(JSON.stringify({ id, method, params }));
+  return new Promise((resolve, reject) => {
+    pending.set(id, { resolve, reject, method });
+  });
+}
+
+async function evaluate(expression) {
+  const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+  if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
+  return result.result.value;
+}
+
+async function navigateAndWait(url) {
+  const loaded = new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      loadWaiters.delete(done);
+      resolve(false);
+    }, 8000);
+    const done = () => {
+      clearTimeout(timer);
+      loadWaiters.delete(done);
+      resolve(true);
+    };
+    loadWaiters.add(done);
+  });
+
+  await send('Page.navigate', { url });
+  await loaded;
+  await sleep(2600);
 }
 
 async function runProfile(profile) {
-  const port = await freePort();
-  const userDataDir = `/tmp/capa-profile-check-${process.pid}-${Date.now()}-${Math.random()}`;
-  let browser;
-  let ws;
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: profile.width,
+    height: profile.height,
+    deviceScaleFactor: 1,
+    mobile: profile.width < 700,
+  });
 
-  try {
-    browser = spawn(
-      chromium,
-      [
-        '--headless=new',
-        '--no-sandbox',
-        '--disable-gpu',
-        `--remote-debugging-port=${port}`,
-        `--user-data-dir=${userDataDir}`,
-        'about:blank',
-      ],
-      { stdio: ['ignore', 'ignore', 'pipe'] },
-    );
+  const url = `${baseUrl}${profile.path}`;
+  await navigateAndWait(url);
 
-    ws = await openCdp(port);
-    let id = 0;
-    const pending = new Map();
-
-    ws.addEventListener('message', (event) => {
-      const message = JSON.parse(event.data);
-      if (message.id && pending.has(message.id)) {
-        const { resolve, reject } = pending.get(message.id);
-        pending.delete(message.id);
-        if (message.error) reject(new Error(JSON.stringify(message.error)));
-        else resolve(message.result);
-      }
-    });
-
-    const send = (method, params = {}) => new Promise((resolve, reject) => {
-      const messageId = ++id;
-      pending.set(messageId, { resolve, reject });
-      ws.send(JSON.stringify({ id: messageId, method, params }));
-    });
-
-    const evaluate = async (expression) => {
-      const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-      if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
-      return result.result.value;
+  const result = await evaluate(`(() => {
+    const rect = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
     };
-
-    await send('Page.enable');
-    await send('Runtime.enable');
-    await send('Emulation.setDeviceMetricsOverride', {
-      width: profile.width,
-      height: profile.height,
-      deviceScaleFactor: 1,
-      mobile: profile.width < 700,
-    });
-
-    const url = `${baseUrl}${profile.path}`;
-    await send('Page.navigate', { url });
-    await new Promise((resolve) => {
-      const listener = (event) => {
-        const message = JSON.parse(event.data);
-        if (message.method === 'Page.loadEventFired') {
-          ws.removeEventListener('message', listener);
-          resolve();
-        }
-      };
-      ws.addEventListener('message', listener);
-      setTimeout(resolve, 8000);
-    });
-    await sleep(2600);
-
-    const result = await evaluate(`(() => {
-      const rect = (el) => {
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        return { x: r.x, y: r.y, w: r.width, h: r.height };
-      };
-      const profile = document.querySelector('[data-dog-profile]');
-      const gallery = document.querySelector('[data-dog-profile-gallery]');
-      const title = document.querySelector('#dog-profile-heading')?.textContent?.trim() || '';
-      const bodyText = document.body.innerText;
-      const mainImage = gallery?.querySelector('img');
-      const mainImageRect = rect(mainImage);
-      return {
-        url: location.href,
-        title,
-        hasProfile: Boolean(profile),
-        hasGallery: Boolean(gallery),
-        profileRect: rect(profile),
-        galleryRect: rect(gallery),
-        mainImageRect,
-        scrollWidth: document.documentElement.scrollWidth,
-        innerWidth: window.innerWidth,
-        bodyText,
-      };
-    })()`);
-
-    const failures = [];
-    if (!result.hasProfile) failures.push('missing profile root');
-    if (!result.hasGallery) failures.push('missing gallery root');
-    if (result.title !== profile.dog) failures.push(`expected dog title ${profile.dog}, got ${result.title}`);
-    if (result.scrollWidth > result.innerWidth + 1) failures.push(`horizontal overflow ${result.scrollWidth} > ${result.innerWidth}`);
-    if (result.galleryRect && result.profileRect && result.galleryRect.w > result.profileRect.w + 1) {
-      failures.push(`gallery wider than profile ${result.galleryRect.w} > ${result.profileRect.w}`);
-    }
-    if (result.mainImageRect && result.galleryRect && result.mainImageRect.w > result.galleryRect.w + 1) {
-      failures.push(`main image wider than gallery ${result.mainImageRect.w} > ${result.galleryRect.w}`);
-    }
-    if (profile.adopted && !result.bodyText.includes('ADOTADO!')) failures.push('missing adopted label');
-
+    const profile = document.querySelector('[data-dog-profile]');
+    const gallery = document.querySelector('[data-dog-profile-gallery]');
+    const title = document.querySelector('#dog-profile-heading')?.textContent?.trim() || '';
+    const mainImage = gallery?.querySelector('img');
+    const galleryLabels = [...(gallery?.querySelectorAll('span') || [])]
+      .map((node) => node.textContent.trim())
+      .filter(Boolean);
     return {
-      name: profile.name,
-      ok: failures.length === 0,
-      failures,
-      url: result.url,
-      title: result.title,
-      galleryWidth: result.galleryRect?.w,
-      profileWidth: result.profileRect?.w,
-      imageWidth: result.mainImageRect?.w,
-      scrollWidth: result.scrollWidth,
-      innerWidth: result.innerWidth,
+      url: location.href,
+      title,
+      hasProfile: Boolean(profile),
+      hasGallery: Boolean(gallery),
+      profileRect: rect(profile),
+      galleryRect: rect(gallery),
+      mainImageRect: rect(mainImage),
+      scrollWidth: document.documentElement.scrollWidth,
+      innerWidth: window.innerWidth,
+      galleryLabels,
     };
-  } finally {
-    if (ws) ws.close();
-    if (browser && !browser.killed) browser.kill('SIGTERM');
-    await sleep(150);
-    rmSync(userDataDir, { recursive: true, force: true });
+  })()`);
+
+  const failures = [];
+  if (!result.hasProfile) failures.push('missing profile root');
+  if (!result.hasGallery) failures.push('missing gallery root');
+  if (result.title !== profile.dog) failures.push(`expected dog title ${profile.dog}, got ${result.title}`);
+  if (result.scrollWidth > result.innerWidth + 1) failures.push(`horizontal overflow ${result.scrollWidth} > ${result.innerWidth}`);
+  if (result.galleryRect && result.profileRect && result.galleryRect.w > result.profileRect.w + 1) {
+    failures.push(`gallery wider than profile ${result.galleryRect.w} > ${result.profileRect.w}`);
   }
+  if (result.mainImageRect && result.galleryRect && result.mainImageRect.w > result.galleryRect.w + 1) {
+    failures.push(`main image wider than gallery ${result.mainImageRect.w} > ${result.galleryRect.w}`);
+  }
+  if (profile.adoptedLabel && !result.galleryLabels.includes(profile.adoptedLabel)) {
+    failures.push(`missing adopted label ${profile.adoptedLabel}`);
+  }
+
+  return {
+    name: profile.name,
+    ok: failures.length === 0,
+    failures,
+    url: result.url,
+    title: result.title,
+    galleryWidth: result.galleryRect?.w,
+    profileWidth: result.profileRect?.w,
+    imageWidth: result.mainImageRect?.w,
+    scrollWidth: result.scrollWidth,
+    innerWidth: result.innerWidth,
+    galleryLabels: result.galleryLabels,
+  };
 }
 
-const results = [];
-for (const profile of profiles) {
-  results.push(await runProfile(profile));
-}
+try {
+  browser = spawn(chromium, [
+    '--headless=new',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--hide-scrollbars',
+    `--remote-debugging-port=${port}`,
+    `--user-data-dir=${profileDir}`,
+    'about:blank',
+  ], { stdio: ['ignore', 'ignore', 'pipe'] });
 
-const failed = results.filter((result) => !result.ok);
-console.log(JSON.stringify({ ok: failed.length === 0, baseUrl, results }, null, 2));
-if (failed.length > 0) process.exit(1);
+  browser.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+  browser.once('error', (error) => { browserError = error; });
+  browser.once('exit', (code, signal) => { browserExit = { code, signal }; });
+
+  const version = await getJsonVersion();
+  const targetsRes = await fetch(`http://127.0.0.1:${port}/json/list`);
+  const targets = await targetsRes.json();
+  const pageTarget = targets.find((target) => target.type === 'page' && target.webSocketDebuggerUrl);
+  if (!pageTarget) throw new Error(`No page CDP target. Browser version: ${JSON.stringify(version)}`);
+
+  ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => {
+    ws.addEventListener('open', resolve, { once: true });
+    ws.addEventListener('error', reject, { once: true });
+  });
+
+  ws.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data);
+    if (message.id && pending.has(message.id)) {
+      const { resolve, reject, method } = pending.get(message.id);
+      pending.delete(message.id);
+      if (message.error) reject(new Error(`${method}: ${JSON.stringify(message.error)}`));
+      else resolve(message.result);
+    }
+    if (message.method === 'Page.loadEventFired') {
+      for (const waiter of [...loadWaiters]) waiter();
+    }
+  });
+
+  await send('Page.enable');
+  await send('Runtime.enable');
+
+  const results = [];
+  for (const profile of profiles) {
+    results.push(await runProfile(profile));
+  }
+
+  const failed = results.filter((result) => !result.ok);
+  console.log(JSON.stringify({ ok: failed.length === 0, baseUrl, port, results }, null, 2));
+  if (failed.length > 0) process.exitCode = 1;
+} finally {
+  for (const { reject, method } of pending.values()) {
+    reject(new Error(`${method}: dog profile verifier shutting down`));
+  }
+  pending.clear();
+  loadWaiters.clear();
+  try { ws?.close(); } catch {}
+  await stopBrowser();
+  rmSync(profileDir, { recursive: true, force: true });
+}

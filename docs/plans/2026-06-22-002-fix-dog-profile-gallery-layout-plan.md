@@ -40,7 +40,7 @@ The live profile `/cao?id=5fd31126-e731-45a8-ae30-b662d83ce4f5` renders Athos wi
 
 ## Key Technical Decisions
 
-- **Constrain grid children at the gallery boundary:** Add `min-w-0`, `max-w-full`, and `w-full` containment to the gallery root/card so CSS Grid cannot size the track from image min-content width.
+- **Constrain grid children at the gallery boundary:** Add `min-w-0` and `max-w-full` containment to the profile grid and gallery root/card so CSS Grid cannot size the track from image min-content width.
 - **Use profile-photo fitting instead of hero cropping:** Switch the main gallery image to contained fitting inside a fixed-ratio card. CAPA photo uploads vary widely; preserving the whole image is more important than filling every pixel.
 - **Keep the existing data-loading path:** Do not change API/fallback lookup, description parsing, adoption logic, or route query behavior. The bug is presentational.
 - **Preserve Playful style without expanding scope:** Keep rounded cards, shadows, controls, thumbnail strip, and Playful shell; only adjust sizing/cropping and related spacing.
@@ -61,7 +61,7 @@ The live profile `/cao?id=5fd31126-e731-45a8-ae30-b662d83ce4f5` renders Athos wi
 - **Test scenarios:**
   - Athos desktop: the gallery width stays within the profile container and the identity/story column remains visible to the right.
   - Athos mobile: the gallery width matches the mobile content column and does not extend beyond the viewport.
-  - Afonso desktop: a normal available profile still renders the gallery, identity, story, info, and CTA.
+  - Alana desktop: a long-story profile still renders the gallery, identity, story, info, and CTA.
 - **Verification:** Browser DOM checks report no horizontal overflow and gallery width not greater than the profile width.
 
 ### U2. Fit profile photos without cropping key content
@@ -91,7 +91,7 @@ The live profile `/cao?id=5fd31126-e731-45a8-ae30-b662d83ce4f5` renders Athos wi
 - **Patterns to follow:** Existing build and live verification workflow used for recent CAPA Playful page deploys.
 - **Test scenarios:**
   - Build completes with the profile island bundled.
-  - Local browser checks pass for Athos desktop/mobile, Abby adopted mobile, Afonso desktop, and Alana desktop/mobile.
+  - Local browser checks pass for Athos desktop/mobile, Abby adopted mobile, Alana desktop, and English Athos mobile.
   - Live HTTP checks pass for `/cao/`, `/en/dog/`, and other core routes after deploy.
   - Live browser checks pass for the linked Athos URL and at least one English profile URL.
 - **Verification:** The deployed site returns `200`, no profile browser check reports overflow, and the profile screenshot evidence shows the fixed gallery bounds.
@@ -108,6 +108,6 @@ The live profile `/cao?id=5fd31126-e731-45a8-ae30-b662d83ce4f5` renders Athos wi
 
 ## Sources / Research
 
-- Live screenshot evidence from Athos, Abby, Afonso, and Alana profiles showed the gallery root exceeding the profile container.
+- Live screenshot evidence from Athos, Abby, and Alana profiles showed the gallery root exceeding the profile container.
 - `src/components/DogProfile.tsx` contains the affected `PhotoGallery` and profile layout.
 - `src/pages/cao.astro` and `src/pages/en/dog.astro` provide the Playful route shells that should remain unchanged.
