@@ -1,19 +1,19 @@
 ---
 const stats = [
-  { value: '+100 Animais', label: 'À espera de um lar temporário', rotate: '-rotate-2' },
-  { value: 'Suporte Total', label: 'Ração e veterinário incluídos', rotate: 'rotate-1' },
-  { value: 'Flexível', label: 'Adaptado à sua disponibilidade', rotate: '-rotate-1' },
+  { value: '+100 Animais', label: 'À espera de um lar temporário', rotate: 'sm:-rotate-2' },
+  { value: 'Suporte Total', label: 'Ração e veterinário incluídos', rotate: 'sm:rotate-1' },
+  { value: 'Flexível', label: 'Adaptado à sua disponibilidade', rotate: 'sm:-rotate-1' },
 ];
 ---
 
-<section id="fat" class="relative px-5 py-16 sm:px-8 lg:py-24" aria-labelledby="fat-heading">
+<section id="fat" class="relative px-4 py-16 sm:px-8 lg:py-24" aria-labelledby="fat-heading">
   <div class="ambient-blob left-8 bottom-12 h-80 w-80 bg-playful-peach/80"></div>
-  <div class="relative z-10 mx-auto max-w-6xl rounded-[2.5rem] border border-playful-orange/15 bg-playful-peach p-6 shadow-pillowy-lg sm:p-10 lg:p-12">
-    <div class="grid items-center gap-10 lg:grid-cols-[1.08fr_0.92fr]">
-      <div>
+  <div class="relative z-10 mx-auto max-w-6xl rounded-[2rem] border border-playful-orange/15 bg-playful-peach p-4 shadow-pillowy-lg sm:rounded-[2.5rem] sm:p-10 lg:p-12">
+    <div class="grid min-w-0 items-center gap-10 lg:grid-cols-[1.08fr_0.92fr]">
+      <div class="min-w-0">
         <header data-reveal="left" class="mb-7">
-          <span class="mb-3 inline-block rounded-full bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-playful-orange-dark shadow-sm">Famílias de Acolhimento Temporário</span>
-          <h2 id="fat-heading" class="font-playful-display text-4xl font-extrabold leading-[0.98] tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">
+          <span class="mb-3 inline-block max-w-full rounded-full bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-playful-orange-dark shadow-sm sm:tracking-[0.2em]">Famílias de Acolhimento Temporário</span>
+          <h2 id="fat-heading" class="max-w-full break-words font-playful-display text-[clamp(1.8rem,8vw,2.25rem)] font-extrabold leading-[0.98] tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">
             Abra a Sua Casa Temporariamente
           </h2>
         </header>
@@ -36,7 +36,7 @@ const stats = [
         </div>
       </div>
 
-      <div data-reveal="right" data-reveal-delay="160" class="space-y-6">
+      <div data-reveal="right" data-reveal-delay="160" class="min-w-0 space-y-6">
         <div class="overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-pillowy-lg lg:rotate-2">
           <img
             src="/images/ajudar/dog-fostering.png"

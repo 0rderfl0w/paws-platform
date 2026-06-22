@@ -68,9 +68,9 @@ const volunteerWays = [
 ];
 
 const fosterStats = [
-  { value: '100+ Animals', label: 'Waiting for a temporary home', rotate: '-rotate-2' },
-  { value: 'Full Support', label: 'Food and vet care included', rotate: 'rotate-1' },
-  { value: 'Flexible', label: 'Adapted to your availability', rotate: '-rotate-1' },
+  { value: '100+ Animals', label: 'Waiting for a temporary home', rotate: 'sm:-rotate-2' },
+  { value: 'Full Support', label: 'Food and vet care included', rotate: 'sm:rotate-1' },
+  { value: 'Flexible', label: 'Adapted to your availability', rotate: 'sm:-rotate-1' },
 ];
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
@@ -210,14 +210,14 @@ const paymentMethods = [
           </div>
         </section>
 
-        <section id="foster" class="relative px-5 py-16 sm:px-8 lg:py-24" aria-labelledby="foster-heading">
+        <section id="foster" class="relative px-4 py-16 sm:px-8 lg:py-24" aria-labelledby="foster-heading">
           <div class="ambient-blob left-8 bottom-12 h-80 w-80 bg-playful-peach/80"></div>
-          <div class="relative z-10 mx-auto max-w-6xl rounded-[2.5rem] border border-playful-orange/15 bg-playful-peach p-6 shadow-pillowy-lg sm:p-10 lg:p-12">
-            <div class="grid items-center gap-10 lg:grid-cols-[1.08fr_0.92fr]">
-              <div>
+          <div class="relative z-10 mx-auto max-w-6xl rounded-[2rem] border border-playful-orange/15 bg-playful-peach p-4 shadow-pillowy-lg sm:rounded-[2.5rem] sm:p-10 lg:p-12">
+            <div class="grid min-w-0 items-center gap-10 lg:grid-cols-[1.08fr_0.92fr]">
+              <div class="min-w-0">
                 <header data-reveal="left" class="mb-7">
-                  <span class="mb-3 inline-block rounded-full bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.2em] text-playful-orange-dark shadow-sm">Foster Families</span>
-                  <h2 id="foster-heading" class="font-playful-display text-4xl font-extrabold leading-[0.98] tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">Open Your Home Temporarily</h2>
+                  <span class="mb-3 inline-block max-w-full rounded-full bg-white/70 px-4 py-2 text-xs font-extrabold uppercase tracking-[0.16em] text-playful-orange-dark shadow-sm sm:tracking-[0.2em]">Foster Families</span>
+                  <h2 id="foster-heading" class="max-w-full break-words font-playful-display text-[clamp(1.8rem,8vw,2.25rem)] font-extrabold leading-[0.98] tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">Open Your Home Temporarily</h2>
                 </header>
                 <div data-reveal="left" data-reveal-delay="120" class="rounded-[2rem] border border-playful-line/60 bg-white/80 p-6 shadow-sm sm:p-8">
                   <h3 class="mb-4 font-playful-display text-2xl font-extrabold tracking-[-0.03em] text-playful-orange-dark">What is a Foster Family?</h3>
@@ -226,7 +226,7 @@ const paymentMethods = [
                   <p class="font-medium leading-7 text-playful-muted">CAPA provides all food, medication, and veterinary support. You just offer your space, affection, and time.</p>
                 </div>
               </div>
-              <div data-reveal="right" data-reveal-delay="160" class="space-y-6">
+              <div data-reveal="right" data-reveal-delay="160" class="min-w-0 space-y-6">
                 <div class="overflow-hidden rounded-[2rem] border-4 border-white bg-white shadow-pillowy-lg lg:rotate-2">
                   <img src="/images/ajudar/dog-fostering.png" alt="Dog in a foster home environment" class="aspect-[4/3] w-full object-cover" loading="lazy" />
                 </div>
