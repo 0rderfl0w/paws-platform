@@ -149,15 +149,15 @@ function PhotoGallery({ photos, name, locale, adoptedLabel }: { photos: string[]
   if (photos.length === 0) return null;
 
   return (
-    <div className="space-y-4" data-dog-profile-gallery>
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[2.4rem] border-[10px] border-white bg-playful-peach shadow-pillowy-lg lg:rotate-1">
+    <div className="min-w-0 max-w-full space-y-4" data-dog-profile-gallery>
+      <div className="relative aspect-[4/3] min-w-0 max-w-full overflow-hidden rounded-[2.4rem] border-[10px] border-white bg-playful-cream shadow-pillowy-lg lg:rotate-1">
         <img
           src={photos[selected]}
           alt={`${t.dogProfile.breadcrumbDogs} ${name}`}
-          className="h-full w-full object-cover"
+          className="block h-full w-full max-w-full object-contain object-center"
         />
         {adoptedLabel && (
-          <span className="absolute inset-x-5 top-5 rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-squish">
+          <span className="absolute left-4 right-4 top-4 z-10 rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-squish">
             {adoptedLabel}
           </span>
         )}
@@ -189,7 +189,7 @@ function PhotoGallery({ photos, name, locale, adoptedLabel }: { photos: string[]
       </div>
 
       {photos.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto pb-2">
+        <div className="flex max-w-full gap-3 overflow-x-auto pb-2">
           {photos.map((url, i) => (
             <button
               key={i}
@@ -344,10 +344,10 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
         <span className="rounded-full bg-playful-peach px-3 py-2 text-playful-orange-dark">{dog.name}</span>
       </nav>
 
-      <section className="relative z-10 grid items-start gap-10 lg:grid-cols-[1.04fr_0.96fr]" aria-labelledby="dog-profile-heading">
+      <section className="relative z-10 grid min-w-0 items-start gap-10 lg:grid-cols-[1.04fr_0.96fr]" aria-labelledby="dog-profile-heading">
         <PhotoGallery photos={photos} name={dog.name} locale={locale} adoptedLabel={dog.is_adopted ? t.status.adopted : undefined} />
 
-        <div className="space-y-7">
+        <div className="min-w-0 space-y-7">
           <div className="rounded-[2.3rem] border border-playful-line bg-white/88 p-6 shadow-pillowy-lg sm:p-8">
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <span className={`rounded-full px-4 py-2 text-sm font-extrabold shadow-sm ${badgeClasses}`}>{sizeLabel}</span>
@@ -368,7 +368,7 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
         </div>
       </section>
 
-      <div className="relative z-10 mt-10 grid gap-8 lg:grid-cols-[1fr_0.92fr]">
+      <div className="relative z-10 mt-10 grid min-w-0 gap-8 lg:grid-cols-[1fr_0.92fr]">
         {infoFields.length > 0 && (
           <section className="rounded-[2rem] border border-playful-line bg-white/88 p-6 shadow-pillowy sm:p-8" aria-labelledby="dog-about-heading">
             <h2 id="dog-about-heading" className="mb-5 font-playful-display text-2xl font-extrabold tracking-[-0.04em] text-playful-orange-dark">{t.dogProfile.aboutHeading}</h2>
