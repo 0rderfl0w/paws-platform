@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Forms/API: configured live form email delivery through RichKapp's Resend SMTP setup so CAPA submissions send to `capa.geralpvl@gmail.com` from `Richard Kappel <richard@richkapp.com>` with visitor email as Reply-To; verified live `/forms/submit` returned `emailSent:true` / HTTP 201.
 - Mobile nav: removed the “Redes sociais” / “Social links” text from the mobile menu and centered the Facebook/Instagram icons at the bottom.
 - Help donations: replaced the abstract in-kind donation card glyphs with clearer category-specific SVG icons for cleaning supplies, dog food, medication, and other items on `/ajudar/` and `/en/help/`.
 - Site chrome: replaced placeholder social/payment glyphs with real Facebook, Instagram, PayPal, and official MB WAY icons; the mobile burger menu now starts below 1000px and includes Facebook/Instagram links.

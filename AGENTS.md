@@ -119,11 +119,11 @@ PORT=3314
 
 # form delivery; if SMTP vars are absent, submissions persist and frontend falls back to mailto
 CAPA_FORM_RECIPIENT_EMAIL=capa.geralpvl@gmail.com
-CAPA_FORM_FROM_EMAIL=capa.geralpvl@gmail.com
-CAPA_FORM_SMTP_HOST=<smtp host>
+CAPA_FORM_FROM_EMAIL='Richard Kappel <richard@richkapp.com>'
+CAPA_FORM_SMTP_HOST=smtp.resend.com
 CAPA_FORM_SMTP_PORT=587
-CAPA_FORM_SMTP_USER=<smtp username>
-CAPA_FORM_SMTP_PASSWORD=<smtp password>
+CAPA_FORM_SMTP_USER=resend
+CAPA_FORM_SMTP_PASSWORD=<Resend API key; do not commit>
 CAPA_FORM_SMTP_SECURE=false
 CAPA_FORM_EMAIL_DRY_RUN=false
 ```
@@ -131,6 +131,8 @@ CAPA_FORM_EMAIL_DRY_RUN=false
 .env is gitignored. Do not commit `/etc/capapvl-api.env` or any server-only secrets.
 
 Hetzner security posture: local `.env` files are intentionally owner-only (`chmod 600`, `deploy:deploy`). Do not loosen permissions to "fix" access; agents running as `deploy` can still read them. The live API's server-only secrets belong in `/etc/capapvl-api.env`, not in repo files.
+
+**Live form email delivery (2026-06-22):** CAPA uses RichKapp's verified Resend domain for SMTP. Sender is `Richard Kappel <richard@richkapp.com>` because Richard manages the site as CAPA's volunteer; recipient is `capa.geralpvl@gmail.com`; `server/capa-api.ts` sets `Reply-To` to the visitor's submitted email. Use Resend port `587` with `CAPA_FORM_SMTP_SECURE=false`; port `465` timed out from Hetzner during verification.
 
 ---
 
