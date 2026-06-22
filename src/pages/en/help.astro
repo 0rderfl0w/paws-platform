@@ -5,34 +5,35 @@ import PlayfulSiteFooter from '../../components/playful/PlayfulSiteFooter.astro'
 import PlayfulScrollReveal from '../../components/playful/PlayfulScrollReveal.astro';
 import PlayfulDonateMenu from '../../components/playful/PlayfulDonateMenu.astro';
 import BrandIcon from '../../components/BrandIcon.astro';
+import NeedIcon from '../../components/NeedIcon.astro';
 
 const locale = 'en' as const;
 
 const donationNeeds = [
   {
     title: 'Cleaning Supplies',
-    icon: '✦',
+    icon: 'cleaning',
     rotate: 'lg:-rotate-1',
     bg: 'bg-white',
     items: ['Multi-purpose detergent', 'Bleach', 'Bin bags (large)', 'Paper towels', 'Disposable gloves'],
   },
   {
     title: 'Dog Food',
-    icon: '◒',
+    icon: 'dog-food',
     rotate: 'lg:rotate-1 lg:translate-y-5',
     bg: 'bg-playful-peach',
     items: ['Dry food (adult and junior)', 'Wet food (canned)', 'Snacks and treats', 'Puppy food', 'Vitamin supplements'],
   },
   {
     title: 'Medication',
-    icon: '+',
+    icon: 'medicine',
     rotate: 'lg:-rotate-1',
     bg: 'bg-white',
     items: ['External parasite treatments', 'Internal dewormers', 'Bandages and dressings', 'Saline solution', 'Check our current needs list'],
   },
   {
     title: 'Other Items',
-    icon: '✹',
+    icon: 'other-items',
     rotate: 'lg:rotate-1 lg:translate-y-4',
     bg: 'bg-playful-cream',
     items: ['Collars and leads', 'Blankets and cushions', 'Toys and chew bones', 'Transport crates', 'Office supplies'],
@@ -163,7 +164,9 @@ const paymentMethods = [
             <div data-reveal-stagger="90" class="relative z-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {donationNeeds.map(({ title, icon, rotate, bg, items }) => (
                 <article data-reveal="tilt" class={`${bg} ${rotate} card-pillowy rounded-playful border border-playful-line/70 p-7 shadow-pillowy`}>
-                  <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark shadow-sm" aria-hidden="true">{icon}</div>
+                  <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark shadow-sm" aria-hidden="true">
+                    <NeedIcon icon={icon} class="h-9 w-9" />
+                  </div>
                   <h3 class="mb-4 font-playful-display text-xl font-extrabold tracking-[-0.03em] text-playful-orange-dark">{title}</h3>
                   <ul class="space-y-2 text-sm font-medium leading-6 text-playful-muted" role="list">
                     {items.map((item) => (

@@ -1,29 +1,31 @@
 ---
+import NeedIcon from '../NeedIcon.astro';
+
 const donationNeeds = [
   {
     title: 'Materiais de Limpeza',
-    icon: '✦',
+    icon: 'cleaning',
     rotate: 'lg:-rotate-1',
     bg: 'bg-white',
     items: ['Detergente multiusos', 'Lixívia', 'Sacos do lixo (grandes)', 'Papel absorvente', 'Luvas descartáveis'],
   },
   {
     title: 'Comida para Cão',
-    icon: '◒',
+    icon: 'dog-food',
     rotate: 'lg:rotate-1 lg:translate-y-5',
     bg: 'bg-playful-peach',
     items: ['Ração seca (adulto e júnior)', 'Comida húmida em lata', 'Snacks e petiscos', 'Ração para cachorros', 'Suplementos vitamínicos'],
   },
   {
     title: 'Medicação',
-    icon: '+',
+    icon: 'medicine',
     rotate: 'lg:-rotate-1',
     bg: 'bg-white',
     items: ['Antiparasitários externos', 'Desparasitantes internos', 'Pensos e ligaduras', 'Soro fisiológico', 'Consultar lista atual'],
   },
   {
     title: 'Outros Artigos',
-    icon: '✹',
+    icon: 'other-items',
     rotate: 'lg:rotate-1 lg:translate-y-4',
     bg: 'bg-playful-cream',
     items: ['Coleiras e trelas', 'Cobertores e almofadas', 'Brinquedos e ossos', 'Caixas de transporte', 'Material de escritório'],
@@ -47,7 +49,9 @@ const donationNeeds = [
     <div data-reveal-stagger="90" class="relative z-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {donationNeeds.map(({ title, icon, rotate, bg, items }) => (
         <article data-reveal="tilt" class={`${bg} ${rotate} card-pillowy rounded-playful border border-playful-line/70 p-7 shadow-pillowy`}>
-          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark shadow-sm" aria-hidden="true">{icon}</div>
+          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-playful-orange/14 text-playful-orange-dark shadow-sm" aria-hidden="true">
+            <NeedIcon icon={icon} class="h-9 w-9" />
+          </div>
           <h3 class="mb-4 font-playful-display text-xl font-extrabold tracking-[-0.03em] text-playful-orange-dark">{title}</h3>
           <ul class="space-y-2 text-sm font-medium leading-6 text-playful-muted" role="list">
             {items.map((item) => (
