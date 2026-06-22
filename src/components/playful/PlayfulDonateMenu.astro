@@ -4,9 +4,10 @@ import type { Locale } from '../../i18n';
 interface Props {
   locale?: Locale;
   variant?: 'desktop' | 'mobile';
-  mode?: 'menu' | 'mbway-button';
+  mode?: 'menu' | 'mbway-button' | 'card-menu';
   instanceId?: string;
   buttonLabel?: string;
+  cardClass?: string;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   mode = 'menu',
   instanceId = `donate-${locale}-${variant}`,
   buttonLabel,
+  cardClass = 'card-pillowy playful-focus block w-full rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy',
 } = Astro.props;
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
@@ -75,28 +77,37 @@ const buttonClass = variant === 'desktop'
   ? 'squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish'
   : 'playful-focus flex w-full items-center justify-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish';
 
-const panelClass = variant === 'desktop'
-  ? 'absolute right-0 top-full z-[80] mt-3 w-72 rounded-[1.5rem] border border-playful-line bg-white/96 p-2 text-left shadow-pillowy-lg backdrop-blur-md'
-  : 'mt-3 w-full rounded-[1.5rem] border border-playful-line bg-white/92 p-2 text-left shadow-pillowy';
+const panelClass = mode === 'card-menu'
+  ? 'absolute bottom-full left-1/2 z-[80] mb-3 w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-[1.5rem] border border-playful-line bg-white/96 p-2 text-left shadow-pillowy-lg backdrop-blur-md'
+  : variant === 'desktop'
+    ? 'absolute right-0 top-full z-[80] mt-3 w-72 rounded-[1.5rem] border border-playful-line bg-white/96 p-2 text-left shadow-pillowy-lg backdrop-blur-md'
+    : 'mt-3 w-full rounded-[1.5rem] border border-playful-line bg-white/92 p-2 text-left shadow-pillowy';
 
 const itemClass = 'playful-focus flex w-full items-start gap-3 rounded-[1.1rem] px-4 py-3 text-left transition-colors hover:bg-playful-peach/70';
 const standaloneButtonLabel = buttonLabel ?? labels.submit;
 ---
 
-{mode === 'menu' ? (
+{mode === 'menu' || mode === 'card-menu' ? (
   <div data-donate-menu={instanceId} class="relative">
     <button
       id={buttonId}
       data-donate-toggle
+      data-reveal={mode === 'card-menu' ? 'tilt' : undefined}
       type="button"
-      class={buttonClass}
+      class={mode === 'card-menu' ? `${cardClass} cursor-pointer appearance-none` : buttonClass}
       aria-haspopup="menu"
       aria-expanded="false"
       aria-controls={menuId}
     >
-      <span>{labels.donate}</span>
-      <span aria-hidden="true">❤</span>
-      <span data-donate-chevron aria-hidden="true" class="text-xs transition-transform">▾</span>
+      {mode === 'card-menu' ? (
+        <slot />
+      ) : (
+        <>
+          <span>{labels.donate}</span>
+          <span aria-hidden="true">❤</span>
+          <span data-donate-chevron aria-hidden="true" class="text-xs transition-transform">▾</span>
+        </>
+      )}
     </button>
 
     <div id={menuId} data-donate-panel class={`${panelClass} hidden`} role="menu" aria-labelledby={buttonId}>

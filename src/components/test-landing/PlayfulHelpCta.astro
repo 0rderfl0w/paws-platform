@@ -1,5 +1,6 @@
 ---
 import { getTranslations, type Locale } from '../../i18n';
+import PlayfulDonateMenu from '../playful/PlayfulDonateMenu.astro';
 
 interface Props {
   locale?: Locale;
@@ -86,7 +87,7 @@ const ways = [
   { title: t.helpCta.adoptTitle, description: t.helpCta.adoptDesc, icon: '⌂', href: locale === 'pt' ? '/adocao' : '/en/adopt', rotate: 'md:rotate-1', bg: 'bg-playful-peach', action: 'link' },
   { title: t.helpCta.sponsorTitle, description: t.helpCta.sponsorDesc, icon: '🤝', href: helpPath, rotate: 'md:-rotate-1 md:translate-y-7', bg: 'bg-white', action: 'sponsor' },
   { title: t.helpCta.volunteerTitle, description: t.helpCta.volunteerDesc, icon: '✋', href: helpPath, rotate: 'md:rotate-2', bg: 'bg-white', action: 'link' },
-  { title: t.helpCta.donateTitle, description: t.helpCta.donateDesc, icon: '❤', href: helpPath, rotate: 'md:-rotate-2 md:translate-y-4', bg: 'bg-playful-cream', action: 'link' },
+  { title: t.helpCta.donateTitle, description: t.helpCta.donateDesc, icon: '❤', href: helpPath, rotate: 'md:-rotate-2 md:translate-y-4', bg: 'bg-playful-cream', action: 'donate' },
 ];
 ---
 
@@ -124,6 +125,15 @@ const ways = [
           >
             {cardContent}
           </button>
+        ) : action === 'donate' ? (
+          <PlayfulDonateMenu
+            locale={locale}
+            mode="card-menu"
+            instanceId={`home-${locale}-donate-card`}
+            cardClass={cardClass}
+          >
+            {cardContent}
+          </PlayfulDonateMenu>
         ) : (
           <a data-reveal="tilt" href={href} class={cardClass}>
             {cardContent}

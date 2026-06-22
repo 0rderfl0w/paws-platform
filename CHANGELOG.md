@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Home donations: changed homepage help card #4 into a card-shaped Donate dropdown with PayPal, MB Way, and bank-transfer options, matching the top-nav Donate behavior.
 - Help donations: added a direct MB Way CTA button inside the financial-support MB Way card on `/ajudar/` and `/en/help/`, reusing the same phone-number request popup as the Donate menu.
 - Donations: added a Doar/Donate dropdown to the Playful nav with PayPal, MB Way, and bank-transfer options; PayPal opens the real CAPA donation page in a new tab, bank transfer deep-links to the financial support section, and MB Way opens a phone-number request popup.
 - Help donations: updated the `/ajudar/` and `/en/help/` financial-support PayPal cards with the real PayPal donation link and revised the MB Way text to point visitors to the new Donate menu flow.

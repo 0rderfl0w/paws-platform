@@ -94,12 +94,13 @@ function checkTestLanding() {
   assertIncludes(html, 'data-donate-panel', context);
   assertIncludes(html, `href="${paypalDonateUrl}"`, context);
   assertIncludes(html, 'href="/ajudar#apoio-financeiro"', context);
+  assertIncludes(html, 'data-donate-menu="home-pt-donate-card"', context);
   assertIncludes(html, 'data-mbway-modal', context);
   assertIncludes(html, 'name="mbway_phone"', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 28, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 29, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
@@ -112,7 +113,7 @@ const pages = [
     adoptHref: '/adocao',
     helpHref: '/ajudar',
     bankHref: '/ajudar#apoio-financeiro',
-    localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"'],
+    localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"', 'data-donate-menu="home-pt-donate-card"'],
   }),
   checkLivePage({
     page: 'en',
@@ -123,7 +124,7 @@ const pages = [
     adoptHref: '/en/adopt',
     helpHref: '/en/help',
     bankHref: '/en/help#financial-support',
-    localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"'],
+    localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"', 'data-donate-menu="home-en-donate-card"'],
   }),
   checkTestLanding(),
 ];

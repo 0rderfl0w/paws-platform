@@ -43,8 +43,8 @@ if (!Number.isInteger(port) || port <= 0) {
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 const expected = locale === 'en'
-  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium', donateInstance: 'landing-en-desktop', bankHref: '/en/help#financial-support' }
-  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios', donateInstance: 'landing-pt-desktop', bankHref: '/ajudar#apoio-financeiro' };
+  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium', donateInstance: 'landing-en-desktop', donateCardInstance: 'home-en-donate-card', bankHref: '/en/help#financial-support' }
+  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios', donateInstance: 'landing-pt-desktop', donateCardInstance: 'home-pt-donate-card', bankHref: '/ajudar#apoio-financeiro' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
 let browser = null;
@@ -207,14 +207,14 @@ try {
   if (!initial.sponsorModal.formPresent) throw new Error('Missing sponsor modal form');
   if (!initial.sponsorModal.requiredFieldsPresent) throw new Error('Missing required sponsor modal fields');
   if (!initial.sponsorModal.phoneOptional) throw new Error('Sponsor phone field is missing or required');
-  if (initial.donateMenu.toggleCount !== 2) throw new Error(`Expected desktop and mobile donate toggles, got ${initial.donateMenu.toggleCount}`);
-  if (initial.donateMenu.panelCount !== 2) throw new Error(`Expected desktop and mobile donate panels, got ${initial.donateMenu.panelCount}`);
+  if (initial.donateMenu.toggleCount !== 3) throw new Error(`Expected desktop, mobile, and #4-card donate toggles, got ${initial.donateMenu.toggleCount}`);
+  if (initial.donateMenu.panelCount !== 3) throw new Error(`Expected desktop, mobile, and #4-card donate panels, got ${initial.donateMenu.panelCount}`);
   if (!initial.donateMenu.paypalHrefs.includes(paypalDonateUrl)) throw new Error(`Missing PayPal donation href: ${initial.donateMenu.paypalHrefs.join(', ')}`);
   if (!initial.donateMenu.paypalTargets.every((entry) => entry.target === '_blank' && (entry.rel || '').includes('noopener') && (entry.rel || '').includes('noreferrer'))) {
     throw new Error(`PayPal donation links do not all open safely in a new tab: ${JSON.stringify(initial.donateMenu.paypalTargets)}`);
   }
   if (!initial.donateMenu.bankHrefs.includes(expected.bankHref)) throw new Error(`Missing bank transfer href ${expected.bankHref}: ${initial.donateMenu.bankHrefs.join(', ')}`);
-  if (initial.donateMenu.mbwayModalCount !== 2) throw new Error(`Expected desktop and mobile MB Way modals, got ${initial.donateMenu.mbwayModalCount}`);
+  if (initial.donateMenu.mbwayModalCount !== 3) throw new Error(`Expected desktop, mobile, and #4-card MB Way modals, got ${initial.donateMenu.mbwayModalCount}`);
   if (!initial.donateMenu.mbwayPhoneRequired) throw new Error('MB Way phone field is missing or not required');
   if (!initial.adoptHrefs.includes(expected.adoptHref)) {
     throw new Error(`Missing adoption nav href ${expected.adoptHref}; got ${initial.adoptHrefs.join(', ')}`);
@@ -310,6 +310,43 @@ try {
   const decodedMbwayMailto = decodeURIComponent(donateResult.mailto);
   if (!decodedMbwayMailto.includes('+351 919 000 000')) throw new Error(`MB Way mailto missing phone: ${decodedMbwayMailto}`);
 
+  const donateCardResult = await evaluate(`(async () => {
+    const root = document.querySelector('[data-donate-menu=${JSON.stringify(expected.donateCardInstance).slice(1, -1)}]');
+    const toggle = root?.querySelector('[data-donate-toggle]');
+    const panel = root?.querySelector('[data-donate-panel]');
+    if (!root || !toggle || !panel) return { ok: false, reason: 'missing #4 donate card controls' };
+    root.scrollIntoView({ block: 'center' });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    toggle.click();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const panelOpen = !panel.classList.contains('hidden') && toggle.getAttribute('aria-expanded') === 'true';
+    const paypal = root.querySelector('[data-donate-paypal]');
+    const bank = root.querySelector('[data-donate-bank]');
+    const mbway = root.querySelector('[data-mbway-open]');
+    return {
+      ok: true,
+      panelOpen,
+      paypalHref: paypal?.getAttribute('href') || '',
+      paypalTarget: paypal?.getAttribute('target') || '',
+      paypalRel: paypal?.getAttribute('rel') || '',
+      bankHref: bank?.getAttribute('href') || '',
+      hasMbway: Boolean(mbway),
+      buttonText: toggle.textContent.trim(),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+    };
+  })()`);
+
+  if (!donateCardResult.ok) throw new Error(`#4 donate card failed: ${donateCardResult.reason}`);
+  if (!donateCardResult.panelOpen) throw new Error('#4 donate card dropdown did not open');
+  if (donateCardResult.paypalHref !== paypalDonateUrl) throw new Error(`#4 donate card unexpected PayPal href: ${donateCardResult.paypalHref}`);
+  if (donateCardResult.paypalTarget !== '_blank' || !(donateCardResult.paypalRel || '').includes('noopener') || !(donateCardResult.paypalRel || '').includes('noreferrer')) {
+    throw new Error(`#4 donate card PayPal link does not open safely: ${JSON.stringify(donateCardResult)}`);
+  }
+  if (donateCardResult.bankHref !== expected.bankHref) throw new Error(`#4 donate card unexpected bank transfer href: ${donateCardResult.bankHref}`);
+  if (!donateCardResult.hasMbway) throw new Error('#4 donate card is missing MB Way option');
+  if (!donateCardResult.buttonText.includes(locale === 'en' ? 'Donate' : 'Doar')) throw new Error(`#4 donate card text did not include donate label: ${donateCardResult.buttonText}`);
+  if (donateCardResult.overflow) throw new Error('#4 donate card caused horizontal overflow');
+
   let mobileMenu = null;
   if (width < 700) {
     mobileMenu = await evaluate(`(async () => {
@@ -368,7 +405,7 @@ try {
   if (reveal.hidden !== 0) throw new Error(`Reveal left ${reveal.hidden} hidden element(s)`);
   if (reveal.overflow) throw new Error('Page has horizontal overflow after scrolling');
 
-  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, mobileMenu, filterResult, reveal }, null, 2));
+  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, donateCardResult, mobileMenu, filterResult, reveal }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));
