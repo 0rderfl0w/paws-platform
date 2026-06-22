@@ -179,11 +179,11 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
             </p>
           )}
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <button data-visit-close type="button" onClick={closeModal} className="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <button data-visit-close type="button" onClick={closeModal} className="playful-focus w-full rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy sm:w-auto">
               {t.dogProfile.visitClose}
             </button>
-            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
+            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus w-full rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70 sm:w-auto">
               {submitState === 'submitting' ? t.dogProfile.visitSubmitting : t.dogProfile.visitSubmit}
             </button>
           </div>

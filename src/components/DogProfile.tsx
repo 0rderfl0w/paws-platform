@@ -436,11 +436,11 @@ function AdoptionInterest({ dogName, locale }: { dogName: string; locale: Locale
             </p>
           )}
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <button data-adoption-close type="button" onClick={closeModal} className="playful-focus rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy">
+          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+            <button data-adoption-close type="button" onClick={closeModal} className="playful-focus w-full rounded-full border-2 border-playful-orange bg-white px-6 py-3 font-playful-display text-sm font-extrabold text-playful-orange-dark shadow-pillowy sm:w-auto">
               {t.dogProfile.visitClose}
             </button>
-            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70">
+            <button type="submit" disabled={submitState === 'submitting'} className="squishy playful-focus w-full rounded-full bg-playful-orange px-6 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish disabled:cursor-wait disabled:opacity-70 sm:w-auto">
               {submitState === 'submitting' ? t.dogProfile.adoptionSubmitting : t.dogProfile.adoptionSubmit}
             </button>
           </div>
@@ -455,7 +455,7 @@ function AdoptionInterest({ dogName, locale }: { dogName: string; locale: Locale
         type="button"
         data-adoption-open
         onClick={openModal}
-        className="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display font-extrabold text-white shadow-squish"
+        className="squishy playful-focus inline-flex w-full items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display font-extrabold text-white shadow-squish sm:w-auto"
         aria-haspopup="dialog"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5" aria-hidden="true">
@@ -629,9 +629,9 @@ export default function DogProfile({ locale = 'pt' }: { locale?: Locale }) {
         <section className="relative z-10 mt-10 rounded-[2.2rem] border border-playful-orange/15 bg-playful-orange-dark p-7 text-white shadow-pillowy-lg sm:p-9" aria-labelledby="dog-adopt-heading">
           <h2 id="dog-adopt-heading" className="font-playful-display text-3xl font-extrabold tracking-[-0.04em]">{t.dogProfile.adoptTitle} {dog.name}?</h2>
           <p className="mt-3 max-w-3xl text-base font-medium leading-7 text-white/82">{t.dogProfile.adoptDesc}</p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
             <AdoptionInterest dogName={dog.name} locale={locale} />
-            <a href={adoptPath} className="squishy playful-focus inline-flex items-center justify-center rounded-full bg-white px-7 py-4 font-playful-display font-extrabold text-playful-orange-dark shadow-pillowy">
+            <a href={adoptPath} className="squishy playful-focus inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-4 text-center font-playful-display font-extrabold text-playful-orange-dark shadow-pillowy sm:w-auto">
               {t.dogProfile.adoptionProcess}
             </a>
           </div>

@@ -173,6 +173,9 @@ async function runProfile(profile) {
     const visitCta = document.querySelector('[data-dog-profile] [data-visit-source="dog"]');
     const visitButton = document.querySelector('[data-dog-profile] [data-visit-open="dog"]');
     const adoptionButton = document.querySelector('[data-adoption-open]');
+    const adoptionSection = document.querySelector('[data-dog-profile] section[aria-labelledby="dog-adopt-heading"]');
+    const adoptionButtonRow = adoptionButton?.parentElement;
+    const adoptionProcessLink = adoptionSection?.querySelector('a[href]');
     const heading = document.querySelector('#dog-profile-heading');
     const mobileControls = gallery?.querySelector('[data-gallery-mobile-controls]');
     const mobilePrev = gallery?.querySelector('[data-gallery-prev="mobile"]');
@@ -205,6 +208,11 @@ async function runProfile(profile) {
       visitButtonVisible: isVisible(visitButton),
       adoptionButtonText: adoptionButton?.textContent?.trim() || '',
       adoptionButtonVisible: isVisible(adoptionButton),
+      adoptionButtonRect: rect(adoptionButton),
+      adoptionButtonRowRect: rect(adoptionButtonRow),
+      adoptionProcessText: adoptionProcessLink?.textContent?.trim() || '',
+      adoptionProcessVisible: isVisible(adoptionProcessLink),
+      adoptionProcessRect: rect(adoptionProcessLink),
       headingRect: rect(heading),
       mainImageRect: rect(mainImage),
       mobileControlsRect: rect(mobileControls),
@@ -270,6 +278,18 @@ async function runProfile(profile) {
     const expectedAdoptionLabel = profile.path.startsWith('/en/') ? 'Send adoption request' : 'Enviar pedido de adoção';
     if (!result.adoptionButtonVisible) failures.push('missing adoption request button');
     if (!result.adoptionButtonText.includes(expectedAdoptionLabel)) failures.push(`adoption button label missing ${expectedAdoptionLabel}: ${result.adoptionButtonText}`);
+    if (!result.adoptionProcessVisible) failures.push('missing adoption process link');
+    if (profile.width < 700 && result.adoptionButtonRowRect && result.adoptionButtonRect && result.adoptionProcessRect) {
+      const expectedButtonWidth = result.adoptionButtonRowRect.w;
+      for (const [label, buttonRect] of [['adoption request', result.adoptionButtonRect], ['adoption process', result.adoptionProcessRect]]) {
+        if (Math.abs(buttonRect.w - expectedButtonWidth) > 2) {
+          failures.push(`${label} button is not full-width/aligned on mobile: ${buttonRect.w} vs row ${expectedButtonWidth}`);
+        }
+        if (Math.abs(buttonRect.x - result.adoptionButtonRowRect.x) > 2) {
+          failures.push(`${label} button is not aligned to row start on mobile: ${buttonRect.x} vs row ${result.adoptionButtonRowRect.x}`);
+        }
+      }
+    }
     if (result.galleryRect && result.visitCtaRect && result.visitCtaRect.y < result.galleryRect.y + result.galleryRect.h - 1) {
       failures.push(`visit CTA is not below the gallery ${result.visitCtaRect.y} < ${result.galleryRect.y + result.galleryRect.h}`);
     }
@@ -430,6 +450,10 @@ async function runProfile(profile) {
     visitButtonText: result.visitButtonText,
     adoptionButtonVisible: result.adoptionButtonVisible,
     adoptionButtonText: result.adoptionButtonText,
+    adoptionButtonRect: result.adoptionButtonRect,
+    adoptionButtonRowRect: result.adoptionButtonRowRect,
+    adoptionProcessVisible: result.adoptionProcessVisible,
+    adoptionProcessRect: result.adoptionProcessRect,
     visitSubmission,
     adoptionSubmission,
     galleryFrameRect: result.galleryFrameRect,
