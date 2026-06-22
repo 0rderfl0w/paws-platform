@@ -43,8 +43,8 @@ if (!Number.isInteger(port) || port <= 0) {
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 const expected = locale === 'en'
-  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium', donateInstance: 'landing-en-desktop', donateCardInstance: 'home-en-donate-card', bankHref: '/en/help#financial-support' }
-  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios', donateInstance: 'landing-pt-desktop', donateCardInstance: 'home-pt-donate-card', bankHref: '/ajudar#apoio-financeiro' };
+  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium', donateInstance: 'landing-en-desktop', mobileDonateInstance: 'landing-en-mobile', donateCardInstance: 'home-en-donate-card', bankHref: '/en/help#financial-support' }
+  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios', donateInstance: 'landing-pt-desktop', mobileDonateInstance: 'landing-pt-mobile', donateCardInstance: 'home-pt-donate-card', bankHref: '/ajudar#apoio-financeiro' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
 let browser = null;
@@ -352,19 +352,63 @@ try {
     mobileMenu = await evaluate(`(async () => {
       const button = document.querySelector('#playful-mobile-menu-btn');
       const menu = document.querySelector('#playful-mobile-menu');
-      if (!button || !menu) return { present: false };
+      const donateRoot = document.querySelector('[data-donate-menu=${JSON.stringify(expected.mobileDonateInstance).slice(1, -1)}]');
+      if (!button || !menu || !donateRoot) return { present: false };
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 180));
+      const opened = !menu.classList.contains('hidden') && button.getAttribute('aria-expanded') === 'true';
+      const donateToggle = donateRoot.querySelector('[data-donate-toggle]');
+      const panel = donateRoot.querySelector('[data-donate-panel]');
+      const bank = donateRoot.querySelector('[data-donate-bank]');
+      if (!donateToggle || !panel || !bank) return { present: true, opened, reason: 'missing mobile donate controls' };
+      donateToggle.click();
+      await new Promise((resolve) => setTimeout(resolve, 350));
+      const panelOpen = !panel.classList.contains('hidden') && donateToggle.getAttribute('aria-expanded') === 'true';
+      menu.scrollTop = 0;
+      await new Promise((resolve) => setTimeout(resolve, 80));
+      const beforeScrollTop = menu.scrollTop;
+      const scrollable = menu.scrollHeight > menu.clientHeight + 2;
+      menu.scrollTop = menu.scrollHeight;
+      await new Promise((resolve) => setTimeout(resolve, 180));
+      const afterScrollTop = menu.scrollTop;
+      const menuRect = menu.getBoundingClientRect();
+      const panelRect = panel.getBoundingClientRect();
+      const bankRect = bank.getBoundingClientRect();
+      const style = getComputedStyle(menu);
+      const menuScrollHeight = menu.scrollHeight;
+      const menuClientHeight = menu.clientHeight;
+      const menuOverflowY = style.overflowY;
+      const menuMaxHeight = style.maxHeight;
+      const bankReachable = bankRect.bottom <= menuRect.bottom + 2 && bankRect.top >= menuRect.top - 2;
       button.click();
       await new Promise((resolve) => setTimeout(resolve, 150));
-      const opened = !menu.classList.contains('hidden') && button.getAttribute('aria-expanded') === 'true';
-      menu.querySelector('ul a[href^="#"]')?.click();
-      await new Promise((resolve) => setTimeout(resolve, 150));
       const closed = menu.classList.contains('hidden') && button.getAttribute('aria-expanded') === 'false';
-      return { present: true, opened, closed };
+      return {
+        present: true,
+        opened,
+        closed,
+        panelOpen,
+        scrollable,
+        beforeScrollTop,
+        afterScrollTop,
+        menuScrollHeight,
+        menuClientHeight,
+        menuOverflowY,
+        menuMaxHeight,
+        bankReachable,
+        menuRect: { top: menuRect.top, bottom: menuRect.bottom, h: menuRect.height },
+        panelRect: { top: panelRect.top, bottom: panelRect.bottom, h: panelRect.height },
+        bankRect: { top: bankRect.top, bottom: bankRect.bottom, h: bankRect.height },
+      };
     })()`);
 
     if (!mobileMenu.present) throw new Error('Missing mobile menu controls');
     if (!mobileMenu.opened) throw new Error('Mobile menu did not open');
-    if (!mobileMenu.closed) throw new Error('Mobile menu did not close after link click');
+    if (!mobileMenu.panelOpen) throw new Error(`Mobile Donate dropdown did not open: ${JSON.stringify(mobileMenu)}`);
+    if (!['auto', 'scroll'].includes(mobileMenu.menuOverflowY)) throw new Error(`Mobile menu is not vertically scrollable: ${JSON.stringify(mobileMenu)}`);
+    if (mobileMenu.scrollable && mobileMenu.afterScrollTop <= 0) throw new Error(`Mobile menu could not scroll to donation options: ${JSON.stringify(mobileMenu)}`);
+    if (!mobileMenu.bankReachable) throw new Error(`Bottom donation option is not reachable inside the mobile menu viewport: ${JSON.stringify(mobileMenu)}`);
+    if (!mobileMenu.closed) throw new Error('Mobile menu did not close');
   }
 
   const filterResult = await evaluate(`(async () => {

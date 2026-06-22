@@ -189,7 +189,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
   }
 </style>
 
-<script define:vars={{ instanceId, shelterEmail, labels }}>
+<script define:vars={{ instanceId, shelterEmail, labels, variant }}>
   const donateRoot = document.querySelector(`[data-donate-menu="${instanceId}"]`);
   const donateToggle = donateRoot?.querySelector('[data-donate-toggle]');
   const donatePanel = donateRoot?.querySelector('[data-donate-panel]');
@@ -208,7 +208,13 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
 
   donateToggle?.addEventListener('click', (event) => {
     event.stopPropagation();
-    setDonateOpen(donatePanel?.classList.contains('hidden') ?? true);
+    const shouldOpen = donatePanel?.classList.contains('hidden') ?? true;
+    setDonateOpen(shouldOpen);
+    if (shouldOpen && variant === 'mobile') {
+      window.requestAnimationFrame(() => {
+        donatePanel?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
+    }
   });
 
   donatePanel?.addEventListener('click', (event) => {
