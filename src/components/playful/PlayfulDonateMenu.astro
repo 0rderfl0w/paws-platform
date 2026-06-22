@@ -4,13 +4,17 @@ import type { Locale } from '../../i18n';
 interface Props {
   locale?: Locale;
   variant?: 'desktop' | 'mobile';
+  mode?: 'menu' | 'mbway-button';
   instanceId?: string;
+  buttonLabel?: string;
 }
 
 const {
   locale = 'pt',
   variant = 'desktop',
+  mode = 'menu',
   instanceId = `donate-${locale}-${variant}`,
+  buttonLabel,
 } = Astro.props;
 
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
@@ -76,49 +80,61 @@ const panelClass = variant === 'desktop'
   : 'mt-3 w-full rounded-[1.5rem] border border-playful-line bg-white/92 p-2 text-left shadow-pillowy';
 
 const itemClass = 'playful-focus flex w-full items-start gap-3 rounded-[1.1rem] px-4 py-3 text-left transition-colors hover:bg-playful-peach/70';
+const standaloneButtonLabel = buttonLabel ?? labels.submit;
 ---
 
-<div data-donate-menu={instanceId} class={variant === 'desktop' ? 'relative' : 'relative'}>
-  <button
-    id={buttonId}
-    data-donate-toggle
-    type="button"
-    class={buttonClass}
-    aria-haspopup="menu"
-    aria-expanded="false"
-    aria-controls={menuId}
-  >
-    <span>{labels.donate}</span>
-    <span aria-hidden="true">❤</span>
-    <span data-donate-chevron aria-hidden="true" class="text-xs transition-transform">▾</span>
-  </button>
-
-  <div id={menuId} data-donate-panel class={`${panelClass} hidden`} role="menu" aria-labelledby={buttonId}>
-    <a data-donate-paypal role="menuitem" href={paypalDonateUrl} target="_blank" rel="noopener noreferrer" class={itemClass}>
-      <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">◈</span>
-      <span>
-        <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.paypal}</span>
-        <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.paypalDesc}</span>
-      </span>
-    </a>
-
-    <button data-mbway-open role="menuitem" type="button" class={itemClass}>
-      <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">▯</span>
-      <span>
-        <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.mbway}</span>
-        <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.mbwayDesc}</span>
-      </span>
+{mode === 'menu' ? (
+  <div data-donate-menu={instanceId} class="relative">
+    <button
+      id={buttonId}
+      data-donate-toggle
+      type="button"
+      class={buttonClass}
+      aria-haspopup="menu"
+      aria-expanded="false"
+      aria-controls={menuId}
+    >
+      <span>{labels.donate}</span>
+      <span aria-hidden="true">❤</span>
+      <span data-donate-chevron aria-hidden="true" class="text-xs transition-transform">▾</span>
     </button>
 
-    <a data-donate-bank role="menuitem" href={bankTransferHref} class={itemClass}>
-      <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">↴</span>
-      <span>
-        <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.bankTransfer}</span>
-        <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.bankTransferDesc}</span>
-      </span>
-    </a>
+    <div id={menuId} data-donate-panel class={`${panelClass} hidden`} role="menu" aria-labelledby={buttonId}>
+      <a data-donate-paypal role="menuitem" href={paypalDonateUrl} target="_blank" rel="noopener noreferrer" class={itemClass}>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">◈</span>
+        <span>
+          <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.paypal}</span>
+          <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.paypalDesc}</span>
+        </span>
+      </a>
+
+      <button data-mbway-open={instanceId} role="menuitem" type="button" class={itemClass}>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">▯</span>
+        <span>
+          <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.mbway}</span>
+          <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.mbwayDesc}</span>
+        </span>
+      </button>
+
+      <a data-donate-bank role="menuitem" href={bankTransferHref} class={itemClass}>
+        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-playful-orange/14 text-sm font-extrabold text-playful-orange-dark" aria-hidden="true">↴</span>
+        <span>
+          <span class="block font-playful-display text-sm font-extrabold text-playful-orange-dark">{labels.bankTransfer}</span>
+          <span class="mt-0.5 block text-xs font-bold leading-5 text-playful-muted">{labels.bankTransferDesc}</span>
+        </span>
+      </a>
+    </div>
   </div>
-</div>
+) : (
+  <button
+    data-mbway-open={instanceId}
+    type="button"
+    class="squishy playful-focus mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-5 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish"
+  >
+    <span>{standaloneButtonLabel}</span>
+    <span aria-hidden="true">▯</span>
+  </button>
+)}
 
 <dialog data-mbway-modal={instanceId} id={dialogId} aria-labelledby={`${dialogId}-title`} aria-describedby={`${dialogId}-intro`} class="w-[calc(100%-2rem)] max-w-lg rounded-[2rem] bg-transparent p-0 text-left text-playful-ink">
   <div class="relative rounded-[2rem] border-2 border-playful-line bg-playful-canvas p-5 shadow-pillowy-lg sm:p-7">
@@ -171,6 +187,7 @@ const itemClass = 'playful-focus flex w-full items-start gap-3 rounded-[1.1rem] 
   const mbwayForm = document.querySelector(`[data-mbway-form="${instanceId}"]`);
   const mbwayMailto = document.querySelector(`[data-mbway-mailto="${instanceId}"]`);
   const mbwayMailtoNote = document.querySelector(`[data-mbway-mailto-note="${instanceId}"]`);
+  const mbwayOpenButton = document.querySelector(`[data-mbway-open="${instanceId}"]`);
 
   const setDonateOpen = (isOpen) => {
     donatePanel?.classList.toggle('hidden', !isOpen);
@@ -199,7 +216,7 @@ const itemClass = 'playful-focus flex w-full items-start gap-3 rounded-[1.1rem] 
     link.addEventListener('click', () => setDonateOpen(false));
   });
 
-  donateRoot?.querySelector('[data-mbway-open]')?.addEventListener('click', () => {
+  mbwayOpenButton?.addEventListener('click', () => {
     setDonateOpen(false);
     if (typeof mbwayDialog?.showModal === 'function') mbwayDialog.showModal();
     else mbwayDialog?.setAttribute('open', '');

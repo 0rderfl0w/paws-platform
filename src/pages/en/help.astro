@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import PlayfulSiteNav from '../../components/playful/PlayfulSiteNav.astro';
 import PlayfulSiteFooter from '../../components/playful/PlayfulSiteFooter.astro';
 import PlayfulScrollReveal from '../../components/playful/PlayfulScrollReveal.astro';
+import PlayfulDonateMenu from '../../components/playful/PlayfulDonateMenu.astro';
 
 const locale = 'en' as const;
 
@@ -75,7 +76,7 @@ const fosterStats = [
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 
 const paymentMethods = [
-  { title: 'MB Way', icon: '▯', description: 'Use the Donate menu, choose MB Way, and leave your phone number. We will message you with the phone number where you can send the donation.' },
+  { title: 'MB Way', icon: '▯', description: 'Use the Donate menu, choose MB Way, and leave your phone number. We will message you with the phone number where you can send the donation.', cta: 'Request MB Way number' },
   { title: 'PayPal', icon: '◈', description: 'You can donate directly through CAPA\'s secure PayPal donation page.', href: paypalDonateUrl, cta: 'Donate with PayPal' },
 ];
 ---
@@ -281,6 +282,7 @@ const paymentMethods = [
                     <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
                     <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
                     <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+                    {cta && <PlayfulDonateMenu locale="en" mode="mbway-button" instanceId="help-en-mbway-card" buttonLabel={cta} />}
                   </article>
                 )
               ))}

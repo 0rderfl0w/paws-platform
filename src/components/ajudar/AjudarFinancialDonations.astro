@@ -1,4 +1,6 @@
 ---
+import PlayfulDonateMenu from '../playful/PlayfulDonateMenu.astro';
+
 const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 
 const paymentMethods = [
@@ -6,6 +8,7 @@ const paymentMethods = [
     title: 'MB Way',
     icon: '▯',
     description: 'No menu Doar, escolha MB Way e deixe o seu número. Enviamos-lhe o número para onde pode fazer o donativo.',
+    cta: 'Pedir número MB Way',
   },
   {
     title: 'PayPal',
@@ -58,6 +61,7 @@ const paymentMethods = [
             <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
             <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
             <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+            {cta && <PlayfulDonateMenu locale="pt" mode="mbway-button" instanceId="help-pt-mbway-card" buttonLabel={cta} />}
           </article>
         )
       ))}
