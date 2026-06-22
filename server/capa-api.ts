@@ -80,8 +80,8 @@ const ALLOWED_ORIGINS = (process.env.CAPA_ALLOWED_ORIGINS ?? 'https://capapvl.pt
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
-const FORM_RECIPIENT_EMAIL = (process.env.CAPA_FORM_RECIPIENT_EMAIL || ADMIN_EMAIL || 'capa.geralpvl@gmail.com').trim();
-const FORM_FROM_EMAIL = (process.env.CAPA_FORM_FROM_EMAIL || FORM_RECIPIENT_EMAIL).trim();
+const FORM_RECIPIENT_EMAIL = (process.env.CAPA_FORM_RECIPIENT_EMAIL || 'capa.geralpvl@gmail.com').trim();
+const FORM_FROM_EMAIL = (process.env.CAPA_FORM_FROM_EMAIL || FORM_RECIPIENT_EMAIL || ADMIN_EMAIL).trim();
 const FORM_SMTP_HOST = (process.env.CAPA_FORM_SMTP_HOST || '').trim();
 const FORM_SMTP_PORT = Number(process.env.CAPA_FORM_SMTP_PORT || 587);
 const FORM_SMTP_USER = (process.env.CAPA_FORM_SMTP_USER || '').trim();
