@@ -10,12 +10,14 @@ const t = getTranslations(locale);
 
 const homePath = locale === 'pt' ? '/' : '/en/';
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 
 const navLinks = [
   { href: homePath, label: t.nav.home },
   { href: dogsPath, label: t.nav.dogs },
+  { href: adoptPath, label: t.nav.adoption },
   { href: aboutPath, label: t.nav.about },
   { href: helpPath, label: t.nav.help },
 ];

@@ -42,8 +42,8 @@ if (!Number.isInteger(port) || port <= 0) {
 }
 
 const expected = locale === 'en'
-  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium' }
-  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios' };
+  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium' }
+  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
 let browser = null;
@@ -168,6 +168,9 @@ try {
       cardCount: cards.length,
       firstHref: cards[0]?.getAttribute('href') || '',
       hasHelpText: document.body.innerText.includes(${JSON.stringify(expected.helpText)}),
+      adoptHrefs: [...document.querySelectorAll('nav a')]
+        .filter((link) => link.textContent.trim() === ${JSON.stringify(expected.adoptText)})
+        .map((link) => link.getAttribute('href')),
       helpHrefs: [...document.querySelectorAll('a')]
         .filter((link) => link.textContent.includes(${JSON.stringify(locale === 'en' ? 'Help' : 'Ajudar')}))
         .map((link) => link.getAttribute('href')),
@@ -181,6 +184,9 @@ try {
   if (initial.cardCount !== 6) throw new Error(`Expected 6 featured dog cards, got ${initial.cardCount}`);
   if (!initial.firstHref.startsWith(expected.dogHrefPrefix)) throw new Error(`Unexpected first dog href: ${initial.firstHref}`);
   if (!initial.hasHelpText) throw new Error(`Missing help CTA text: ${expected.helpText}`);
+  if (!initial.adoptHrefs.includes(expected.adoptHref)) {
+    throw new Error(`Missing adoption nav href ${expected.adoptHref}; got ${initial.adoptHrefs.join(', ')}`);
+  }
   if (!initial.helpHrefs.includes(expected.helpHref)) {
     throw new Error(`Missing help route href ${expected.helpHref}; got ${initial.helpHrefs.join(', ')}`);
   }

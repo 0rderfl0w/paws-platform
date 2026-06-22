@@ -17,11 +17,13 @@ const brandAriaLabel = homePath === '/test-landing'
 const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
 
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 
 const navLinks = [
   { href: '#inicio', label: t.nav.home },
   { href: dogsPath, label: t.nav.dogs },
+  { href: adoptPath, label: t.nav.adoption },
   { href: '#sobre-nos', label: t.nav.about },
   { href: helpPath, label: t.nav.help },
 ];
@@ -42,7 +44,7 @@ const navLinks = [
         <li>
           <a
             href={href}
-            class={`squishy playful-focus rounded-full px-4 py-2 text-sm font-extrabold text-playful-muted transition-colors hover:bg-playful-peach hover:text-playful-orange-dark ${index === 0 ? '-rotate-1' : index === 1 ? 'rotate-1' : index === 2 ? '-rotate-1' : 'rotate-1'}`}
+            class={`squishy playful-focus rounded-full px-3 py-2 text-sm font-extrabold text-playful-muted transition-colors hover:bg-playful-peach hover:text-playful-orange-dark lg:px-4 ${index === 0 ? '-rotate-1' : index === 1 ? 'rotate-1' : index === 2 ? '-rotate-1' : 'rotate-1'}`}
           >
             {label}
           </a>

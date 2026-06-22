@@ -3,6 +3,7 @@ const pt = {
   nav: {
     home: 'Início',
     dogs: 'Os Nossos Cães',
+    adoption: 'Adoção',
     about: 'Sobre Nós',
     help: 'Ajudar',
     helpNow: 'Ajudar Agora',

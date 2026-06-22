@@ -21,7 +21,7 @@ function assertNotIncludes(html, needle, context) {
   }
 }
 
-function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, helpHref, localeNeedles }) {
+function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, helpHref, localeNeedles }) {
   const html = readBuilt(htmlPath);
   const context = `${page} (${htmlPath})`;
 
@@ -35,6 +35,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, helpHref, local
   assertIncludes(html, 'rel="noopener noreferrer"', context);
   assertIncludes(html, 'href="#inicio"', context);
   assertIncludes(html, `href="${dogsHref}"`, context);
+  assertIncludes(html, `href="${adoptHref}"`, context);
   assertNotIncludes(html, 'href="#caes"', context);
   assertIncludes(html, 'href="#sobre-nos"', context);
   assertIncludes(html, `href="${helpHref}"`, context);
@@ -59,6 +60,7 @@ function checkTestLanding() {
   assertIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertIncludes(html, 'href="/test-landing"', context);
   assertIncludes(html, 'href="/caes"', context);
+  assertIncludes(html, 'href="/adocao"', context);
   assertNotIncludes(html, 'href="#caes"', context);
   assertIncludes(html, `href="${mapsHref}"`, context);
   assertIncludes(html, 'target="_blank"', context);
@@ -68,7 +70,7 @@ function checkTestLanding() {
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 13, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 14, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
@@ -78,6 +80,7 @@ const pages = [
     title: 'CAPA Póvoa de Lanhoso — Adota um Cão',
     ogUrl: 'https://capapvl.org/',
     dogsHref: '/caes',
+    adoptHref: '/adocao',
     helpHref: '/ajudar',
     localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"'],
   }),
@@ -87,6 +90,7 @@ const pages = [
     title: 'CAPA Póvoa de Lanhoso — Adopt a Dog',
     ogUrl: 'https://capapvl.org/en/',
     dogsHref: '/en/dogs',
+    adoptHref: '/en/adopt',
     helpHref: '/en/help',
     localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"'],
   }),

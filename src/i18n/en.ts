@@ -5,6 +5,7 @@ const en: TranslationKeys = {
   nav: {
     home: 'Home',
     dogs: 'Our Dogs',
+    adoption: 'Adoption',
     about: 'About Us',
     help: 'Help',
     helpNow: 'Help Now',

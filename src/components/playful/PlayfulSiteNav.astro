@@ -13,6 +13,7 @@ const normalizedCurrentPath = normalizePath(currentPathname);
 
 const homePath = locale === 'pt' ? '/' : '/en/';
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
@@ -21,8 +22,9 @@ const brandAriaLabel = locale === 'pt' ? 'CAPA Póvoa de Lanhoso — Página ini
 const navLinks = [
   { href: homePath, label: t.nav.home, rotate: '-rotate-1' },
   { href: dogsPath, label: t.nav.dogs, rotate: 'rotate-1' },
-  { href: aboutPath, label: t.nav.about, rotate: '-rotate-1' },
-  { href: helpPath, label: t.nav.help, rotate: 'rotate-1' },
+  { href: adoptPath, label: t.nav.adoption, rotate: '-rotate-1' },
+  { href: aboutPath, label: t.nav.about, rotate: 'rotate-1' },
+  { href: helpPath, label: t.nav.help, rotate: '-rotate-1' },
 ];
 
 function normalizePath(path: string) {
@@ -55,7 +57,7 @@ function isActivePath(href: string) {
           <li>
             <a
               href={href}
-              class={`squishy playful-focus rounded-full px-4 py-2 text-sm font-extrabold transition-colors ${rotate} ${isActive ? 'bg-playful-peach text-playful-orange-dark shadow-sm' : 'text-playful-muted hover:bg-playful-peach hover:text-playful-orange-dark'}`}
+              class={`squishy playful-focus rounded-full px-3 py-2 text-sm font-extrabold transition-colors lg:px-4 ${rotate} ${isActive ? 'bg-playful-peach text-playful-orange-dark shadow-sm' : 'text-playful-muted hover:bg-playful-peach hover:text-playful-orange-dark'}`}
               aria-current={isActive ? 'page' : undefined}
             >
               {label}
