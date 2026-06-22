@@ -69,9 +69,11 @@ const requiredSnippets = [
   'PT50 0010 0000 4591 4000 0014 9',
   'Clube de Adoção e Proteção Animal de Póvoa de Lanhoso',
   'MB Way',
-  'Contacte-nos por email para obter o número de telefone para pagamento via MB Way.',
+  'No menu Doar, escolha MB Way e deixe o seu número. Enviamos-lhe o número para onde pode fazer o donativo.',
   'PayPal',
-  'Aceitamos doações via PayPal. Contacte-nos para obter o link de pagamento direto.',
+  'Pode fazer o seu donativo diretamente através da página segura de donativos PayPal da CAPA.',
+  'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360',
+  'Doar via PayPal',
   'Para qualquer dúvida sobre pagamentos, contacte-nos em',
   'Cada Gesto Conta',
   'Por detrás de cada animal que adotamos, tratamos e resgatamos, há pessoas como você que acreditam',
@@ -91,6 +93,8 @@ const forbiddenSnippets = [
   'Página Não Encontrada',
   'Página não encontrada',
   'https://capapvl.pt/ajudar',
+  'Aceitamos doações via PayPal. Contacte-nos para obter o link de pagamento direto.',
+  'Contacte-nos por email para obter o número de telefone para pagamento via MB Way.',
 ];
 const forbiddenPresent = forbiddenSnippets.filter((snippet) => html.includes(snippet));
 if (forbiddenPresent.length) {

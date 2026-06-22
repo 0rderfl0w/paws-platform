@@ -1,5 +1,6 @@
 ---
 import { getTranslations, getAlternatePath, locales, type Locale } from '../../i18n';
+import PlayfulDonateMenu from './PlayfulDonateMenu.astro';
 
 interface Props {
   locale?: Locale;
@@ -87,10 +88,7 @@ function isActivePath(href: string) {
           );
         })}
       </div>
-      <a href={helpPath} class="squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish">
-        {t.nav.helpNow}
-        <span aria-hidden="true">❤</span>
-      </a>
+      <PlayfulDonateMenu locale={locale} variant="desktop" instanceId={`site-${locale}-desktop`} />
     </div>
 
     <button
@@ -143,9 +141,7 @@ function isActivePath(href: string) {
         );
       })}
       <li class="pt-2">
-        <a href={helpPath} class="playful-focus block rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish">
-          {t.nav.helpNow}
-        </a>
+        <PlayfulDonateMenu locale={locale} variant="mobile" instanceId={`site-${locale}-mobile`} />
       </li>
     </ul>
   </div>

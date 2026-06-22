@@ -41,9 +41,10 @@ if (!Number.isInteger(port) || port <= 0) {
   throw new Error(`Invalid CDP port: ${portArg}`);
 }
 
+const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 const expected = locale === 'en'
-  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium' }
-  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios' };
+  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', adoptHref: '/en/adopt', adoptText: 'Adoption', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium', donateInstance: 'landing-en-desktop', bankHref: '/en/help#financial-support' }
+  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', adoptHref: '/adocao', adoptText: 'Adoção', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios', donateInstance: 'landing-pt-desktop', bankHref: '/ajudar#apoio-financeiro' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
 let browser = null;
@@ -176,6 +177,15 @@ try {
           .every((name) => Boolean(document.querySelector('[name="' + name + '"]'))),
         phoneOptional: Boolean(document.querySelector('[name="sponsor_phone"]')) && !document.querySelector('[name="sponsor_phone"]')?.hasAttribute('required'),
       },
+      donateMenu: {
+        toggleCount: document.querySelectorAll('[data-donate-toggle]').length,
+        panelCount: document.querySelectorAll('[data-donate-panel]').length,
+        paypalHrefs: [...document.querySelectorAll('[data-donate-paypal]')].map((link) => link.getAttribute('href')),
+        paypalTargets: [...document.querySelectorAll('[data-donate-paypal]')].map((link) => ({ target: link.getAttribute('target'), rel: link.getAttribute('rel') })),
+        bankHrefs: [...document.querySelectorAll('[data-donate-bank]')].map((link) => link.getAttribute('href')),
+        mbwayModalCount: document.querySelectorAll('[data-mbway-modal]').length,
+        mbwayPhoneRequired: Boolean(document.querySelector('[name="mbway_phone"]')) && document.querySelector('[name="mbway_phone"]')?.hasAttribute('required'),
+      },
       adoptHrefs: [...document.querySelectorAll('nav a')]
         .filter((link) => link.textContent.trim() === ${JSON.stringify(expected.adoptText)})
         .map((link) => link.getAttribute('href')),
@@ -197,6 +207,15 @@ try {
   if (!initial.sponsorModal.formPresent) throw new Error('Missing sponsor modal form');
   if (!initial.sponsorModal.requiredFieldsPresent) throw new Error('Missing required sponsor modal fields');
   if (!initial.sponsorModal.phoneOptional) throw new Error('Sponsor phone field is missing or required');
+  if (initial.donateMenu.toggleCount !== 2) throw new Error(`Expected desktop and mobile donate toggles, got ${initial.donateMenu.toggleCount}`);
+  if (initial.donateMenu.panelCount !== 2) throw new Error(`Expected desktop and mobile donate panels, got ${initial.donateMenu.panelCount}`);
+  if (!initial.donateMenu.paypalHrefs.includes(paypalDonateUrl)) throw new Error(`Missing PayPal donation href: ${initial.donateMenu.paypalHrefs.join(', ')}`);
+  if (!initial.donateMenu.paypalTargets.every((entry) => entry.target === '_blank' && (entry.rel || '').includes('noopener') && (entry.rel || '').includes('noreferrer'))) {
+    throw new Error(`PayPal donation links do not all open safely in a new tab: ${JSON.stringify(initial.donateMenu.paypalTargets)}`);
+  }
+  if (!initial.donateMenu.bankHrefs.includes(expected.bankHref)) throw new Error(`Missing bank transfer href ${expected.bankHref}: ${initial.donateMenu.bankHrefs.join(', ')}`);
+  if (initial.donateMenu.mbwayModalCount !== 2) throw new Error(`Expected desktop and mobile MB Way modals, got ${initial.donateMenu.mbwayModalCount}`);
+  if (!initial.donateMenu.mbwayPhoneRequired) throw new Error('MB Way phone field is missing or not required');
   if (!initial.adoptHrefs.includes(expected.adoptHref)) {
     throw new Error(`Missing adoption nav href ${expected.adoptHref}; got ${initial.adoptHrefs.join(', ')}`);
   }
@@ -239,6 +258,57 @@ try {
   for (const needle of ['QA Sponsor', 'qa-sponsor@example.com', '+351 912 345 678', '€25', 'Browser smoke test sponsorship note']) {
     if (!decodedSponsorMailto.includes(needle)) throw new Error(`Sponsor mailto missing ${needle}: ${decodedSponsorMailto}`);
   }
+
+  const donateResult = await evaluate(`(async () => {
+    const root = document.querySelector('[data-donate-menu=${JSON.stringify(expected.donateInstance).slice(1, -1)}]');
+    const toggle = root?.querySelector('[data-donate-toggle]');
+    const panel = root?.querySelector('[data-donate-panel]');
+    if (!root || !toggle || !panel) return { ok: false, reason: 'missing donate menu controls' };
+    toggle.click();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const panelOpen = !panel.classList.contains('hidden') && toggle.getAttribute('aria-expanded') === 'true';
+    const paypal = root.querySelector('[data-donate-paypal]');
+    const bank = root.querySelector('[data-donate-bank]');
+    const mbway = root.querySelector('[data-mbway-open]');
+    if (!paypal || !bank || !mbway) return { ok: false, reason: 'missing donate menu items' };
+    mbway.click();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const dialog = document.querySelector('[data-mbway-modal=${JSON.stringify(expected.donateInstance).slice(1, -1)}]');
+    const form = document.querySelector('[data-mbway-form=${JSON.stringify(expected.donateInstance).slice(1, -1)}]');
+    if (!dialog || !form) return { ok: false, reason: 'missing MB Way dialog/form' };
+    const dialogOpen = dialog.open || dialog.hasAttribute('open');
+    form.dataset.skipMailLaunch = 'true';
+    form.querySelector('[name="mbway_phone"]').value = '+351 919 000 000';
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const mailto = document.querySelector('[data-mbway-mailto=${JSON.stringify(expected.donateInstance).slice(1, -1)}]')?.getAttribute('href') || '';
+    const noteVisible = !document.querySelector('[data-mbway-mailto-note=${JSON.stringify(expected.donateInstance).slice(1, -1)}]')?.classList.contains('hidden');
+    dialog.close?.();
+    return {
+      ok: true,
+      panelOpen,
+      paypalHref: paypal.getAttribute('href'),
+      paypalTarget: paypal.getAttribute('target'),
+      paypalRel: paypal.getAttribute('rel'),
+      bankHref: bank.getAttribute('href'),
+      dialogOpen,
+      mailto,
+      noteVisible,
+    };
+  })()`);
+
+  if (!donateResult.ok) throw new Error(`Donate menu failed: ${donateResult.reason}`);
+  if (!donateResult.panelOpen) throw new Error('Donate dropdown did not open');
+  if (donateResult.paypalHref !== paypalDonateUrl) throw new Error(`Unexpected PayPal href: ${donateResult.paypalHref}`);
+  if (donateResult.paypalTarget !== '_blank' || !(donateResult.paypalRel || '').includes('noopener') || !(donateResult.paypalRel || '').includes('noreferrer')) {
+    throw new Error(`PayPal link does not open safely in a new tab: ${JSON.stringify(donateResult)}`);
+  }
+  if (donateResult.bankHref !== expected.bankHref) throw new Error(`Unexpected bank transfer href: ${donateResult.bankHref}`);
+  if (!donateResult.dialogOpen) throw new Error('MB Way dialog did not open');
+  if (!donateResult.noteVisible) throw new Error('MB Way fallback mailto note did not appear');
+  if (!donateResult.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected MB Way mailto target: ${donateResult.mailto}`);
+  const decodedMbwayMailto = decodeURIComponent(donateResult.mailto);
+  if (!decodedMbwayMailto.includes('+351 919 000 000')) throw new Error(`MB Way mailto missing phone: ${decodedMbwayMailto}`);
 
   let mobileMenu = null;
   if (width < 700) {
@@ -298,7 +368,7 @@ try {
   if (reveal.hidden !== 0) throw new Error(`Reveal left ${reveal.hidden} hidden element(s)`);
   if (reveal.overflow) throw new Error('Page has horizontal overflow after scrolling');
 
-  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, mobileMenu, filterResult, reveal }, null, 2));
+  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, mobileMenu, filterResult, reveal }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));

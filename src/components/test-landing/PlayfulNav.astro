@@ -1,5 +1,6 @@
 ---
 import { getTranslations, getAlternatePath, locales, type Locale } from '../../i18n';
+import PlayfulDonateMenu from '../playful/PlayfulDonateMenu.astro';
 
 interface Props {
   locale?: Locale;
@@ -70,10 +71,7 @@ const navLinks = [
           );
         })}
       </div>
-      <a href={helpPath} class="squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish">
-        {t.nav.helpNow}
-        <span aria-hidden="true">❤</span>
-      </a>
+      <PlayfulDonateMenu locale={locale} variant="desktop" instanceId={`landing-${locale}-desktop`} />
     </div>
 
     <button
@@ -121,9 +119,7 @@ const navLinks = [
         </li>
       ))}
       <li class="pt-2">
-        <a href={helpPath} class="playful-focus block rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish">
-          {t.nav.helpNow}
-        </a>
+        <PlayfulDonateMenu locale={locale} variant="mobile" instanceId={`landing-${locale}-mobile`} />
       </li>
     </ul>
   </div>

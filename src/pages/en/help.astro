@@ -72,9 +72,11 @@ const fosterStats = [
   { value: 'Flexible', label: 'Adapted to your availability', rotate: '-rotate-1' },
 ];
 
+const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
+
 const paymentMethods = [
-  { title: 'MB Way', icon: '▯', description: 'Contact us by email to get the phone number for MB Way payments.' },
-  { title: 'PayPal', icon: '◈', description: 'We accept donations via PayPal. Contact us for a direct payment link.' },
+  { title: 'MB Way', icon: '▯', description: 'Use the Donate menu, choose MB Way, and leave your phone number. We will message you with the phone number where you can send the donation.' },
+  { title: 'PayPal', icon: '◈', description: 'You can donate directly through CAPA\'s secure PayPal donation page.', href: paypalDonateUrl, cta: 'Donate with PayPal' },
 ];
 ---
 
@@ -266,12 +268,21 @@ const paymentMethods = [
             </div>
 
             <div data-reveal-stagger="90" class="relative z-10 mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {paymentMethods.map(({ title, icon, description }, index) => (
-                <article data-reveal="tilt" class={`card-pillowy rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
-                  <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
-                  <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
-                  <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
-                </article>
+              {paymentMethods.map(({ title, icon, description, href, cta }, index) => (
+                href ? (
+                  <a data-reveal="tilt" href={href} target="_blank" rel="noopener noreferrer" class={`card-pillowy playful-focus block rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
+                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
+                    <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
+                    <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+                    <span class="mt-5 inline-flex rounded-full bg-playful-orange px-5 py-3 font-playful-display text-sm font-extrabold text-white shadow-squish">{cta}</span>
+                  </a>
+                ) : (
+                  <article data-reveal="tilt" class={`card-pillowy rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy ${index === 0 ? 'sm:-rotate-1' : 'sm:rotate-1 sm:translate-y-4'}`}>
+                    <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange/14 text-2xl font-extrabold text-playful-orange-dark" aria-hidden="true">{icon}</div>
+                    <h3 class="mb-2 font-playful-display text-xl font-extrabold text-playful-orange-dark">{title}</h3>
+                    <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
+                  </article>
+                )
               ))}
             </div>
 

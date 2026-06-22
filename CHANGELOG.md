@@ -1,6 +1,8 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Donations: added a Doar/Donate dropdown to the Playful nav with PayPal, MB Way, and bank-transfer options; PayPal opens the real CAPA donation page in a new tab, bank transfer deep-links to the financial support section, and MB Way opens a phone-number request popup.
+- Help donations: updated the `/ajudar/` and `/en/help/` financial-support PayPal cards with the real PayPal donation link and revised the MB Way text to point visitors to the new Donate menu flow.
 - Home sponsor card: changed the #2 Apadrinhar/Sponsor card into a popup form that collects name, email, optional phone, business status, monthly contribution amount, preferred contribution method, and notes, then prepares an email to `capa.geralpvl@gmail.com`.
 - Landing nav: added the missing Adoção/Adoption menu link to the live home nav and shared site nav, pointing to `/adocao` and `/en/adopt` across Portuguese and English menus.
 - Dog profiles: fixed the language switcher on `/cao/` and `/en/dog/` so Portuguese/English flag links preserve the `?id=` query instead of dropping visitors onto the empty dog-profile route.

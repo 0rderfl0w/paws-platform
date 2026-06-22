@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 
 const root = process.cwd();
 const mapsHref = 'https://maps.app.goo.gl/vjuwcaWTdFS4YzARA';
+const paypalDonateUrl = 'https://www.paypal.com/donate/?cmd=_s-xclick&hosted_button_id=W6QJXB42XRY4G&source=urlw&ssrt=1782128512360';
 
 function readBuilt(relativePath) {
   return readFileSync(resolve(root, relativePath), 'utf8');
@@ -21,7 +22,7 @@ function assertNotIncludes(html, needle, context) {
   }
 }
 
-function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, helpHref, localeNeedles }) {
+function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, helpHref, bankHref, localeNeedles }) {
   const html = readBuilt(htmlPath);
   const context = `${page} (${htmlPath})`;
 
@@ -47,6 +48,12 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertIncludes(html, 'name="sponsor_amount"', context);
   assertIncludes(html, 'name="sponsor_method"', context);
   assertIncludes(html, 'mailto:capa.geralpvl@gmail.com', context);
+  assertIncludes(html, 'data-donate-toggle', context);
+  assertIncludes(html, 'data-donate-panel', context);
+  assertIncludes(html, `href="${paypalDonateUrl}"`, context);
+  assertIncludes(html, `href="${bankHref}"`, context);
+  assertIncludes(html, 'data-mbway-modal', context);
+  assertIncludes(html, 'name="mbway_phone"', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertNotIncludes(html, 'CAPA Póvoa de Lanhoso — Test Landing', context);
@@ -55,7 +62,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 23 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 29 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -83,10 +90,16 @@ function checkTestLanding() {
   assertIncludes(html, 'name="sponsor_amount"', context);
   assertIncludes(html, 'name="sponsor_method"', context);
   assertIncludes(html, 'mailto:capa.geralpvl@gmail.com', context);
+  assertIncludes(html, 'data-donate-toggle', context);
+  assertIncludes(html, 'data-donate-panel', context);
+  assertIncludes(html, `href="${paypalDonateUrl}"`, context);
+  assertIncludes(html, 'href="/ajudar#apoio-financeiro"', context);
+  assertIncludes(html, 'data-mbway-modal', context);
+  assertIncludes(html, 'name="mbway_phone"', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 22, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 28, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
@@ -98,6 +111,7 @@ const pages = [
     dogsHref: '/caes',
     adoptHref: '/adocao',
     helpHref: '/ajudar',
+    bankHref: '/ajudar#apoio-financeiro',
     localeNeedles: ['Os Nossos', 'Cães', 'Adota', 'Saiba como ajudar', 'href="/"'],
   }),
   checkLivePage({
@@ -108,6 +122,7 @@ const pages = [
     dogsHref: '/en/dogs',
     adoptHref: '/en/adopt',
     helpHref: '/en/help',
+    bankHref: '/en/help#financial-support',
     localeNeedles: ['Our', 'Dogs', 'Adopt', 'Learn how to help', 'href="/en/"'],
   }),
   checkTestLanding(),
