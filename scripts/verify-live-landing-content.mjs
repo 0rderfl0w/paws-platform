@@ -35,6 +35,10 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertIncludes(html, 'data-footer-iban-value', context);
   assertIncludes(html, 'data-footer-visit', context);
   assertIncludes(html, 'data-footer-visit-map', context);
+  assertIncludes(html, 'data-footer-richkapp-credit', context);
+  assertIncludes(html, 'data-footer-richkapp-link', context);
+  assertIncludes(html, 'Made with ❤️ by', context);
+  assertIncludes(html, 'href="https://richkapp.com/websites"', context);
   assertIncludes(html, 'data-visit-source="footer"', context);
   assertIncludes(html, 'data-mobile-menu-scroll', context);
   assertIncludes(html, 'data-mobile-socials', context);
@@ -80,7 +84,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 47 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 51 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -103,6 +107,10 @@ function checkTestLanding() {
   assertIncludes(html, 'data-footer-iban-value', context);
   assertIncludes(html, 'data-footer-visit', context);
   assertIncludes(html, 'data-footer-visit-map', context);
+  assertIncludes(html, 'data-footer-richkapp-credit', context);
+  assertIncludes(html, 'data-footer-richkapp-link', context);
+  assertIncludes(html, 'Made with ❤️ by', context);
+  assertIncludes(html, 'href="https://richkapp.com/websites"', context);
   assertIncludes(html, 'data-visit-source="footer"', context);
   assertIncludes(html, 'data-mobile-menu-scroll', context);
   assertIncludes(html, 'data-mobile-socials', context);
@@ -130,7 +138,7 @@ function checkTestLanding() {
   assertNotIncludes(html, 'EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 48, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 52, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [

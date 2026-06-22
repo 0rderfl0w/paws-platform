@@ -112,7 +112,7 @@ const en: TranslationKeys = {
     donate: 'Make a Donation',
     supportCapa: 'Support CAPA',
     copyright: '© 2026 CAPA Póvoa de Lanhoso. All rights reserved.',
-    madeWith: 'Made with ❤️ by volunteers who love animals',
+    madeWith: 'Made with ❤️ by',
     adoption: 'Adoption',
     howToHelp: 'How to Help',
   },

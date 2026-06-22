@@ -124,7 +124,16 @@ const helpLinks = [
 
     <div data-reveal="rise" class="mt-12 border-t border-playful-orange/15 pt-8 text-center text-xs font-bold text-playful-muted/80">
       <p>{t.footer.copyright}</p>
-      <p class="mt-2">{t.footer.madeWith}</p>
+      <p class="mt-2" data-footer-richkapp-credit>
+        {t.footer.madeWith}{' '}
+        <a
+          href="https://richkapp.com/websites"
+          data-footer-richkapp-link
+          class="playful-focus underline decoration-playful-orange/45 decoration-2 underline-offset-4 hover:text-playful-orange-dark"
+          target="_blank"
+          rel="noopener noreferrer"
+        >RichKapp</a>
+      </p>
     </div>
   </div>
 </footer>

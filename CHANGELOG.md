@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Footer: changed the bottom credit to “Made with ❤️ by RichKapp”, with RichKapp underlined and opening `https://richkapp.com/websites` in a new tab.
 - Forms: replaced the native browser date-time picker in visit scheduling with a CAPA-controlled European `dd/mm/yyyy hh:mm` 24-hour field so Portuguese and English visitors do not see US `mm/dd/yyyy` formatting.
 - Forms/API: configured live form email delivery through RichKapp's Resend SMTP setup so CAPA submissions send to `capa.geralpvl@gmail.com` from `Richard Kappel <richard@richkapp.com>` with visitor email as Reply-To; verified live `/forms/submit` returned `emailSent:true` / HTTP 201.
 - Mobile nav: removed the “Redes sociais” / “Social links” text from the mobile menu and centered the Facebook/Instagram icons at the bottom.

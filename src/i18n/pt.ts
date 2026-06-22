@@ -110,7 +110,7 @@ const pt = {
     donate: 'Fazer Donativo',
     supportCapa: 'Apoie o CAPA',
     copyright: '© 2026 CAPA Póvoa de Lanhoso. Todos os direitos reservados.',
-    madeWith: 'Feito com ❤️ por voluntários que amam animais',
+    madeWith: 'Made with ❤️ by',
     adoption: 'Adoção',
     howToHelp: 'Como Ajudar',
   },
