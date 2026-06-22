@@ -475,10 +475,96 @@ try {
     throw new Error(`Footer IBAN value is horizontally clipped: ${JSON.stringify(footerIban)}`);
   }
 
+  const footerVisit = await evaluate(`(async () => {
+    const section = document.querySelector('[data-footer-visit]');
+    const map = section?.querySelector('[data-footer-visit-map]');
+    const contact = document.querySelector('[data-footer-contact]');
+    const footerHeadings = [...document.querySelectorAll('footer h3')].map((node) => node.textContent.trim());
+    const visitButton = section?.querySelector('[data-visit-open="footer"]');
+    if (!section || !map || !visitButton) return { ok: false, reason: 'missing footer visit controls', footerHeadings };
+    section.scrollIntoView({ block: 'center' });
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    visitButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const modal = document.querySelector('[data-visit-modal="footer"]');
+    const form = document.querySelector('[data-visit-form="footer"]');
+    const panel = document.querySelector('[data-visit-modal-panel]');
+    const close = document.querySelector('[data-visit-close]');
+    const title = document.querySelector('[data-visit-modal-title]');
+    const rect = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, h: r.height };
+    };
+    if (!modal || !form) return { ok: false, reason: 'missing footer visit modal/form', footerHeadings };
+    form.dataset.skipMailLaunch = 'true';
+    form.querySelector('[name="visit_name"]').value = 'Footer QA Visitor';
+    form.querySelector('[name="visit_email"]').value = 'footer-qa@example.com';
+    form.querySelector('[name="visit_phone"]').value = '+351 930 111 111';
+    form.querySelector('[name="visit_time"]').value = '2026-07-06T11:45';
+    form.querySelector('[name="visit_message"]').value = 'Footer browser smoke visit request';
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const mailto = document.querySelector('[data-visit-mailto]')?.getAttribute('href') || '';
+    const noteVisible = Boolean(document.querySelector('[data-visit-mailto-note]'));
+    const openGeometry = {
+      panelRect: rect(panel),
+      closeRect: rect(close),
+      titleRect: rect(title),
+    };
+    close?.click();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+    return {
+      ok: true,
+      headingText: section.querySelector('h3')?.textContent?.trim() || '',
+      bodyText: section.textContent || '',
+      footerHeadings,
+      mapHref: map.getAttribute('href'),
+      mapTarget: map.getAttribute('target'),
+      mapRel: map.getAttribute('rel'),
+      contactText: contact?.textContent || '',
+      buttonText: visitButton.textContent.trim(),
+      ...openGeometry,
+      noteVisible,
+      mailto,
+      modalClosed: !document.querySelector('[data-visit-modal="footer"]'),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+    };
+  })()`);
+
+  if (!footerVisit.ok) throw new Error(`Footer Visit failed: ${footerVisit.reason}; headings=${JSON.stringify(footerVisit.footerHeadings)}`);
+  const expectedVisitHeading = locale === 'en' ? 'Visit' : 'Visita';
+  const expectedNavHeading = locale === 'en' ? 'Navigation' : 'Navegação';
+  if (footerVisit.headingText !== expectedVisitHeading) throw new Error(`Unexpected footer Visit heading: ${footerVisit.headingText}`);
+  if (footerVisit.footerHeadings.indexOf(expectedVisitHeading) !== footerVisit.footerHeadings.indexOf(expectedNavHeading) + 1) {
+    throw new Error(`Footer Visit section is not directly after Navigation: ${JSON.stringify(footerVisit.footerHeadings)}`);
+  }
+  if (footerVisit.mapHref !== 'https://maps.app.goo.gl/vjuwcaWTdFS4YzARA') throw new Error(`Unexpected footer maps href: ${footerVisit.mapHref}`);
+  if (footerVisit.mapTarget !== '_blank' || !(footerVisit.mapRel || '').includes('noopener') || !(footerVisit.mapRel || '').includes('noreferrer')) {
+    throw new Error(`Footer maps link does not open safely: ${JSON.stringify(footerVisit)}`);
+  }
+  if (footerVisit.contactText.includes('EN310') || footerVisit.contactText.includes('Póvoa de Lanhoso, Braga')) {
+    throw new Error(`Footer Contact still contains address text: ${footerVisit.contactText}`);
+  }
+  if (!footerVisit.noteVisible) throw new Error('Footer visit fallback mailto note did not appear');
+  if (!footerVisit.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected footer visit mailto target: ${footerVisit.mailto}`);
+  const decodedFooterVisitMailto = decodeURIComponent(footerVisit.mailto || '');
+  for (const needle of ['Footer QA Visitor', 'footer-qa@example.com', '+351 930 111 111', '2026-07-06T11:45', 'Footer browser smoke visit request']) {
+    if (!decodedFooterVisitMailto.includes(needle)) throw new Error(`Footer visit mailto missing ${needle}: ${decodedFooterVisitMailto}`);
+  }
+  if (!decodedFooterVisitMailto.includes(locale === 'en' ? 'CAPA Póvoa de Lanhoso shelter' : 'Abrigo CAPA Póvoa de Lanhoso')) {
+    throw new Error(`Footer visit mailto missing shelter context: ${decodedFooterVisitMailto}`);
+  }
+  if (footerVisit.panelRect && footerVisit.panelRect.top < -1) throw new Error(`Footer visit modal panel is clipped: ${JSON.stringify(footerVisit)}`);
+  if (footerVisit.closeRect && footerVisit.closeRect.top < -1) throw new Error(`Footer visit modal close button is clipped: ${JSON.stringify(footerVisit)}`);
+  if (footerVisit.titleRect && footerVisit.titleRect.top < -1) throw new Error(`Footer visit modal title is clipped: ${JSON.stringify(footerVisit)}`);
+  if (!footerVisit.modalClosed) throw new Error('Footer visit modal did not close');
+  if (footerVisit.overflow) throw new Error('Footer Visit caused horizontal overflow');
+
   if (reveal.hidden !== 0) throw new Error(`Reveal left ${reveal.hidden} hidden element(s)`);
   if (reveal.overflow) throw new Error('Page has horizontal overflow after scrolling');
 
-  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, donateCardResult, mobileMenu, filterResult, reveal, footerIban }, null, 2));
+  console.log(JSON.stringify({ ok: true, url, locale, width, port, initial, sponsorResult, donateResult, donateCardResult, mobileMenu, filterResult, reveal, footerIban, footerVisit }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));

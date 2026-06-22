@@ -1,5 +1,6 @@
 ---
 import { getTranslations, type Locale } from '../../i18n';
+import VisitSchedule from '../VisitSchedule';
 
 interface Props {
   locale?: Locale;
@@ -41,7 +42,7 @@ const helpLinks = [
   <div class="ambient-blob -right-16 bottom-6 h-80 w-80 bg-playful-orange/25"></div>
 
   <div class="relative z-10 mx-auto max-w-7xl px-5 py-16 sm:px-8">
-    <div data-reveal-stagger="80" class="grid gap-10 lg:grid-cols-[1.25fr_0.75fr_0.75fr_1fr]">
+    <div data-reveal-stagger="80" class="grid gap-10 lg:grid-cols-[1.2fr_0.7fr_1fr_0.75fr_0.9fr]">
       <div data-reveal="left">
         <a href={homePath} class="playful-focus inline-flex items-center gap-4 rounded-full">
           <img src="/logo.jpg" alt="CAPA Póvoa de Lanhoso" class="h-20 w-20 rounded-[1.75rem] border-4 border-white object-cover shadow-pillowy" width="80" height="80" />
@@ -66,6 +67,32 @@ const helpLinks = [
         </ul>
       </div>
 
+      <div data-reveal="rise" data-footer-visit>
+        <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.visitHeading}</h3>
+        <p class="mt-4 text-sm font-semibold leading-6 text-playful-muted">{t.footer.visitPrompt}</p>
+        <a
+          href={mapsHref}
+          data-footer-visit-map
+          class="playful-focus group mt-4 block overflow-hidden rounded-[1.5rem] border border-playful-orange/20 bg-white/78 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-pillowy"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={mapsLabel}
+        >
+          <span class="relative flex min-h-28 items-center justify-center overflow-hidden rounded-[1.1rem] bg-[linear-gradient(135deg,rgba(255,138,31,0.16),rgba(83,134,58,0.18)),repeating-linear-gradient(45deg,rgba(111,78,55,0.12)_0_1px,transparent_1px_18px)]">
+            <span class="absolute left-4 top-4 h-12 w-20 rounded-full border-2 border-white/80 bg-white/35 rotate-[-14deg]"></span>
+            <span class="absolute bottom-4 right-5 h-10 w-24 rounded-full border-2 border-white/80 bg-white/35 rotate-[10deg]"></span>
+            <span class="relative flex h-14 w-14 items-center justify-center rounded-full bg-playful-orange text-white shadow-squish transition group-hover:scale-105">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-8 w-8" aria-hidden="true">
+                <path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 10-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+              </svg>
+            </span>
+          </span>
+          <span class="mt-3 block text-xs font-extrabold uppercase tracking-[0.18em] text-playful-orange-dark">{t.footer.visitMapEyebrow}</span>
+          <span class="mt-1 block text-sm font-extrabold text-playful-ink">{t.footer.visitMapLabel}</span>
+        </a>
+        <VisitSchedule locale={locale} source="footer" client:idle />
+      </div>
+
       <div data-reveal="rise">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.helpHeading}</h3>
         <ul class="mt-4 space-y-2" role="list">
@@ -77,18 +104,13 @@ const helpLinks = [
 
       <div data-reveal="right">
         <h3 class="font-playful-display text-lg font-extrabold text-playful-orange-dark">{t.footer.contactHeading}</h3>
-        <ul class="mt-4 space-y-3 text-sm font-medium leading-6" role="list">
-          <li>
-            <a href={mapsHref} class="playful-focus inline-block rounded-2xl hover:text-playful-orange-dark" target="_blank" rel="noopener noreferrer" aria-label={mapsLabel}>
-              EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal
-            </a>
-          </li>
+        <ul class="mt-4 space-y-3 text-sm font-medium leading-6" role="list" data-footer-contact>
           <li><a href="tel:+351253690000" class="playful-focus hover:text-playful-orange-dark">+351 253 690 000</a></li>
           <li><a href="mailto:capa.geralpvl@gmail.com" class="playful-focus hover:text-playful-orange-dark">capa.geralpvl@gmail.com</a></li>
         </ul>
       </div>
 
-      <div data-reveal="rise" class="lg:col-start-3 lg:col-span-2 lg:-mt-3">
+      <div data-reveal="rise" class="lg:col-start-3 lg:col-span-3 lg:-mt-3">
         <div class="w-full rounded-[2rem] bg-white/75 px-4 py-4 text-center text-xs font-bold leading-relaxed shadow-sm sm:rounded-full sm:px-6 sm:py-3 xl:text-sm" data-footer-iban>
           <p class="mx-auto flex max-w-full flex-col items-center justify-center gap-1.5 text-playful-ink sm:flex-row sm:gap-0">
             <span class="font-extrabold text-playful-orange-dark">{t.footer.supportCapa}</span>

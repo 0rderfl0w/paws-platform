@@ -170,8 +170,8 @@ async function runProfile(profile) {
     const title = document.querySelector('#dog-profile-heading')?.textContent?.trim() || '';
     const mainImage = gallery?.querySelector('img');
     const galleryFrame = gallery?.querySelector('[data-dog-profile-gallery-frame]');
-    const visitCta = document.querySelector('[data-visit-cta]');
-    const visitButton = document.querySelector('[data-visit-open]');
+    const visitCta = document.querySelector('[data-dog-profile] [data-visit-source="dog"]');
+    const visitButton = document.querySelector('[data-dog-profile] [data-visit-open="dog"]');
     const heading = document.querySelector('#dog-profile-heading');
     const mobileControls = gallery?.querySelector('[data-gallery-mobile-controls]');
     const mobilePrev = gallery?.querySelector('[data-gallery-prev="mobile"]');
@@ -277,12 +277,20 @@ async function runProfile(profile) {
   let visitSubmission = null;
   if (!profile.adoptedLabel && result.visitButtonVisible) {
     visitSubmission = await evaluate(`(async () => {
-      const openButton = document.querySelector('[data-visit-open]');
+      const openButton = document.querySelector('[data-dog-profile] [data-visit-open="dog"]');
       openButton?.click();
       await new Promise((resolve) => setTimeout(resolve, 250));
       const modal = document.querySelector('[data-visit-modal]');
       const form = document.querySelector('[data-visit-form]');
       if (!modal || !form) return { ok: false, reason: 'missing visit modal/form' };
+      const rect = (el) => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { top: r.top, bottom: r.bottom, h: r.height };
+      };
+      const panel = document.querySelector('[data-visit-modal-panel]');
+      const close = document.querySelector('[data-visit-close]');
+      const title = document.querySelector('[data-visit-modal-title]');
       form.dataset.skipMailLaunch = 'true';
       form.querySelector('[name="visit_name"]').value = 'QA Visitor';
       form.querySelector('[name="visit_email"]').value = 'qa-visitor@example.com';
@@ -293,11 +301,19 @@ async function runProfile(profile) {
       await new Promise((resolve) => setTimeout(resolve, 250));
       const mailto = document.querySelector('[data-visit-mailto]')?.getAttribute('href') || '';
       const noteVisible = Boolean(document.querySelector('[data-visit-mailto-note]'));
+      const openGeometry = {
+        modalRect: rect(modal),
+        panelRect: rect(panel),
+        closeRect: rect(close),
+        titleRect: rect(title),
+        viewportHeight: window.innerHeight,
+      };
       document.querySelector('[data-visit-close]')?.click();
       await new Promise((resolve) => setTimeout(resolve, 100));
       return {
         ok: true,
         modalOpen: Boolean(modal),
+        ...openGeometry,
         noteVisible,
         mailto,
         modalClosed: !document.querySelector('[data-visit-modal]'),
@@ -305,6 +321,9 @@ async function runProfile(profile) {
     })()`);
 
     if (!visitSubmission.ok) failures.push(`visit modal failed: ${visitSubmission.reason}`);
+    if (visitSubmission.panelRect && visitSubmission.panelRect.top < -1) failures.push(`visit modal panel is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
+    if (visitSubmission.closeRect && visitSubmission.closeRect.top < -1) failures.push(`visit modal close button is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
+    if (visitSubmission.titleRect && visitSubmission.titleRect.top < -1) failures.push(`visit modal title is clipped above viewport: ${JSON.stringify(visitSubmission)}`);
     if (!visitSubmission.noteVisible) failures.push('visit fallback mailto note did not appear');
     if (!visitSubmission.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) failures.push(`unexpected visit mailto target: ${visitSubmission.mailto}`);
     const decodedVisitMailto = decodeURIComponent(visitSubmission.mailto || '');

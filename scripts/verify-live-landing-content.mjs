@@ -33,6 +33,9 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertIncludes(html, 'data-footer-iban', context);
   assertIncludes(html, 'data-footer-iban-value', context);
+  assertIncludes(html, 'data-footer-visit', context);
+  assertIncludes(html, 'data-footer-visit-map', context);
+  assertIncludes(html, 'data-visit-source="footer"', context);
   assertIncludes(html, 'data-mobile-menu-scroll', context);
   assertIncludes(html, `href="${mapsHref}"`, context);
   assertIncludes(html, 'target="_blank"', context);
@@ -58,6 +61,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertIncludes(html, 'data-mbway-modal', context);
   assertIncludes(html, 'name="mbway_phone"', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
+  assertNotIncludes(html, 'EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal', context);
   assertNotIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertNotIncludes(html, 'CAPA Póvoa de Lanhoso — Test Landing', context);
 
@@ -65,7 +69,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 32 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 36 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -86,6 +90,9 @@ function checkTestLanding() {
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertIncludes(html, 'data-footer-iban', context);
   assertIncludes(html, 'data-footer-iban-value', context);
+  assertIncludes(html, 'data-footer-visit', context);
+  assertIncludes(html, 'data-footer-visit-map', context);
+  assertIncludes(html, 'data-visit-source="footer"', context);
   assertIncludes(html, 'data-mobile-menu-scroll', context);
   assertIncludes(html, 'href="/ajudar"', context);
   assertIncludes(html, 'data-sponsor-modal-open', context);
@@ -104,9 +111,10 @@ function checkTestLanding() {
   assertIncludes(html, 'data-mbway-modal', context);
   assertIncludes(html, 'name="mbway_phone"', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
+  assertNotIncludes(html, 'EN310 115<br />Póvoa de Lanhoso, Braga<br />Portugal', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 32, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 36, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
