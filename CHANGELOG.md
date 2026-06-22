@@ -2,6 +2,7 @@
 
 ## 2026-06-22
 - Dog profiles: fixed the language switcher on `/cao/` and `/en/dog/` so Portuguese/English flag links preserve the `?id=` query instead of dropping visitors onto the empty dog-profile route.
+- Landing nav: changed the live-home Help links from the in-page `#ajudar` anchor to the dedicated help routes `/ajudar` and `/en/help` for Portuguese and English home pages.
 - Dog profiles: fixed the Playful gallery regression where real shelter photos could force the gallery wider than the profile container, clipping dogs off-screen on `/cao/` and `/en/dog/`; profile photos now fit inside a bounded card and the new browser verifier covers Athos, Abby, Alana, and English/mobile variants.
 - Full-site Playful audit: moved the remaining public legacy surfaces (`/en/help/`, `/cao/`, `/en/dog/`, and `404.html`) onto CAPA's Playful Impact shell while leaving the noindex admin app routes as admin-only islands.
 - Dog profiles: restyled the shared React profile island with Playful photo gallery, profile cards, compatibility chips, adopted/available CTA panels, and route-aware Playful nav/footer wrappers for Portuguese and English profile routes.

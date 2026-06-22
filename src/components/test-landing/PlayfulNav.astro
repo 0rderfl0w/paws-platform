@@ -17,12 +17,13 @@ const brandAriaLabel = homePath === '/test-landing'
 const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
 
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
+const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 
 const navLinks = [
   { href: '#inicio', label: t.nav.home },
   { href: dogsPath, label: t.nav.dogs },
   { href: '#sobre-nos', label: t.nav.about },
-  { href: '#ajudar', label: t.nav.help },
+  { href: helpPath, label: t.nav.help },
 ];
 ---
 
@@ -67,7 +68,7 @@ const navLinks = [
           );
         })}
       </div>
-      <a href="#ajudar" class="squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish">
+      <a href={helpPath} class="squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish">
         {t.nav.helpNow}
         <span aria-hidden="true">❤</span>
       </a>
@@ -118,7 +119,7 @@ const navLinks = [
         </li>
       ))}
       <li class="pt-2">
-        <a href="#ajudar" class="playful-focus block rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish">
+        <a href={helpPath} class="playful-focus block rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish">
           {t.nav.helpNow}
         </a>
       </li>

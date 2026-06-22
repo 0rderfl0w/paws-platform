@@ -42,8 +42,8 @@ if (!Number.isInteger(port) || port <= 0) {
 }
 
 const expected = locale === 'en'
-  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', helpText: 'Learn how to help', filter: 'Medium' }
-  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', helpText: 'Saiba como ajudar', filter: 'Médios' };
+  ? { title: 'CAPA Póvoa de Lanhoso — Adopt a Dog', dogHrefPrefix: '/en/dog?id=', helpHref: '/en/help', helpText: 'Learn how to help', filter: 'Medium' }
+  : { title: 'CAPA Póvoa de Lanhoso — Adota um Cão', dogHrefPrefix: '/cao?id=', helpHref: '/ajudar', helpText: 'Saiba como ajudar', filter: 'Médios' };
 
 const profileDir = `/tmp/capa-live-landing-browser-${port}-${Date.now()}`;
 let browser = null;
@@ -168,6 +168,9 @@ try {
       cardCount: cards.length,
       firstHref: cards[0]?.getAttribute('href') || '',
       hasHelpText: document.body.innerText.includes(${JSON.stringify(expected.helpText)}),
+      helpHrefs: [...document.querySelectorAll('a')]
+        .filter((link) => link.textContent.includes(${JSON.stringify(locale === 'en' ? 'Help' : 'Ajudar')}))
+        .map((link) => link.getAttribute('href')),
       hasNoindex: Boolean(document.querySelector('meta[name="robots"][content*="noindex"]')),
       overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
     };
@@ -178,6 +181,10 @@ try {
   if (initial.cardCount !== 6) throw new Error(`Expected 6 featured dog cards, got ${initial.cardCount}`);
   if (!initial.firstHref.startsWith(expected.dogHrefPrefix)) throw new Error(`Unexpected first dog href: ${initial.firstHref}`);
   if (!initial.hasHelpText) throw new Error(`Missing help CTA text: ${expected.helpText}`);
+  if (!initial.helpHrefs.includes(expected.helpHref)) {
+    throw new Error(`Missing help route href ${expected.helpHref}; got ${initial.helpHrefs.join(', ')}`);
+  }
+  if (initial.helpHrefs.includes('#ajudar')) throw new Error('Home Help links still point to #ajudar');
   if (initial.hasNoindex) throw new Error('Live landing page has noindex');
   if (initial.overflow) throw new Error('Initial page has horizontal overflow');
 
