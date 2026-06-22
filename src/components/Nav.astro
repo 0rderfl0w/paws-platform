@@ -14,7 +14,6 @@ const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
-const socialMenuLabel = locale === 'pt' ? 'Redes sociais' : 'Social links';
 const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
 const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
 
@@ -164,9 +163,8 @@ const currentPath = Astro.url.pathname;
           </a>
         </li>
         <li class="pt-3">
-          <div data-mobile-socials class="flex items-center justify-between gap-3 rounded-lg bg-warm-100 px-4 py-3">
-            <span class="text-xs font-bold uppercase tracking-[0.14em] text-warm-500">{socialMenuLabel}</span>
-            <span class="flex items-center gap-2">
+          <div data-mobile-socials class="flex items-center justify-center rounded-lg bg-warm-100 px-4 py-3">
+            <span class="flex items-center justify-center gap-3">
               <a href="https://facebook.com/capapvl" class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-600" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="facebook" class="h-4 w-4" /></a>
               <a href="https://instagram.com/capapvl" class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-500 text-white transition-colors hover:bg-primary-600" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="instagram" class="h-4 w-4" /></a>
             </span>

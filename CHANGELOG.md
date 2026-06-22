@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Mobile nav: removed the “Redes sociais” / “Social links” text from the mobile menu and centered the Facebook/Instagram icons at the bottom.
 - Help donations: replaced the abstract in-kind donation card glyphs with clearer category-specific SVG icons for cleaning supplies, dog food, medication, and other items on `/ajudar/` and `/en/help/`.
 - Site chrome: replaced placeholder social/payment glyphs with real Facebook, Instagram, PayPal, and official MB WAY icons; the mobile burger menu now starts below 1000px and includes Facebook/Instagram links.
 - Help: fixed the FAT / foster-family block on narrow mobile screens so the peach card, badge, and large heading stay aligned instead of clipping or forcing broken word wraps.

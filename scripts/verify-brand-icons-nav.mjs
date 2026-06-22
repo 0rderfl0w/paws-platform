@@ -95,6 +95,12 @@ async function checkPage({ path, width, locale, nav }) {
       const mobileSocials = document.querySelector('[data-mobile-socials]');
       const socialIcons = mobileSocials ? [...mobileSocials.querySelectorAll('[data-brand-icon]')].map((node) => node.getAttribute('data-brand-icon')) : [];
       const socialLinks = mobileSocials ? [...mobileSocials.querySelectorAll('a')].map((link) => ({ href: link.getAttribute('href'), target: link.getAttribute('target'), rel: link.getAttribute('rel') })) : [];
+      const socialCluster = mobileSocials?.querySelector('span');
+      const socialRect = rect(mobileSocials);
+      const socialClusterRect = rect(socialCluster);
+      const socialCenterDelta = socialRect && socialClusterRect
+        ? Math.abs((socialClusterRect.x + socialClusterRect.w / 2) - (socialRect.x + socialRect.w / 2))
+        : null;
       const donateRoot = document.querySelector('[data-donate-menu*="mobile"]');
       const donateToggle = donateRoot?.querySelector('[data-donate-toggle]');
       donateToggle?.click();
@@ -105,6 +111,10 @@ async function checkPage({ path, width, locale, nav }) {
         mobileButtonVisible: visible(mobileButton),
         mobileOpen: mobileMenu && !mobileMenu.classList.contains('hidden'),
         mobileSocialsPresent: Boolean(mobileSocials),
+        mobileSocialsText: mobileSocials?.textContent?.trim() || '',
+        socialCenterDelta,
+        socialRect,
+        socialClusterRect,
         socialIcons,
         socialLinks,
         donatePanelIcons: panelIcons,
@@ -129,6 +139,8 @@ async function checkPage({ path, width, locale, nav }) {
     assert(result.mobileButtonVisible, 'Burger button should be visible below 1000px', result);
     assert(result.mobileOpen, 'Mobile menu did not open below 1000px', result);
     assert(result.mobileSocialsPresent, 'Mobile menu social icon row missing', result);
+    assert(result.mobileSocialsText === '', 'Mobile menu social row should not contain visible label text', result);
+    assert(result.socialCenterDelta !== null && result.socialCenterDelta <= 2, 'Mobile menu social icons are not centered in their row', result);
     assert(result.socialIcons.includes('facebook') && result.socialIcons.includes('instagram'), 'Mobile menu social icons missing', result);
     assert(result.socialLinks.every((link) => link.target === '_blank' && (link.rel || '').includes('noopener')), 'Mobile social links are not safe external links', result);
     assert(result.donatePanelIcons.includes('paypal') && result.donatePanelIcons.includes('mbway'), 'Mobile donate menu payment icons missing', result);

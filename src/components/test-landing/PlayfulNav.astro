@@ -21,7 +21,6 @@ const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select la
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
 const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
-const socialMenuLabel = locale === 'pt' ? 'Redes sociais' : 'Social links';
 const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
 const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
 
@@ -126,9 +125,8 @@ const navLinks = [
         <PlayfulDonateMenu locale={locale} variant="mobile" instanceId={`landing-${locale}-mobile`} />
       </li>
       <li class="pt-3">
-        <div data-mobile-socials class="flex items-center justify-between gap-3 rounded-[1.35rem] bg-white/75 px-4 py-3 shadow-sm">
-          <span class="text-xs font-extrabold uppercase tracking-[0.18em] text-playful-muted">{socialMenuLabel}</span>
-          <span class="flex items-center gap-2">
+        <div data-mobile-socials class="flex items-center justify-center rounded-[1.35rem] bg-white/75 px-4 py-3 shadow-sm">
+          <span class="flex items-center justify-center gap-3">
             <a href="https://facebook.com/capapvl" class="playful-focus flex h-10 w-10 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={facebookLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="facebook" class="h-5 w-5" /></a>
             <a href="https://instagram.com/capapvl" class="playful-focus flex h-10 w-10 items-center justify-center rounded-full bg-playful-orange text-white shadow-sm" aria-label={instagramLabel} target="_blank" rel="noopener noreferrer"><BrandIcon name="instagram" class="h-5 w-5" /></a>
           </span>
