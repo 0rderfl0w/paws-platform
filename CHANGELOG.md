@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-22
+- Home sponsor card: changed the #2 Apadrinhar/Sponsor card into a popup form that collects name, email, optional phone, business status, monthly contribution amount, preferred contribution method, and notes, then prepares an email to `capa.geralpvl@gmail.com`.
 - Landing nav: added the missing Adoção/Adoption menu link to the live home nav and shared site nav, pointing to `/adocao` and `/en/adopt` across Portuguese and English menus.
 - Dog profiles: fixed the language switcher on `/cao/` and `/en/dog/` so Portuguese/English flag links preserve the `?id=` query instead of dropping visitors onto the empty dog-profile route.
 - Landing nav: changed the live-home Help links from the in-page `#ajudar` anchor to the dedicated help routes `/ajudar` and `/en/help` for Portuguese and English home pages.

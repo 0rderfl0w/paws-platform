@@ -168,6 +168,14 @@ try {
       cardCount: cards.length,
       firstHref: cards[0]?.getAttribute('href') || '',
       hasHelpText: document.body.innerText.includes(${JSON.stringify(expected.helpText)}),
+      sponsorModal: {
+        openButtonCount: document.querySelectorAll('[data-sponsor-modal-open]').length,
+        dialogPresent: Boolean(document.querySelector('[data-sponsor-modal]')),
+        formPresent: Boolean(document.querySelector('[data-sponsor-form]')),
+        requiredFieldsPresent: ['sponsor_name', 'sponsor_email', 'sponsor_business', 'sponsor_amount', 'sponsor_method']
+          .every((name) => Boolean(document.querySelector('[name="' + name + '"]'))),
+        phoneOptional: Boolean(document.querySelector('[name="sponsor_phone"]')) && !document.querySelector('[name="sponsor_phone"]')?.hasAttribute('required'),
+      },
       adoptHrefs: [...document.querySelectorAll('nav a')]
         .filter((link) => link.textContent.trim() === ${JSON.stringify(expected.adoptText)})
         .map((link) => link.getAttribute('href')),
@@ -184,6 +192,11 @@ try {
   if (initial.cardCount !== 6) throw new Error(`Expected 6 featured dog cards, got ${initial.cardCount}`);
   if (!initial.firstHref.startsWith(expected.dogHrefPrefix)) throw new Error(`Unexpected first dog href: ${initial.firstHref}`);
   if (!initial.hasHelpText) throw new Error(`Missing help CTA text: ${expected.helpText}`);
+  if (initial.sponsorModal.openButtonCount !== 1) throw new Error(`Expected one sponsor modal opener, got ${initial.sponsorModal.openButtonCount}`);
+  if (!initial.sponsorModal.dialogPresent) throw new Error('Missing sponsor modal dialog');
+  if (!initial.sponsorModal.formPresent) throw new Error('Missing sponsor modal form');
+  if (!initial.sponsorModal.requiredFieldsPresent) throw new Error('Missing required sponsor modal fields');
+  if (!initial.sponsorModal.phoneOptional) throw new Error('Sponsor phone field is missing or required');
   if (!initial.adoptHrefs.includes(expected.adoptHref)) {
     throw new Error(`Missing adoption nav href ${expected.adoptHref}; got ${initial.adoptHrefs.join(', ')}`);
   }
@@ -193,6 +206,39 @@ try {
   if (initial.helpHrefs.includes('#ajudar')) throw new Error('Home Help links still point to #ajudar');
   if (initial.hasNoindex) throw new Error('Live landing page has noindex');
   if (initial.overflow) throw new Error('Initial page has horizontal overflow');
+
+  const sponsorResult = await evaluate(`(async () => {
+    const openButton = document.querySelector('[data-sponsor-modal-open]');
+    const dialog = document.querySelector('[data-sponsor-modal]');
+    const form = document.querySelector('[data-sponsor-form]');
+    if (!openButton || !dialog || !form) return { ok: false, reason: 'missing controls' };
+    openButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const opened = dialog.open || dialog.hasAttribute('open');
+    form.dataset.skipMailLaunch = 'true';
+    form.querySelector('[name="sponsor_name"]').value = 'QA Sponsor';
+    form.querySelector('[name="sponsor_email"]').value = 'qa-sponsor@example.com';
+    form.querySelector('[name="sponsor_phone"]').value = '+351 912 345 678';
+    form.querySelector('[name="sponsor_business"][value="yes"]').checked = true;
+    form.querySelector('[name="sponsor_amount"]').value = '25';
+    form.querySelector('[name="sponsor_method"]').value = form.querySelector('[name="sponsor_method"] option:nth-child(2)').value;
+    form.querySelector('[name="sponsor_message"]').value = 'Browser smoke test sponsorship note';
+    form.requestSubmit();
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const mailto = document.querySelector('[data-sponsor-mailto]')?.getAttribute('href') || '';
+    const noteVisible = !document.querySelector('[data-sponsor-mailto-note]')?.classList.contains('hidden');
+    dialog.close?.();
+    return { ok: true, opened, mailto, noteVisible };
+  })()`);
+
+  if (!sponsorResult.ok) throw new Error(`Sponsor modal failed: ${sponsorResult.reason}`);
+  if (!sponsorResult.opened) throw new Error('Sponsor modal did not open');
+  if (!sponsorResult.noteVisible) throw new Error('Sponsor fallback mailto note did not appear');
+  if (!sponsorResult.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) throw new Error(`Unexpected sponsor mailto target: ${sponsorResult.mailto}`);
+  const decodedSponsorMailto = decodeURIComponent(sponsorResult.mailto);
+  for (const needle of ['QA Sponsor', 'qa-sponsor@example.com', '+351 912 345 678', '€25', 'Browser smoke test sponsorship note']) {
+    if (!decodedSponsorMailto.includes(needle)) throw new Error(`Sponsor mailto missing ${needle}: ${decodedSponsorMailto}`);
+  }
 
   let mobileMenu = null;
   if (width < 700) {

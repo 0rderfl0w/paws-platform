@@ -39,6 +39,14 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
   assertNotIncludes(html, 'href="#caes"', context);
   assertIncludes(html, 'href="#sobre-nos"', context);
   assertIncludes(html, `href="${helpHref}"`, context);
+  assertIncludes(html, 'data-sponsor-modal-open', context);
+  assertIncludes(html, 'data-sponsor-modal', context);
+  assertIncludes(html, 'name="sponsor_email"', context);
+  assertIncludes(html, 'name="sponsor_phone"', context);
+  assertIncludes(html, 'name="sponsor_business"', context);
+  assertIncludes(html, 'name="sponsor_amount"', context);
+  assertIncludes(html, 'name="sponsor_method"', context);
+  assertIncludes(html, 'mailto:capa.geralpvl@gmail.com', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'name="robots" content="noindex, nofollow"', context);
   assertNotIncludes(html, 'CAPA Póvoa de Lanhoso — Test Landing', context);
@@ -47,7 +55,7 @@ function checkLivePage({ page, htmlPath, title, ogUrl, dogsHref, adoptHref, help
     assertIncludes(html, needle, context);
   }
 
-  return { page, checked: 15 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
+  return { page, checked: 23 + localeNeedles.length, htmlPath: resolve(root, htmlPath) };
 }
 
 function checkTestLanding() {
@@ -67,10 +75,18 @@ function checkTestLanding() {
   assertIncludes(html, 'rel="noopener noreferrer"', context);
   assertIncludes(html, 'IBAN: PT50 0010 0000 4591 4000 0014 9', context);
   assertIncludes(html, 'href="/ajudar"', context);
+  assertIncludes(html, 'data-sponsor-modal-open', context);
+  assertIncludes(html, 'data-sponsor-modal', context);
+  assertIncludes(html, 'name="sponsor_email"', context);
+  assertIncludes(html, 'name="sponsor_phone"', context);
+  assertIncludes(html, 'name="sponsor_business"', context);
+  assertIncludes(html, 'name="sponsor_amount"', context);
+  assertIncludes(html, 'name="sponsor_method"', context);
+  assertIncludes(html, 'mailto:capa.geralpvl@gmail.com', context);
   assertNotIncludes(html, 'href="#ajudar"', context);
   assertNotIncludes(html, 'property="og:url" content="https://capapvl.org/"', context);
 
-  return { page: 'test', checked: 14, htmlPath: resolve(root, htmlPath) };
+  return { page: 'test', checked: 22, htmlPath: resolve(root, htmlPath) };
 }
 
 const pages = [
