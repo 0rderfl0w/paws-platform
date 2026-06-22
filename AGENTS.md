@@ -185,6 +185,8 @@ scripts/                    # Hetzner migration/data maintenance scripts
 - **Cards:** rounded-2xl, soft shadows, warm borders, fully clickable
 - **Typography:** Inter, bold headings in warm-900
 - **Buttons:** primary-500 orange, rounded-xl, hover transitions
+- **Iconography:** Use recognizable, context-specific icons for donation/help cards; avoid abstract placeholder glyphs when the action needs instant comprehension.
+- **Mobile nav socials:** Keep Facebook/Instagram as icon-only links centered at the bottom of the mobile menu. Do not add a visible “Redes sociais” / “Social links” label there.
 - **Mobile-first:** Always responsive, hamburger nav on mobile
 - **Language:** Portuguese (PT) — all public content
 
