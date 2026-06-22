@@ -7,8 +7,9 @@ interface Props {
 
 const { locale = 'pt' } = Astro.props;
 const t = getTranslations(locale);
-const currentPath = Astro.url.pathname;
-const normalizedCurrentPath = normalizePath(currentPath);
+const currentPathname = Astro.url.pathname;
+const currentPath = `${currentPathname}${Astro.url.search}`;
+const normalizedCurrentPath = normalizePath(currentPathname);
 
 const homePath = locale === 'pt' ? '/' : '/en/';
 const dogsPath = locale === 'pt' ? '/caes' : '/en/dogs';
@@ -75,6 +76,8 @@ function isActivePath(href: string) {
               title={label}
               aria-label={label}
               aria-current={isActive ? 'true' : undefined}
+              data-playful-language-link
+              data-locale={code}
               class={`playful-focus flex h-9 w-9 items-center justify-center rounded-full text-base transition-all ${isActive ? 'bg-playful-peach shadow-sm' : 'opacity-60 hover:opacity-100'}`}
             >
               {flag}
@@ -116,6 +119,8 @@ function isActivePath(href: string) {
             title={label}
             aria-label={label}
             aria-current={isActive ? 'true' : undefined}
+            data-playful-language-link
+            data-locale={code}
             class={`playful-focus flex items-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold ${isActive ? 'bg-playful-peach text-playful-orange-dark shadow-sm' : 'bg-white/70 text-playful-muted'}`}
           >
             <span>{flag}</span>
@@ -145,6 +150,40 @@ function isActivePath(href: string) {
 </header>
 
 <script>
+  const playfulLanguageRouteMap = {
+    '/': '/en/',
+    '/caes': '/en/dogs',
+    '/cao': '/en/dog',
+    '/adocao': '/en/adopt',
+    '/ajudar': '/en/help',
+    '/sobre-nos': '/en/about',
+    '/admin': '/en/admin',
+  };
+  const playfulReverseLanguageRouteMap = Object.fromEntries(
+    Object.entries(playfulLanguageRouteMap).map(([ptPath, enPath]) => [enPath, ptPath]),
+  );
+  const playfulNormalizePath = (path) => (path === '/' ? '/' : path.replace(/\/+$/, ''));
+  const playfulAlternatePath = (pathname, search, hash, targetLocale) => {
+    const normalizedPath = playfulNormalizePath(pathname);
+    const alternatePath = targetLocale === 'en'
+      ? playfulLanguageRouteMap[normalizedPath] ?? '/en/'
+      : playfulReverseLanguageRouteMap[normalizedPath] ?? '/';
+    return `${alternatePath}${search}${hash}`;
+  };
+  const playfulCurrentLocale = () => {
+    const normalizedPath = playfulNormalizePath(window.location.pathname);
+    return normalizedPath === '/en' || normalizedPath.startsWith('/en/') ? 'en' : 'pt';
+  };
+
+  document.querySelectorAll('[data-playful-language-link]').forEach((link) => {
+    const targetLocale = link.getAttribute('data-locale');
+    if (targetLocale !== 'pt' && targetLocale !== 'en') return;
+    const href = targetLocale === playfulCurrentLocale()
+      ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+      : playfulAlternatePath(window.location.pathname, window.location.search, window.location.hash, targetLocale);
+    link.setAttribute('href', href);
+  });
+
   const playfulSiteBtn = document.getElementById('playful-site-mobile-menu-btn');
   const playfulSiteMenu = document.getElementById('playful-site-mobile-menu');
   const playfulSiteHamburger = document.getElementById('playful-site-hamburger-icon');

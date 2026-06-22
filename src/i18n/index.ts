@@ -40,20 +40,19 @@ const reverseRouteMap: Record<string, string> = Object.fromEntries(
 
 /** Get the equivalent page path in the other locale */
 export function getAlternatePath(currentPath: string, targetLocale: Locale): string {
-  // Normalize: remove trailing slash (except for root)
-  const normalized = currentPath === '/' ? '/' : currentPath.replace(/\/$/, '');
+  const hashIndex = currentPath.indexOf('#');
+  const pathAndQuery = hashIndex === -1 ? currentPath : currentPath.slice(0, hashIndex);
+  const hash = hashIndex === -1 ? '' : currentPath.slice(hashIndex);
+  const queryIndex = pathAndQuery.indexOf('?');
+  const rawPath = queryIndex === -1 ? pathAndQuery : pathAndQuery.slice(0, queryIndex);
+  const query = queryIndex === -1 ? '' : pathAndQuery.slice(queryIndex);
+  const normalizedPath = rawPath === '/' ? '/' : rawPath.replace(/\/+$/, '');
 
-  if (targetLocale === 'en') {
-    // PT → EN: check if query params exist (for /cao?id=xxx → /en/dog?id=xxx)
-    const [path, query] = normalized.split('?');
-    const enPath = routeMap[path] ?? '/en/';
-    return query ? `${enPath}?${query}` : enPath;
-  } else {
-    // EN → PT
-    const [path, query] = normalized.split('?');
-    const ptPath = reverseRouteMap[path] ?? '/';
-    return query ? `${ptPath}?${query}` : ptPath;
-  }
+  const alternatePath = targetLocale === 'en'
+    ? routeMap[normalizedPath] ?? '/en/'
+    : reverseRouteMap[normalizedPath] ?? '/';
+
+  return `${alternatePath}${query}${hash}`;
 }
 
 /** Available locales with display info */

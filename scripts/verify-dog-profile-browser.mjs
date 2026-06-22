@@ -13,6 +13,7 @@ const profiles = [
     dog: 'Athos',
     width: 1440,
     height: 1000,
+    alternatePath: '/en/dog?id=5fd31126-e731-45a8-ae30-b662d83ce4f5',
   },
   {
     name: 'athos-pt-mobile',
@@ -20,6 +21,7 @@ const profiles = [
     dog: 'Athos',
     width: 390,
     height: 900,
+    alternatePath: '/en/dog?id=5fd31126-e731-45a8-ae30-b662d83ce4f5',
   },
   {
     name: 'abby-adopted-mobile',
@@ -28,6 +30,7 @@ const profiles = [
     width: 390,
     height: 900,
     adoptedLabel: 'Adotado!',
+    alternatePath: '/en/dog?id=35a53d19-adbd-4438-9e1d-7f3022d60fb0',
   },
   {
     name: 'alana-long-story-desktop',
@@ -42,6 +45,7 @@ const profiles = [
     dog: 'Athos',
     width: 390,
     height: 900,
+    alternatePath: '/cao?id=5fd31126-e731-45a8-ae30-b662d83ce4f5',
   },
 ];
 
@@ -168,6 +172,9 @@ async function runProfile(profile) {
     const galleryLabels = [...(gallery?.querySelectorAll('span') || [])]
       .map((node) => node.textContent.trim())
       .filter(Boolean);
+    const languageHrefs = [...document.querySelectorAll('a[aria-label="Português"], a[aria-label="English"]')]
+      .map((node) => node.getAttribute('href'))
+      .filter(Boolean);
     return {
       url: location.href,
       title,
@@ -179,6 +186,7 @@ async function runProfile(profile) {
       scrollWidth: document.documentElement.scrollWidth,
       innerWidth: window.innerWidth,
       galleryLabels,
+      languageHrefs,
     };
   })()`);
 
@@ -196,6 +204,9 @@ async function runProfile(profile) {
   if (profile.adoptedLabel && !result.galleryLabels.includes(profile.adoptedLabel)) {
     failures.push(`missing adopted label ${profile.adoptedLabel}`);
   }
+  if (profile.alternatePath && !result.languageHrefs.includes(profile.alternatePath)) {
+    failures.push(`missing language switch href ${profile.alternatePath}; got ${result.languageHrefs.join(', ')}`);
+  }
 
   return {
     name: profile.name,
@@ -209,6 +220,7 @@ async function runProfile(profile) {
     scrollWidth: result.scrollWidth,
     innerWidth: result.innerWidth,
     galleryLabels: result.galleryLabels,
+    languageHrefs: result.languageHrefs,
   };
 }
 
