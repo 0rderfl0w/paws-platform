@@ -339,11 +339,12 @@ async function runProfile(profile) {
       const panel = document.querySelector('[data-visit-modal-panel]');
       const close = document.querySelector('[data-visit-close]');
       const title = document.querySelector('[data-visit-modal-title]');
+      const visitTimeInput = form.querySelector('[name="visit_time"]');
       form.dataset.skipMailLaunch = 'true';
       form.querySelector('[name="visit_name"]').value = 'QA Visitor';
       form.querySelector('[name="visit_email"]').value = 'qa-visitor@example.com';
       form.querySelector('[name="visit_phone"]').value = '+351 930 000 000';
-      form.querySelector('[name="visit_time"]').value = '2026-07-05T10:30';
+      visitTimeInput.value = '05/07/2026 10:30';
       form.querySelector('[name="visit_message"]').value = 'Browser smoke test visit request';
       form.requestSubmit();
       await new Promise((resolve) => setTimeout(resolve, 550));
@@ -366,6 +367,9 @@ async function runProfile(profile) {
         ...openGeometry,
         noteVisible,
         successVisible,
+        visitTimeInputType: visitTimeInput?.getAttribute('type') || '',
+        visitTimeInputPlaceholder: visitTimeInput?.getAttribute('placeholder') || '',
+        visitTimeInputPattern: visitTimeInput?.getAttribute('pattern') || '',
         payload,
         mailto,
         modalClosed: !document.querySelector('[data-visit-modal]'),
@@ -379,6 +383,9 @@ async function runProfile(profile) {
     if (!visitSubmission.successVisible) failures.push(`visit backend success state did not appear: ${JSON.stringify(visitSubmission)}`);
     if (visitSubmission.noteVisible) failures.push(`visit fallback note appeared despite backend success: ${JSON.stringify(visitSubmission)}`);
     if (!visitSubmission.payload || visitSubmission.payload.kind !== 'visit' || visitSubmission.payload.contextValue !== profile.dog) failures.push(`visit backend payload missing dog context: ${JSON.stringify(visitSubmission)}`);
+    if (visitSubmission.visitTimeInputType !== 'text') failures.push(`visit time input should be text to avoid browser-localized US datetime controls: ${JSON.stringify(visitSubmission)}`);
+    if (!visitSubmission.visitTimeInputPlaceholder.startsWith('dd/mm/')) failures.push(`visit time placeholder is not European day/month/year: ${JSON.stringify(visitSubmission)}`);
+    if (visitSubmission.payload?.preferredTime !== '05/07/2026 10:30') failures.push(`visit payload did not preserve European 24h date/time: ${JSON.stringify(visitSubmission)}`);
     if (!visitSubmission.modalClosed) failures.push('visit modal did not close after verifier');
   }
 

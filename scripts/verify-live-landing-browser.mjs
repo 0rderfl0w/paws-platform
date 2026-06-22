@@ -531,11 +531,12 @@ try {
       return { top: r.top, bottom: r.bottom, h: r.height };
     };
     if (!modal || !form) return { ok: false, reason: 'missing footer visit modal/form', footerHeadings };
+    const visitTimeInput = form.querySelector('[name="visit_time"]');
     form.dataset.skipMailLaunch = 'true';
     form.querySelector('[name="visit_name"]').value = 'Footer QA Visitor';
     form.querySelector('[name="visit_email"]').value = 'footer-qa@example.com';
     form.querySelector('[name="visit_phone"]').value = '+351 930 111 111';
-    form.querySelector('[name="visit_time"]').value = '2026-07-06T11:45';
+    visitTimeInput.value = '06/07/2026 11:45';
     form.querySelector('[name="visit_message"]').value = 'Footer browser smoke visit request';
     form.requestSubmit();
     await new Promise((resolve) => setTimeout(resolve, 550));
@@ -563,6 +564,8 @@ try {
       ...openGeometry,
       noteVisible,
       successVisible,
+      visitTimeInputType: visitTimeInput?.getAttribute('type') || '',
+      visitTimeInputPlaceholder: visitTimeInput?.getAttribute('placeholder') || '',
       payload,
       mailto,
       modalClosed: !document.querySelector('[data-visit-modal="footer"]'),
@@ -587,6 +590,9 @@ try {
   if (!footerVisit.successVisible) throw new Error(`Footer visit backend success state did not appear: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.noteVisible) throw new Error(`Footer visit fallback note appeared despite backend success: ${JSON.stringify(footerVisit)}`);
   if (!footerVisit.payload || footerVisit.payload.kind !== 'visit' || footerVisit.payload.source !== 'footer') throw new Error(`Footer visit backend payload missing: ${JSON.stringify(footerVisit)}`);
+  if (footerVisit.visitTimeInputType !== 'text') throw new Error(`Footer visit time input should be text to avoid browser-localized US datetime controls: ${JSON.stringify(footerVisit)}`);
+  if (!footerVisit.visitTimeInputPlaceholder.startsWith('dd/mm/')) throw new Error(`Footer visit time placeholder is not European day/month/year: ${JSON.stringify(footerVisit)}`);
+  if (footerVisit.payload?.preferredTime !== '06/07/2026 11:45') throw new Error(`Footer visit payload did not preserve European 24h date/time: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.panelRect && footerVisit.panelRect.top < -1) throw new Error(`Footer visit modal panel is clipped: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.closeRect && footerVisit.closeRect.top < -1) throw new Error(`Footer visit modal close button is clipped: ${JSON.stringify(footerVisit)}`);
   if (footerVisit.titleRect && footerVisit.titleRect.top < -1) throw new Error(`Footer visit modal title is clipped: ${JSON.stringify(footerVisit)}`);

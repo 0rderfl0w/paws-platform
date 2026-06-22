@@ -134,6 +134,8 @@ Hetzner security posture: local `.env` files are intentionally owner-only (`chmo
 
 **Live form email delivery (2026-06-22):** CAPA uses RichKapp's verified Resend domain for SMTP. Sender is `Richard Kappel <richard@richkapp.com>` because Richard manages the site as CAPA's volunteer; recipient is `capa.geralpvl@gmail.com`; `server/capa-api.ts` sets `Reply-To` to the visitor's submitted email. Use Resend port `587` with `CAPA_FORM_SMTP_SECURE=false`; port `465` timed out from Hetzner during verification.
 
+**Form date/time UX:** Public scheduling forms must show European day/month/year with 24-hour time (`dd/mm/yyyy hh:mm` / PT `dd/mm/aaaa hh:mm`). Do not use native `datetime-local` for these visitor-facing forms because browser locale can display US `mm/dd/yyyy` and 12-hour placeholders.
+
 ---
 
 ## Pages

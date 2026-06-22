@@ -4,6 +4,7 @@ import { getTranslations, type Locale } from '../i18n';
 import { submitFormSubmission } from '../lib/formSubmission';
 
 const SHELTER_EMAIL = 'capa.geralpvl@gmail.com';
+const EUROPEAN_DATE_TIME_PATTERN = /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/;
 
 type VisitScheduleSource = 'dog' | 'footer';
 
@@ -12,6 +13,38 @@ interface VisitScheduleProps {
   dogName?: string;
   source?: VisitScheduleSource;
   className?: string;
+}
+
+function formatEuropeanDateTimeInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 12);
+  const day = digits.slice(0, 2);
+  const month = digits.slice(2, 4);
+  const year = digits.slice(4, 8);
+  const hour = digits.slice(8, 10);
+  const minute = digits.slice(10, 12);
+
+  if (digits.length <= 2) return day;
+  if (digits.length <= 4) return `${day}/${month}`;
+  if (digits.length <= 8) return `${day}/${month}/${year}`;
+  if (digits.length <= 10) return `${day}/${month}/${year} ${hour}`;
+  return `${day}/${month}/${year} ${hour}:${minute}`;
+}
+
+function isValidEuropeanDateTime(value: string): boolean {
+  if (!EUROPEAN_DATE_TIME_PATTERN.test(value)) return false;
+  const [, dayRaw, monthRaw, yearRaw, hourRaw, minuteRaw] = value.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/) ?? [];
+  const day = Number(dayRaw);
+  const month = Number(monthRaw);
+  const year = Number(yearRaw);
+  const hour = Number(hourRaw);
+  const minute = Number(minuteRaw);
+  if (!day || !month || !yearRaw || month < 1 || month > 12 || hour > 23 || minute > 59) return false;
+  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() === month - 1
+    && date.getUTCDate() === day
+    && date.getUTCHours() === hour
+    && date.getUTCMinutes() === minute;
 }
 
 export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', className }: VisitScheduleProps) {
@@ -52,6 +85,12 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
+    const visitTimeInput = form.elements.namedItem('visit_time') as HTMLInputElement | null;
+    visitTimeInput?.setCustomValidity(
+      visitTimeInput.value && isValidEuropeanDateTime(visitTimeInput.value)
+        ? ''
+        : t.dogProfile.visitTimeInvalid,
+    );
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
@@ -156,7 +195,35 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
             </label>
             <label className="block text-sm font-extrabold text-playful-orange-dark">
               {t.dogProfile.visitTimeLabel}
-              <input name="visit_time" type="datetime-local" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" />
+              <input
+                name="visit_time"
+                type="text"
+                required
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={16}
+                pattern="[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}"
+                placeholder={t.dogProfile.visitTimePlaceholder}
+                title={t.dogProfile.visitTimeHelp}
+                aria-describedby={`visit-time-help-${source}`}
+                onInput={(event: FormEvent<HTMLInputElement>) => {
+                  const input = event.currentTarget;
+                  input.value = formatEuropeanDateTimeInput(input.value);
+                  input.setCustomValidity('');
+                }}
+                onBlur={(event: FormEvent<HTMLInputElement>) => {
+                  const input = event.currentTarget;
+                  if (!input.value) {
+                    input.setCustomValidity('');
+                    return;
+                  }
+                  input.setCustomValidity(isValidEuropeanDateTime(input.value) ? '' : t.dogProfile.visitTimeInvalid);
+                }}
+                className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm"
+              />
+              <span id={`visit-time-help-${source}`} className="mt-1 block text-xs font-bold leading-5 text-playful-muted">
+                {t.dogProfile.visitTimeHelp}
+              </span>
             </label>
           </div>
           <label className="block text-sm font-extrabold text-playful-orange-dark">
