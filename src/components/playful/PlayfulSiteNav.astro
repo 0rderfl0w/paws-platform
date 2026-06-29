@@ -1,5 +1,5 @@
 ---
-import { getTranslations, getAlternatePath, locales, type Locale } from '../../i18n';
+import { getTranslations, getAlternatePath, locales, routeMap, type Locale } from '../../i18n';
 import PlayfulDonateMenu from './PlayfulDonateMenu.astro';
 import BrandIcon from '../BrandIcon.astro';
 
@@ -19,6 +19,7 @@ const adoptPath = locale === 'pt' ? '/adocao' : '/en/adopt';
 const aboutPath = locale === 'pt' ? '/sobre-nos' : '/en/about';
 const helpPath = locale === 'pt' ? '/ajudar' : '/en/help';
 const languageSelectorLabel = locale === 'pt' ? 'Selecionar idioma' : 'Select language';
+const playfulLanguageRouteMap = routeMap;
 const brandAriaLabel = locale === 'pt' ? 'CAPA Póvoa de Lanhoso — Página inicial' : 'CAPA Póvoa de Lanhoso — Home';
 const facebookLabel = locale === 'pt' ? 'CAPA no Facebook' : 'CAPA on Facebook';
 const instagramLabel = locale === 'pt' ? 'CAPA no Instagram' : 'CAPA on Instagram';
@@ -158,17 +159,7 @@ function isActivePath(href: string) {
   </div>
 </header>
 
-<script>
-  const playfulLanguageRouteMap = {
-    '/': '/en/',
-    '/caes': '/en/dogs',
-    '/cao': '/en/dog',
-    '/adocao': '/en/adopt',
-    '/ajudar': '/en/help',
-    '/ajudar/formulario-voluntariado': '/en/help/volunteer-form',
-    '/sobre-nos': '/en/about',
-    '/admin': '/en/admin',
-  };
+<script define:vars={{ playfulLanguageRouteMap }}>
   const playfulReverseLanguageRouteMap = Object.fromEntries(
     Object.entries(playfulLanguageRouteMap).map(([ptPath, enPath]) => [enPath, ptPath]),
   );

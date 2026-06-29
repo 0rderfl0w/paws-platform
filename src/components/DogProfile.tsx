@@ -6,8 +6,7 @@ import { getTranslations, localizeDescription, type Locale } from '../i18n';
 import type { Dog } from '../lib/capaApi';
 import VisitSchedule from './VisitSchedule';
 import { submitFormSubmission } from '../lib/formSubmission';
-
-const SHELTER_EMAIL = 'capa.geralpvl@gmail.com';
+import { SHELTER_EMAIL } from '../lib/capaContact';
 
 const SIZE_BADGE_CLASSES: Record<string, string> = {
   small: 'bg-playful-peach text-playful-orange-dark border border-playful-orange/20',

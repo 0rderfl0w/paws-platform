@@ -4,11 +4,11 @@ import { SHELTER_EMAIL } from '../lib/capaContact';
 import { formatEuropeanDateTimeInput, isValidEuropeanDateTime } from '../lib/europeanDateTime';
 import { submitFormSubmission } from '../lib/formSubmission';
 
-type VolunteerFormProps = {
+type SupplyDonationFormProps = {
   locale?: Locale;
 };
 
-type VolunteerCopy = {
+type SupplyDonationCopy = {
   eyebrow: string;
   title: string;
   intro: string;
@@ -20,9 +20,9 @@ type VolunteerCopy = {
   timePlaceholder: string;
   timeHelp: string;
   timeInvalid: string;
-  workTypesLabel: string;
-  workTypesHelp: string;
-  workTypesRequired: string;
+  supplyTypesLabel: string;
+  supplyTypesHelp: string;
+  supplyTypesRequired: string;
   messageLabel: string;
   messagePlaceholder: string;
   submit: string;
@@ -34,104 +34,104 @@ type VolunteerCopy = {
   subject: string;
   bodyIntro: string;
   pageLabel: string;
-  selectedWorkLabel: string;
+  selectedSupplyLabel: string;
   contextLabel: string;
   contextValue: string;
-  workOptions: string[];
+  supplyOptions: string[];
 };
 
-const COPY: Record<Locale, VolunteerCopy> = {
+const COPY: Record<Locale, SupplyDonationCopy> = {
   pt: {
-    eyebrow: 'Voluntariado',
-    title: 'Agenda uma altura para ajudar',
-    intro: 'Diz-nos quando podes vir e que tipo de ajuda consegues oferecer. A equipa responde por email para combinar os detalhes.',
+    eyebrow: 'Donativos em espécie',
+    title: 'Combina a entrega de donativos',
+    intro: 'Diz-nos o que queres doar e quando podes entregar. A equipa responde por email para combinar o melhor momento.',
     nameLabel: 'Nome',
     emailLabel: 'Email',
     phoneLabel: 'Telefone (opcional)',
     phonePlaceholder: '+351 912 345 678',
-    timeLabel: 'Dia e hora pretendidos',
+    timeLabel: 'Dia e hora preferidos para entrega',
     timePlaceholder: 'dd/mm/aaaa hh:mm',
-    timeHelp: 'Usa formato europeu: dia/mês/ano e hora 24h, por exemplo 05/07/2026 10:30.',
-    timeInvalid: 'Indica a data e hora no formato dd/mm/aaaa hh:mm, por exemplo 05/07/2026 10:30.',
-    workTypesLabel: 'Tipo de voluntariado',
-    workTypesHelp: 'Podes escolher mais do que uma opção.',
-    workTypesRequired: 'Escolhe pelo menos um tipo de voluntariado.',
-    messageLabel: 'Mensagem',
-    messagePlaceholder: 'Conta-nos a tua disponibilidade, experiência com animais ou alguma pergunta.',
-    submit: 'Enviar pedido de voluntariado',
+    timeHelp: 'Usa formato europeu: dia/mês/ano e hora 24h, por exemplo 11/07/2026 15:00.',
+    timeInvalid: 'Indica a data e hora no formato dd/mm/aaaa hh:mm, por exemplo 11/07/2026 15:00.',
+    supplyTypesLabel: 'Tipo de donativo',
+    supplyTypesHelp: 'Podes escolher mais do que uma opção.',
+    supplyTypesRequired: 'Escolhe pelo menos um tipo de donativo.',
+    messageLabel: 'Detalhes dos donativos',
+    messagePlaceholder: 'Ex.: 2 sacos de ração júnior, 5 mantas lavadas, lixívia, brinquedos, ou perguntas sobre entrega.',
+    submit: 'Enviar pedido de entrega',
     submitting: 'A enviar…',
     sent: 'Pedido enviado. A equipa da CAPA recebeu os dados e responderá por email.',
     fallbackNote: 'Não conseguimos confirmar o envio automático. Usa este link para enviar o email preparado:',
     openEmail: 'Abrir email preparado',
     notProvided: 'Não indicado',
-    subject: 'Pedido de voluntariado',
-    bodyIntro: 'Novo pedido de voluntariado através do site CAPA.',
+    subject: 'Donativo em espécie',
+    bodyIntro: 'Novo pedido para entrega de donativos em espécie através do site CAPA.',
     pageLabel: 'Página',
-    selectedWorkLabel: 'Tipo(s) de voluntariado',
-    contextLabel: 'Voluntariado',
-    contextValue: 'Agenda de voluntariado CAPA',
-    workOptions: [
-      'Passear cães',
-      'Cuidados no abrigo',
-      'Limpeza e manutenção',
-      'Fotografar animais',
-      'Campanhas e eventos',
-      'Divulgação nas redes sociais',
-      'Transporte de animais ou donativos',
+    selectedSupplyLabel: 'Tipo(s) de donativo',
+    contextLabel: 'Donativos em espécie',
+    contextValue: 'Entrega de donativos CAPA',
+    supplyOptions: [
+      'Materiais de limpeza',
+      'Comida para cão',
+      'Medicação ou material veterinário',
+      'Coleiras, trelas ou transportadoras',
+      'Cobertores, almofadas ou camas',
+      'Brinquedos e snacks',
+      'Material de escritório ou outros artigos',
     ],
   },
   en: {
-    eyebrow: 'Volunteering',
-    title: 'Schedule a time to volunteer',
-    intro: 'Tell us when you can come and what kind of help you are willing to do. The shelter team will reply by email to coordinate details.',
+    eyebrow: 'In-kind donations',
+    title: 'Arrange a supply drop-off',
+    intro: 'Tell us what you would like to donate and when you can drop it off. The shelter team will reply by email to coordinate the best time.',
     nameLabel: 'Name',
     emailLabel: 'Email',
     phoneLabel: 'Phone (optional)',
     phonePlaceholder: '+351 912 345 678',
-    timeLabel: 'Preferred date and time',
+    timeLabel: 'Preferred drop-off date and time',
     timePlaceholder: 'dd/mm/yyyy hh:mm',
-    timeHelp: 'Use European format: day/month/year and 24-hour time, for example 05/07/2026 10:30.',
-    timeInvalid: 'Enter the date and time as dd/mm/yyyy hh:mm, for example 05/07/2026 10:30.',
-    workTypesLabel: 'Volunteer work types',
-    workTypesHelp: 'You can choose more than one option.',
-    workTypesRequired: 'Choose at least one volunteer work type.',
-    messageLabel: 'Message',
-    messagePlaceholder: 'Tell us about your availability, animal experience, or any questions.',
-    submit: 'Send volunteer request',
+    timeHelp: 'Use European format: day/month/year and 24-hour time, for example 11/07/2026 15:00.',
+    timeInvalid: 'Enter the date and time as dd/mm/yyyy hh:mm, for example 11/07/2026 15:00.',
+    supplyTypesLabel: 'Donation type',
+    supplyTypesHelp: 'You can choose more than one option.',
+    supplyTypesRequired: 'Choose at least one supply donation type.',
+    messageLabel: 'Donation details',
+    messagePlaceholder: 'E.g. two bags of junior food, five clean blankets, bleach, toys, or questions about delivery.',
+    submit: 'Send drop-off request',
     submitting: 'Sending…',
     sent: 'Request sent. CAPA received the details and will reply by email.',
     fallbackNote: 'We could not confirm automatic sending. Use this link to send the prepared email:',
     openEmail: 'Open prepared email',
     notProvided: 'Not provided',
-    subject: 'Volunteer request',
-    bodyIntro: 'New volunteer request from the CAPA website.',
+    subject: 'Supply donation drop-off',
+    bodyIntro: 'New in-kind supply donation request from the CAPA website.',
     pageLabel: 'Page',
-    selectedWorkLabel: 'Volunteer work type(s)',
-    contextLabel: 'Volunteering',
-    contextValue: 'CAPA volunteer scheduling',
-    workOptions: [
-      'Dog walking',
-      'Shelter animal care',
-      'Cleaning and maintenance',
-      'Animal photography',
-      'Campaigns and events',
-      'Social media outreach',
-      'Transporting animals or donations',
+    selectedSupplyLabel: 'Supply donation type(s)',
+    contextLabel: 'In-kind donation',
+    contextValue: 'CAPA supply drop-off',
+    supplyOptions: [
+      'Cleaning supplies',
+      'Dog food',
+      'Medication or veterinary supplies',
+      'Collars, leads, or transport crates',
+      'Blankets, cushions, or beds',
+      'Toys and treats',
+      'Office supplies or other items',
     ],
   },
 };
 
 
-export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
+export default function SupplyDonationForm({ locale = 'pt' }: SupplyDonationFormProps) {
   const t = COPY[locale];
   const [mailtoHref, setMailtoHref] = useState('');
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'sent' | 'fallback'>('idle');
-  const [workTypeError, setWorkTypeError] = useState('');
+  const [supplyTypeError, setSupplyTypeError] = useState('');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
-    const timeInput = form.elements.namedItem('volunteer_time') as HTMLInputElement | null;
+    const timeInput = form.elements.namedItem('supply_time') as HTMLInputElement | null;
     timeInput?.setCustomValidity(
       timeInput.value && isValidEuropeanDateTime(timeInput.value)
         ? ''
@@ -139,24 +139,24 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
     );
 
     const data = new FormData(form);
-    const workTypes = data.getAll('volunteer_work').map((value) => String(value).trim()).filter(Boolean);
-    setWorkTypeError(workTypes.length > 0 ? '' : t.workTypesRequired);
+    const supplyTypes = data.getAll('supply_type').map((value) => String(value).trim()).filter(Boolean);
+    setSupplyTypeError(supplyTypes.length > 0 ? '' : t.supplyTypesRequired);
 
-    if (!form.reportValidity() || workTypes.length === 0) return;
+    if (!form.reportValidity() || supplyTypes.length === 0) return;
 
     const get = (name: string) => String(data.get(name) ?? '').trim();
-    const phone = get('volunteer_phone');
-    const message = get('volunteer_message');
-    const workTypesText = workTypes.join(', ');
+    const phone = get('supply_phone');
+    const message = get('supply_message');
+    const supplyTypesText = supplyTypes.join(', ');
 
     const body = [
       t.bodyIntro,
       '',
-      `${t.nameLabel}: ${get('volunteer_name')}`,
-      `${t.emailLabel}: ${get('volunteer_email')}`,
+      `${t.nameLabel}: ${get('supply_name')}`,
+      `${t.emailLabel}: ${get('supply_email')}`,
       `${t.phoneLabel}: ${phone || t.notProvided}`,
-      `${t.timeLabel}: ${get('volunteer_time')}`,
-      `${t.selectedWorkLabel}: ${workTypesText}`,
+      `${t.timeLabel}: ${get('supply_time')}`,
+      `${t.selectedSupplyLabel}: ${supplyTypesText}`,
       `${t.messageLabel}: ${message || t.notProvided}`,
       '',
       `${t.pageLabel}: ${window.location.href}`,
@@ -167,17 +167,17 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
     setSubmitState('submitting');
 
     const result = await submitFormSubmission({
-      kind: 'volunteer',
+      kind: 'supply_donation',
       locale,
-      source: 'volunteer-form',
+      source: 'supply-donation-form',
       pageUrl: window.location.href,
       contextLabel: t.contextLabel,
       contextValue: t.contextValue,
-      name: get('volunteer_name'),
-      email: get('volunteer_email'),
+      name: get('supply_name'),
+      email: get('supply_email'),
       phone,
-      preferredTime: get('volunteer_time'),
-      workTypes,
+      preferredTime: get('supply_time'),
+      supplyTypes,
       message,
       website: get('website'),
     }, { skipBackend: form.dataset.skipBackend === 'true' });
@@ -185,7 +185,7 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
     if (result.status === 'sent') {
       setSubmitState('sent');
       form.reset();
-      setWorkTypeError('');
+      setSupplyTypeError('');
       return;
     }
 
@@ -197,12 +197,12 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
   };
 
   return (
-    <section data-volunteer-form-section className="relative z-10 mx-auto max-w-4xl rounded-[2.5rem] border-2 border-playful-orange/15 bg-white/90 p-5 shadow-pillowy-lg sm:p-8 lg:p-10" aria-labelledby="volunteer-form-heading">
+    <section data-supply-donation-form-section className="relative z-10 mx-auto max-w-4xl rounded-[2.5rem] border-2 border-playful-orange/15 bg-white/90 p-5 shadow-pillowy-lg sm:p-8 lg:p-10" aria-labelledby="supply-donation-form-heading">
       <div className="mb-7 text-center">
         <span className="inline-flex -rotate-1 rounded-full border border-playful-line bg-playful-peach px-4 py-2 text-xs font-extrabold uppercase tracking-[0.22em] text-playful-orange-dark shadow-sm">
           {t.eyebrow}
         </span>
-        <h1 id="volunteer-form-heading" className="mx-auto mt-4 max-w-3xl font-playful-display text-4xl font-extrabold tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">
+        <h1 id="supply-donation-form-heading" className="mx-auto mt-4 max-w-3xl font-playful-display text-4xl font-extrabold tracking-[-0.045em] text-playful-orange-dark sm:text-5xl">
           {t.title}
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-7 text-playful-muted sm:text-lg sm:leading-8">
@@ -210,7 +210,7 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
         </p>
       </div>
 
-      <form data-volunteer-form className="space-y-5" onSubmit={handleSubmit}>
+      <form data-supply-donation-form className="space-y-5" onSubmit={handleSubmit}>
         <label className="hidden" aria-hidden="true">
           Website
           <input name="website" tabIndex={-1} autoComplete="off" />
@@ -219,20 +219,20 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-extrabold text-playful-orange-dark">
             {t.nameLabel}
-            <input name="volunteer_name" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="name" />
+            <input name="supply_name" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="name" />
           </label>
           <label className="block text-sm font-extrabold text-playful-orange-dark">
             {t.emailLabel}
-            <input name="volunteer_email" type="email" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="email" />
+            <input name="supply_email" type="email" required className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="email" />
           </label>
           <label className="block text-sm font-extrabold text-playful-orange-dark">
             {t.phoneLabel}
-            <input name="volunteer_phone" type="tel" className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="tel" placeholder={t.phonePlaceholder} />
+            <input name="supply_phone" type="tel" className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" autoComplete="tel" placeholder={t.phonePlaceholder} />
           </label>
           <label className="block text-sm font-extrabold text-playful-orange-dark">
             {t.timeLabel}
             <input
-              name="volunteer_time"
+              name="supply_time"
               type="text"
               required
               inputMode="numeric"
@@ -241,7 +241,7 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
               pattern="[0-9]{2}/[0-9]{2}/[0-9]{4} [0-9]{2}:[0-9]{2}"
               placeholder={t.timePlaceholder}
               title={t.timeHelp}
-              aria-describedby="volunteer-time-help"
+              aria-describedby="supply-time-help"
               onInput={(event: FormEvent<HTMLInputElement>) => {
                 const input = event.currentTarget;
                 input.value = formatEuropeanDateTimeInput(input.value);
@@ -257,52 +257,52 @@ export default function VolunteerForm({ locale = 'pt' }: VolunteerFormProps) {
               }}
               className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm"
             />
-            <span id="volunteer-time-help" className="mt-1 block text-xs font-bold leading-5 text-playful-muted">
+            <span id="supply-time-help" className="mt-1 block text-xs font-bold leading-5 text-playful-muted">
               {t.timeHelp}
             </span>
           </label>
         </div>
 
-        <fieldset className="rounded-[1.6rem] border border-playful-line bg-playful-cream/70 p-4 sm:p-5" aria-describedby="volunteer-work-help volunteer-work-error">
-          <legend className="px-2 text-sm font-extrabold text-playful-orange-dark">{t.workTypesLabel}</legend>
-          <p id="volunteer-work-help" className="mb-4 text-xs font-bold leading-5 text-playful-muted">{t.workTypesHelp}</p>
+        <fieldset className="rounded-[1.6rem] border border-playful-line bg-playful-cream/70 p-4 sm:p-5" aria-describedby="supply-type-help supply-type-error">
+          <legend className="px-2 text-sm font-extrabold text-playful-orange-dark">{t.supplyTypesLabel}</legend>
+          <p id="supply-type-help" className="mb-4 text-xs font-bold leading-5 text-playful-muted">{t.supplyTypesHelp}</p>
           <div className="grid gap-3 sm:grid-cols-2">
-            {t.workOptions.map((option) => (
+            {t.supplyOptions.map((option) => (
               <label key={option} className="flex items-start gap-3 rounded-[1.1rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted shadow-sm">
                 <input
-                  data-volunteer-work-option
-                  name="volunteer_work"
+                  data-supply-type-option
+                  name="supply_type"
                   type="checkbox"
                   value={option}
-                  onChange={() => setWorkTypeError('')}
+                  onChange={() => setSupplyTypeError('')}
                   className="mt-1 h-5 w-5 accent-playful-orange"
                 />
                 <span>{option}</span>
               </label>
             ))}
           </div>
-          {workTypeError && (
-            <p id="volunteer-work-error" data-volunteer-work-error className="mt-3 text-sm font-extrabold text-playful-orange-dark" aria-live="polite">
-              {workTypeError}
+          {supplyTypeError && (
+            <p id="supply-type-error" data-supply-type-error className="mt-3 text-sm font-extrabold text-playful-orange-dark" aria-live="polite">
+              {supplyTypeError}
             </p>
           )}
         </fieldset>
 
         <label className="block text-sm font-extrabold text-playful-orange-dark">
           {t.messageLabel}
-          <textarea name="volunteer_message" rows={5} className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" placeholder={t.messagePlaceholder} />
+          <textarea name="supply_message" rows={5} className="mt-2 w-full rounded-[1.2rem] border border-playful-line bg-white px-4 py-3 text-base font-semibold text-playful-ink shadow-sm" placeholder={t.messagePlaceholder} />
         </label>
 
         {submitState === 'sent' && (
-          <p data-volunteer-success className="rounded-[1.25rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-800" aria-live="polite">
+          <p data-supply-success className="rounded-[1.25rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-800" aria-live="polite">
             {t.sent}
           </p>
         )}
 
         {submitState === 'fallback' && mailtoHref && (
-          <p data-volunteer-mailto-note className="rounded-[1.25rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted">
+          <p data-supply-mailto-note className="rounded-[1.25rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted">
             {t.fallbackNote}{' '}
-            <a data-volunteer-mailto href={mailtoHref} className="playful-focus text-playful-orange-dark underline decoration-playful-orange/40 decoration-2 underline-offset-4 hover:text-playful-orange">
+            <a data-supply-mailto href={mailtoHref} className="playful-focus text-playful-orange-dark underline decoration-playful-orange/40 decoration-2 underline-offset-4 hover:text-playful-orange">
               {t.openEmail}
             </a>
           </p>

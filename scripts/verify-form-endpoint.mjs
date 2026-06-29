@@ -168,7 +168,38 @@ try {
     throw new Error(`Expected volunteer missing work type rejection: ${JSON.stringify(volunteerMissingWork)}`);
   }
 
-  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, volunteer: volunteer.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
+  const supplyDonation = await post(baseUrl, {
+    kind: 'supply_donation',
+    locale: 'en',
+    source: 'supply-donation-form',
+    pageUrl: 'https://capapvl.org/en/help/supply-donation-form',
+    contextLabel: 'In-kind donation',
+    contextValue: 'CAPA supply drop-off',
+    name: 'QA Donor',
+    email: 'qa-donor@example.com',
+    phone: '',
+    preferredTime: '11/07/2026 15:00',
+    supplyTypes: ['Dog food', 'Cleaning supplies'],
+    message: 'Supply donation verifier',
+  });
+  if (supplyDonation.status !== 201 || !supplyDonation.body.ok || !supplyDonation.body.emailSent) {
+    throw new Error(`Expected supply donation dry-run submission to return 201/emailSent: ${JSON.stringify(supplyDonation)}`);
+  }
+
+  const supplyDonationMissingTypes = await post(baseUrl, {
+    kind: 'supply_donation',
+    locale: 'en',
+    source: 'verify-form-endpoint',
+    pageUrl: 'https://capapvl.org/en/help/supply-donation-form',
+    name: 'QA Donor',
+    email: 'qa-donor@example.com',
+    preferredTime: '11/07/2026 15:00',
+  });
+  if (supplyDonationMissingTypes.status !== 400 || !String(supplyDonationMissingTypes.body.error || '').includes('At least one supply donation type')) {
+    throw new Error(`Expected supply donation missing type rejection: ${JSON.stringify(supplyDonationMissingTypes)}`);
+  }
+
+  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, volunteer: volunteer.body, supplyDonation: supplyDonation.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
 } finally {
   if (serverProcess) {
     serverProcess.kill('SIGTERM');

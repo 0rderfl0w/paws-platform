@@ -1,6 +1,7 @@
 # CHANGELOG — capapvl.pt
 
 ## 2026-06-29
+- Help donations: added bilingual in-kind supply donation form routes at `/ajudar/formulario-donativos-em-especie` and `/en/help/supply-donation-form`, replacing the supply-section email text with localized drop-off form buttons and extending `/forms/submit` email delivery with `supply_donation` submissions.
 - Help hero: changed the primary hero actions to `Voluntariado` / `Volunteer` links that open the new volunteer form pages and `Doar` / `Donate` dropdowns that reuse the site donation menu options.
 - Help volunteering: added bilingual volunteer scheduling form routes at `/en/help/volunteer-form` and `/ajudar/formulario-voluntariado`, linked them from both help pages, and extended the existing backend-backed form submission/email flow for volunteer requests with multi-select work types, required email, optional phone, and preferred time.
 

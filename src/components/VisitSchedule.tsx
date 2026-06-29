@@ -1,10 +1,9 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { getTranslations, type Locale } from '../i18n';
+import { SHELTER_EMAIL } from '../lib/capaContact';
+import { formatEuropeanDateTimeInput, isValidEuropeanDateTime } from '../lib/europeanDateTime';
 import { submitFormSubmission } from '../lib/formSubmission';
-
-const SHELTER_EMAIL = 'capa.geralpvl@gmail.com';
-const EUROPEAN_DATE_TIME_PATTERN = /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/;
 
 type VisitScheduleSource = 'dog' | 'footer';
 
@@ -15,43 +14,10 @@ interface VisitScheduleProps {
   className?: string;
 }
 
-function formatEuropeanDateTimeInput(value: string): string {
-  const digits = value.replace(/\D/g, '').slice(0, 12);
-  const day = digits.slice(0, 2);
-  const month = digits.slice(2, 4);
-  const year = digits.slice(4, 8);
-  const hour = digits.slice(8, 10);
-  const minute = digits.slice(10, 12);
-
-  if (digits.length <= 2) return day;
-  if (digits.length <= 4) return `${day}/${month}`;
-  if (digits.length <= 8) return `${day}/${month}/${year}`;
-  if (digits.length <= 10) return `${day}/${month}/${year} ${hour}`;
-  return `${day}/${month}/${year} ${hour}:${minute}`;
-}
-
-function isValidEuropeanDateTime(value: string): boolean {
-  if (!EUROPEAN_DATE_TIME_PATTERN.test(value)) return false;
-  const [, dayRaw, monthRaw, yearRaw, hourRaw, minuteRaw] = value.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})$/) ?? [];
-  const day = Number(dayRaw);
-  const month = Number(monthRaw);
-  const year = Number(yearRaw);
-  const hour = Number(hourRaw);
-  const minute = Number(minuteRaw);
-  if (!day || !month || !yearRaw || month < 1 || month > 12 || hour > 23 || minute > 59) return false;
-  const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
-  return date.getUTCFullYear() === year
-    && date.getUTCMonth() === month - 1
-    && date.getUTCDate() === day
-    && date.getUTCHours() === hour
-    && date.getUTCMinutes() === minute;
-}
-
 export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', className }: VisitScheduleProps) {
   const t = getTranslations(locale);
   const [isOpen, setIsOpen] = useState(false);
   const [mailtoHref, setMailtoHref] = useState('');
-  const [showMailtoNote, setShowMailtoNote] = useState(false);
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'sent' | 'fallback'>('idle');
 
   const isFooter = source === 'footer';
@@ -76,7 +42,6 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
   }, [isOpen]);
 
   const openModal = () => {
-    setShowMailtoNote(false);
     setSubmitState('idle');
     setIsOpen(true);
   };
@@ -113,7 +78,6 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
 
     const mailto = `mailto:${SHELTER_EMAIL}?subject=${encodeURIComponent(`${emailSubject} — ${contextValue}`)}&body=${encodeURIComponent(body)}`;
     setMailtoHref(mailto);
-    setShowMailtoNote(false);
     setSubmitState('submitting');
 
     const result = await submitFormSubmission({
@@ -138,7 +102,6 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
     }
 
     setSubmitState('fallback');
-    setShowMailtoNote(true);
 
     if (form.dataset.skipMailLaunch !== 'true') {
       window.location.href = mailto;
@@ -237,7 +200,7 @@ export default function VisitSchedule({ locale = 'pt', dogName, source = 'dog', 
             </p>
           )}
 
-          {showMailtoNote && mailtoHref && (
+          {submitState === 'fallback' && mailtoHref && (
             <p data-visit-mailto-note className="rounded-[1.25rem] border border-playful-line bg-white/85 px-4 py-3 text-sm font-bold leading-6 text-playful-muted">
               {t.dogProfile.visitFallbackNote}{' '}
               <a data-visit-mailto href={mailtoHref} className="playful-focus text-playful-orange-dark underline decoration-playful-orange/40 decoration-2 underline-offset-4 hover:text-playful-orange">

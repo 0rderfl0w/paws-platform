@@ -30,7 +30,8 @@ type DogPayload = {
   is_adopted?: boolean;
 };
 
-type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest' | 'volunteer';
+const FORM_SUBMISSION_KINDS = ['sponsorship', 'mbway', 'visit', 'adoption_interest', 'volunteer', 'supply_donation'] as const;
+type FormSubmissionKind = typeof FORM_SUBMISSION_KINDS[number];
 
 type FormSubmissionPayload = {
   kind?: string;
@@ -47,6 +48,7 @@ type FormSubmissionPayload = {
   business?: string;
   contributionMethod?: string;
   workTypes?: string[] | string;
+  supplyTypes?: string[] | string;
   message?: string;
   website?: string;
 };
@@ -66,6 +68,7 @@ type NormalizedFormSubmission = {
   business: string;
   contributionMethod: string;
   workTypes: string;
+  supplyTypes: string;
   message: string;
   payload: Record<string, string>;
 };
@@ -263,7 +266,7 @@ function cleanMultiline(value: unknown, maxLength = 3000): string {
   return value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().slice(0, maxLength);
 }
 
-function cleanWorkTypes(value: unknown, maxItems = 12): string {
+function cleanMultiSelectValues(value: unknown, maxItems = 12): string {
   const rawItems = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
   return rawItems
     .map((item) => cleanFormString(item, 120))
@@ -280,7 +283,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
   if (cleanFormString(input.website, 200)) return 'bot';
 
   const kind = cleanFormString(input.kind, 40) as FormSubmissionKind;
-  if (!['sponsorship', 'mbway', 'visit', 'adoption_interest', 'volunteer'].includes(kind)) throw new Error('Invalid form type');
+  if (!(FORM_SUBMISSION_KINDS as readonly string[]).includes(kind)) throw new Error('Invalid form type');
 
   const normalized: NormalizedFormSubmission = {
     kind,
@@ -296,7 +299,8 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     amount: cleanFormString(input.amount, 80),
     business: cleanFormString(input.business, 120),
     contributionMethod: cleanFormString(input.contributionMethod, 160),
-    workTypes: cleanWorkTypes(input.workTypes),
+    workTypes: cleanMultiSelectValues(input.workTypes),
+    supplyTypes: cleanMultiSelectValues(input.supplyTypes),
     message: cleanMultiline(input.message, 3000),
     payload: {},
   };
@@ -316,6 +320,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     business: normalized.business,
     contributionMethod: normalized.contributionMethod,
     workTypes: normalized.workTypes,
+    supplyTypes: normalized.supplyTypes,
     message: normalized.message,
   };
 
@@ -342,6 +347,11 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     if (!normalized.workTypes) throw new Error('At least one volunteer work type is required');
   }
 
+  if (normalized.kind === 'supply_donation') {
+    if (!normalized.preferredTime) throw new Error('Preferred drop-off time is required');
+    if (!normalized.supplyTypes) throw new Error('At least one supply donation type is required');
+  }
+
   if (normalized.kind === 'adoption_interest' && !normalized.contextValue) {
     throw new Error('Dog name is required');
   }
@@ -354,6 +364,7 @@ function formSubject(submission: NormalizedFormSubmission): string {
   if (submission.kind === 'mbway') return 'Pedido de número MB Way para donativo';
   if (submission.kind === 'adoption_interest') return `Interesse em adoção — ${submission.contextValue}`;
   if (submission.kind === 'volunteer') return 'Novo pedido de voluntariado';
+  if (submission.kind === 'supply_donation') return 'Novo pedido de donativo em espécie';
   return `Pedido de visita — ${submission.contextValue || 'Abrigo CAPA Póvoa de Lanhoso'}`;
 }
 
@@ -364,6 +375,8 @@ function formBody(submission: NormalizedFormSubmission): string {
       ? (submission.contextLabel || 'Visita')
       : submission.kind === 'volunteer'
         ? 'Voluntariado'
+        : submission.kind === 'supply_donation'
+          ? 'Donativo em espécie'
         : 'Origem';
   const lines = [
     `Novo pedido recebido através do site CAPA.`,
@@ -375,6 +388,7 @@ function formBody(submission: NormalizedFormSubmission): string {
     `Telefone: ${submission.phone || 'Não indicado'}`,
     submission.preferredTime ? `Dia/hora pretendidos: ${submission.preferredTime}` : '',
     submission.workTypes ? `Tipo(s) de voluntariado: ${submission.workTypes}` : '',
+    submission.supplyTypes ? `Tipo(s) de donativo em espécie: ${submission.supplyTypes}` : '',
     submission.amount ? `Contributo mensal pretendido: ${submission.amount}` : '',
     submission.business ? `Empresa: ${submission.business}` : '',
     submission.contributionMethod ? `Forma preferida para contribuir: ${submission.contributionMethod}` : '',

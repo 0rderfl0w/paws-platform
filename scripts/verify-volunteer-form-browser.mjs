@@ -108,6 +108,13 @@ async function capture(name) {
   return path;
 }
 
+async function captureClip(name, clip) {
+  const result = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: true, clip });
+  const path = `${screenshotDir}/${name}.png`;
+  writeFileSync(path, Buffer.from(result.data, 'base64'));
+  return path;
+}
+
 async function checkHelpLink(path, expectedHref, label) {
   await navigate(path, 1280, 900);
   return await evaluate(`(() => {
@@ -238,7 +245,10 @@ async function submitVolunteer(path, locale, mode) {
     boxes[1].checked = true;
     form.querySelector('[name="volunteer_message"]').value = 'Browser volunteer smoke';
     form.requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 650));
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-volunteer-success]') || document.querySelector('[data-volunteer-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
 
     const payload = window.__capaVolunteerRequests[0] || null;
     const successVisible = Boolean(document.querySelector('[data-volunteer-success]'));
@@ -292,7 +302,10 @@ async function checkFallback(path) {
     form.querySelector('[name="volunteer_time"]').value = '10/07/2026 09:00';
     form.querySelector('[name="volunteer_work"]').checked = true;
     form.requestSubmit();
-    await new Promise((resolve) => setTimeout(resolve, 450));
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-volunteer-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
     const mailto = document.querySelector('[data-volunteer-mailto]')?.getAttribute('href') || '';
     return {
       ok: true,
@@ -302,6 +315,163 @@ async function checkFallback(path) {
   })()`);
   if (!result.ok || !result.noteVisible || !result.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) {
     throw new Error(`Volunteer fallback failed for ${path}: ${JSON.stringify(result)}`);
+  }
+  return result;
+}
+
+async function checkSupplyDonationSection(path, expectedHref, label) {
+  await navigate(path, 1280, 900);
+  await evaluate(`document.querySelector('[data-supply-donation-link]')?.scrollIntoView({ block: 'center' })`);
+  await sleep(900);
+  const result = await evaluate(`(() => {
+    const link = document.querySelector('[data-supply-donation-link]');
+    const section = link?.closest('section');
+    return {
+      ok: Boolean(link && section),
+      path: ${JSON.stringify(path)},
+      expectedHref: ${JSON.stringify(expectedHref)},
+      href: link?.getAttribute('href') || '',
+      text: link?.textContent?.trim().replace(/\\s+/g, ' ') || '',
+      label: ${JSON.stringify(label)},
+      emailVisibleInSection: Boolean(section?.textContent?.includes('capa.geralpvl@gmail.com')),
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+      clip: link ? {
+        x: 0,
+        y: Math.max(0, link.getBoundingClientRect().top + window.scrollY - 350),
+        width: Math.min(window.innerWidth, document.documentElement.scrollWidth),
+        height: Math.min(700, document.documentElement.scrollHeight - Math.max(0, link.getBoundingClientRect().top + window.scrollY - 350)),
+        scale: 1,
+      } : null,
+    };
+  })()`);
+  result.screenshot = result.clip ? await captureClip(`supply-section-${label}`, result.clip) : await capture(`supply-section-${label}`);
+  if (!result.ok || result.href !== expectedHref || result.emailVisibleInSection || result.overflow) {
+    throw new Error(`Supply donation section failed for ${path}: ${JSON.stringify(result)}`);
+  }
+  return result;
+}
+
+async function submitSupplyDonation(path, locale, mode) {
+  await navigate(path, mode === 'mobile' ? 390 : 1365, mode === 'mobile' ? 900 : 1100);
+  const screenshot = await capture(`supply-donation-${locale}-${mode}`);
+  let bottomScreenshot = '';
+  if (mode === 'mobile') {
+    await evaluate(`document.querySelector('[data-supply-donation-form] button[type="submit"]')?.scrollIntoView({ block: 'center' })`);
+    await sleep(250);
+    bottomScreenshot = await capture(`supply-donation-${locale}-${mode}-bottom`);
+    await evaluate(`window.scrollTo(0, 0)`);
+    await sleep(150);
+  }
+  const result = await evaluate(`(async () => {
+    for (let i = 0; i < 80; i += 1) {
+      if (document.querySelector('[data-supply-donation-form]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const form = document.querySelector('[data-supply-donation-form]');
+    if (!form) return { ok: false, reason: 'missing supply donation form' };
+
+    window.__capaSupplyDonationRequests = [];
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (input, init = {}) => {
+      const requestUrl = typeof input === 'string' ? input : input?.url || '';
+      if (String(requestUrl).includes('/forms/submit')) {
+        let payload = {};
+        try { payload = JSON.parse(init?.body || '{}'); } catch {}
+        window.__capaSupplyDonationRequests.push(payload);
+        return Promise.resolve(new Response(JSON.stringify({ ok: true, emailSent: true, submissionId: 'browser-supply-qa' }), {
+          status: 201,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return originalFetch(input, init);
+    };
+
+    form.dataset.skipMailLaunch = 'true';
+    form.querySelector('[name="supply_name"]').value = ${JSON.stringify(locale === 'pt' ? 'Doador QA' : 'QA Donor')};
+    form.querySelector('[name="supply_email"]').value = 'qa-donor@example.com';
+    form.querySelector('[name="supply_phone"]').value = '';
+    form.querySelector('[name="supply_time"]').value = '11/07/2026 15:00';
+    const boxes = [...form.querySelectorAll('[name="supply_type"]')];
+    boxes[0].checked = true;
+    boxes[1].checked = true;
+    form.querySelector('[name="supply_message"]').value = 'Browser supply donation smoke';
+    form.requestSubmit();
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-supply-success]') || document.querySelector('[data-supply-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    const payload = window.__capaSupplyDonationRequests[0] || null;
+    const successVisible = Boolean(document.querySelector('[data-supply-success]'));
+    const noteVisible = Boolean(document.querySelector('[data-supply-mailto-note]'));
+    const phone = form.querySelector('[name="supply_phone"]');
+    const time = form.querySelector('[name="supply_time"]');
+    const languageLinks = [...document.querySelectorAll('[data-playful-language-link]')].map((link) => ({ locale: link.getAttribute('data-locale'), href: link.getAttribute('href') }));
+    return {
+      ok: true,
+      title: document.title,
+      htmlLang: document.documentElement.lang,
+      successVisible,
+      noteVisible,
+      payload,
+      checkboxCount: boxes.length,
+      phoneRequired: phone?.hasAttribute('required') || false,
+      timeType: time?.getAttribute('type') || '',
+      timePlaceholder: time?.getAttribute('placeholder') || '',
+      languageLinks,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+      screenshot: ${JSON.stringify(screenshot)},
+      bottomScreenshot: ${JSON.stringify(bottomScreenshot)},
+    };
+  })()`);
+  if (!result.ok) throw new Error(`Supply donation form check failed for ${path}: ${result.reason}`);
+  if (!result.successVisible) throw new Error(`Supply donation success state missing for ${path}: ${JSON.stringify(result)}`);
+  if (result.noteVisible) throw new Error(`Supply donation fallback note appeared on mocked success for ${path}: ${JSON.stringify(result)}`);
+  if (!result.payload || result.payload.kind !== 'supply_donation' || result.payload.source !== 'supply-donation-form') throw new Error(`Supply donation payload missing for ${path}: ${JSON.stringify(result)}`);
+  if (!Array.isArray(result.payload.supplyTypes) || result.payload.supplyTypes.length !== 2) throw new Error(`Supply donation supplyTypes missing for ${path}: ${JSON.stringify(result)}`);
+  if (result.payload.phone !== '') throw new Error(`Supply donation phone should be optional/empty for ${path}: ${JSON.stringify(result)}`);
+  if (result.phoneRequired) throw new Error(`Supply donation phone field is required for ${path}: ${JSON.stringify(result)}`);
+  if (result.timeType !== 'text') throw new Error(`Supply donation time input should be text for ${path}: ${JSON.stringify(result)}`);
+  if (!result.timePlaceholder.startsWith('dd/mm/')) throw new Error(`Supply donation time placeholder is not European day/month/year for ${path}: ${JSON.stringify(result)}`);
+  if (locale === 'en' && !result.languageLinks.some((link) => link.locale === 'pt' && link.href.includes('/ajudar/formulario-donativos-em-especie'))) {
+    throw new Error(`Supply donation English page language link should point to PT supply form for ${path}: ${JSON.stringify(result)}`);
+  }
+  if (locale === 'pt' && !result.languageLinks.some((link) => link.locale === 'en' && link.href.includes('/en/help/supply-donation-form'))) {
+    throw new Error(`Supply donation Portuguese page language link should point to EN supply form for ${path}: ${JSON.stringify(result)}`);
+  }
+  if (result.overflow) throw new Error(`Supply donation page overflows horizontally for ${path}: ${JSON.stringify(result)}`);
+  return result;
+}
+
+async function checkSupplyFallback(path) {
+  await navigate(path, 1280, 900);
+  const result = await evaluate(`(async () => {
+    for (let i = 0; i < 80; i += 1) {
+      if (document.querySelector('[data-supply-donation-form]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const form = document.querySelector('[data-supply-donation-form]');
+    if (!form) return { ok: false, reason: 'missing supply donation form' };
+    form.dataset.skipBackend = 'true';
+    form.dataset.skipMailLaunch = 'true';
+    form.querySelector('[name="supply_name"]').value = 'Fallback QA';
+    form.querySelector('[name="supply_email"]').value = 'fallback@example.com';
+    form.querySelector('[name="supply_time"]').value = '12/07/2026 09:00';
+    form.querySelector('[name="supply_type"]').checked = true;
+    form.requestSubmit();
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-supply-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const mailto = document.querySelector('[data-supply-mailto]')?.getAttribute('href') || '';
+    return {
+      ok: true,
+      noteVisible: Boolean(document.querySelector('[data-supply-mailto-note]')),
+      mailto,
+    };
+  })()`);
+  if (!result.ok || !result.noteVisible || !result.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) {
+    throw new Error(`Supply donation fallback failed for ${path}: ${JSON.stringify(result)}`);
   }
   return result;
 }
@@ -352,6 +522,9 @@ try {
   if (!helpEn.ok || helpEn.overflow) throw new Error(`English help link failed: ${JSON.stringify(helpEn)}`);
   if (!helpPt.ok || helpPt.overflow) throw new Error(`Portuguese help link failed: ${JSON.stringify(helpPt)}`);
 
+  const supplySectionEn = await checkSupplyDonationSection('/en/help/', '/en/help/supply-donation-form', 'en');
+  const supplySectionPt = await checkSupplyDonationSection('/ajudar/', '/ajudar/formulario-donativos-em-especie', 'pt');
+
   const heroPt = await checkHeroActions('/ajudar/', '/ajudar/formulario-voluntariado', 'hero-pt-donate', 'Doar', 'pt');
   const heroEn = await checkHeroActions('/en/help/', '/en/help/volunteer-form', 'hero-en-donate', 'Donate', 'en');
   const heroPtMobile = await checkHeroActions('/ajudar/', '/ajudar/formulario-voluntariado', 'hero-pt-donate', 'Doar', 'pt', 'mobile');
@@ -363,8 +536,12 @@ try {
   const formPtDesktop = await submitVolunteer('/ajudar/formulario-voluntariado/', 'pt', 'desktop');
   const formEnMobile = await submitVolunteer('/en/help/volunteer-form/', 'en', 'mobile');
   const fallback = await checkFallback('/en/help/volunteer-form/');
+  const supplyEnDesktop = await submitSupplyDonation('/en/help/supply-donation-form/', 'en', 'desktop');
+  const supplyPtDesktop = await submitSupplyDonation('/ajudar/formulario-donativos-em-especie/', 'pt', 'desktop');
+  const supplyEnMobile = await submitSupplyDonation('/en/help/supply-donation-form/', 'en', 'mobile');
+  const supplyFallback = await checkSupplyFallback('/en/help/supply-donation-form/');
 
-  console.log(JSON.stringify({ ok: true, baseUrl, helpEn, helpPt, heroPt, heroEn, heroPtMobile, heroEnMobile, siblingPt, siblingEn, formEnDesktop, formPtDesktop, formEnMobile, fallback }, null, 2));
+  console.log(JSON.stringify({ ok: true, baseUrl, helpEn, helpPt, supplySectionEn, supplySectionPt, heroPt, heroEn, heroPtMobile, heroEnMobile, siblingPt, siblingEn, formEnDesktop, formPtDesktop, formEnMobile, fallback, supplyEnDesktop, supplyPtDesktop, supplyEnMobile, supplyFallback }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));
