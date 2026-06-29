@@ -199,7 +199,41 @@ try {
     throw new Error(`Expected supply donation missing type rejection: ${JSON.stringify(supplyDonationMissingTypes)}`);
   }
 
-  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, volunteer: volunteer.body, supplyDonation: supplyDonation.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
+  const fosterHome = await post(baseUrl, {
+    kind: 'foster_home',
+    locale: 'en',
+    source: 'foster-home-form',
+    pageUrl: 'https://capapvl.org/en/help/foster-home-form',
+    contextLabel: 'Foster family',
+    contextValue: 'CAPA temporary foster home request',
+    name: 'QA Foster',
+    email: 'qa-foster@example.com',
+    phone: '',
+    fosterDetails: {
+      'Town / parish': 'Póvoa de Lanhoso',
+      'Home type': 'House',
+      'Outdoor space available': ['Fenced yard / garden'],
+      'How long can you foster?': ['2 to 4 weeks'],
+    },
+    message: 'Foster home verifier',
+  });
+  if (fosterHome.status !== 201 || !fosterHome.body.ok || !fosterHome.body.emailSent) {
+    throw new Error(`Expected foster home dry-run submission to return 201/emailSent: ${JSON.stringify(fosterHome)}`);
+  }
+
+  const fosterHomeMissingDetails = await post(baseUrl, {
+    kind: 'foster_home',
+    locale: 'en',
+    source: 'verify-form-endpoint',
+    pageUrl: 'https://capapvl.org/en/help/foster-home-form',
+    name: 'QA Foster',
+    email: 'qa-foster@example.com',
+  });
+  if (fosterHomeMissingDetails.status !== 400 || !String(fosterHomeMissingDetails.body.error || '').includes('Foster home details')) {
+    throw new Error(`Expected foster home missing details rejection: ${JSON.stringify(fosterHomeMissingDetails)}`);
+  }
+
+  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, volunteer: volunteer.body, supplyDonation: supplyDonation.body, fosterHome: fosterHome.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
 } finally {
   if (serverProcess) {
     serverProcess.kill('SIGTERM');

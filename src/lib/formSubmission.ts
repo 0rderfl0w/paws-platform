@@ -1,7 +1,7 @@
 const API_BASE_URL = (import.meta.env.PUBLIC_CAPA_API_URL || '').replace(/\/$/, '');
 const FORM_SUBMISSION_TIMEOUT_MS = 10000;
 
-export type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest' | 'volunteer' | 'supply_donation';
+export type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest' | 'volunteer' | 'supply_donation' | 'foster_home';
 
 export type FormSubmissionPayload = {
   kind: FormSubmissionKind;
@@ -19,6 +19,7 @@ export type FormSubmissionPayload = {
   contributionMethod?: string;
   workTypes?: string[] | string;
   supplyTypes?: string[] | string;
+  fosterDetails?: Record<string, string | string[]>;
   message?: string;
   website?: string;
 };

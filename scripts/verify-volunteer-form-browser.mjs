@@ -322,7 +322,7 @@ async function checkFallback(path) {
 async function checkSupplyDonationSection(path, expectedHref, label) {
   await navigate(path, 1280, 900);
   await evaluate(`document.querySelector('[data-supply-donation-link]')?.scrollIntoView({ block: 'center' })`);
-  await sleep(900);
+  await sleep(1600);
   const result = await evaluate(`(() => {
     const link = document.querySelector('[data-supply-donation-link]');
     const section = link?.closest('section');
@@ -476,6 +476,215 @@ async function checkSupplyFallback(path) {
   return result;
 }
 
+async function checkFosterSection(path, expectedHref, label) {
+  await navigate(path, 1280, 900);
+  await evaluate(`document.querySelector('[data-foster-home-link]')?.scrollIntoView({ block: 'center' })`);
+  await sleep(1600);
+  const result = await evaluate(`(() => {
+    const link = document.querySelector('[data-foster-home-link]');
+    const section = link?.closest('section');
+    return {
+      ok: Boolean(link && section),
+      path: ${JSON.stringify(path)},
+      expectedHref: ${JSON.stringify(expectedHref)},
+      href: link?.getAttribute('href') || '',
+      text: link?.textContent?.trim().replace(/\\s+/g, ' ') || '',
+      label: ${JSON.stringify(label)},
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+      clip: link ? {
+        x: 0,
+        y: Math.max(0, link.getBoundingClientRect().top + window.scrollY - 350),
+        width: Math.min(window.innerWidth, document.documentElement.scrollWidth),
+        height: Math.min(700, document.documentElement.scrollHeight - Math.max(0, link.getBoundingClientRect().top + window.scrollY - 350)),
+        scale: 1,
+      } : null,
+    };
+  })()`);
+  if (!result.ok) throw new Error(`Foster CTA missing for ${path}: ${JSON.stringify(result)}`);
+  if (result.href !== expectedHref) throw new Error(`Foster CTA href mismatch for ${path}: ${JSON.stringify(result)}`);
+  if (result.overflow) throw new Error(`Foster CTA section overflows for ${path}: ${JSON.stringify(result)}`);
+  result.screenshot = result.clip ? await captureClip(`foster-section-${label}`, result.clip) : await capture(`foster-section-${label}`);
+  return result;
+}
+
+async function submitFosterHome(path, locale, mode) {
+  await navigate(path, mode === 'mobile' ? 390 : 1365, mode === 'mobile' ? 900 : 1100);
+  const screenshot = await capture(`foster-${locale}-${mode}`);
+  let fieldsScreenshot = '';
+  if (mode === 'mobile') {
+    await evaluate(`document.querySelector('[name="foster_name"]')?.scrollIntoView({ block: 'center' })`);
+    await sleep(250);
+    fieldsScreenshot = await capture(`foster-${locale}-${mode}-fields`);
+    await evaluate(`window.scrollTo(0, 0)`);
+    await sleep(150);
+  }
+  let bottomScreenshot = '';
+  const result = await evaluate(`(async () => {
+    for (let i = 0; i < 80; i += 1) {
+      if (document.querySelector('[data-foster-home-form]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const form = document.querySelector('[data-foster-home-form]');
+    if (!form) return { ok: false, reason: 'missing foster form' };
+
+    window.__capaFosterRequests = [];
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (input, init = {}) => {
+      const url = String(input);
+      if (url.includes('/forms/submit')) {
+        const payload = JSON.parse(init.body || '{}');
+        window.__capaFosterRequests.push(payload);
+        return new Response(JSON.stringify({ ok: true, submissionId: 'foster-browser-smoke', emailSent: true, dryRun: true }), { status: 201, headers: { 'Content-Type': 'application/json' } });
+      }
+      return originalFetch(input, init);
+    };
+
+    const set = (name, value) => { const field = form.querySelector('[name="' + name + '"]'); if (field) field.value = value; };
+    const checkValue = (name, index = 0) => { const fields = [...form.querySelectorAll('[name="' + name + '"]')]; if (fields[index]) fields[index].checked = true; };
+    form.dataset.skipMailLaunch = 'true';
+    set('foster_name', ${JSON.stringify(locale === 'pt' ? 'FAT QA' : 'QA Foster')});
+    set('foster_email', 'qa-foster@example.com');
+    set('foster_phone', '');
+    set('foster_area', 'Póvoa de Lanhoso');
+    checkValue('contact_method', 0);
+    form.querySelector('[data-foster-next]')?.click();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+
+    checkValue('home_type', 1);
+    checkValue('housing_status', 0);
+    checkValue('outdoor_space', 3);
+    checkValue('household_agreement', 0);
+    set('household_adults', '2 adults');
+    set('children_at_home', 'No children');
+    set('current_pets', 'One calm adult dog');
+    form.querySelector('[data-foster-next]')?.click();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+
+    checkValue('foster_experience', 1);
+    checkValue('dog_experience', 1);
+    checkValue('dog_experience', 3);
+    checkValue('care_comfort', 0);
+    checkValue('care_comfort', 4);
+    checkValue('transport', 0);
+    form.querySelector('[data-foster-next]')?.click();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+
+    set('availability_start', 'From 15/07');
+    checkValue('duration', 1);
+    checkValue('duration', 2);
+    checkValue('hours_alone', 1);
+    checkValue('animal_preferences', 1);
+    checkValue('animal_preferences', 5);
+    checkValue('size_preferences', 1);
+    checkValue('size_preferences', 3);
+    form.querySelector('[data-foster-next]')?.click();
+    await new Promise((resolve) => setTimeout(resolve, 120));
+
+    set('limits', 'No large reactive dogs for the first foster.');
+    set('foster_message', 'Browser foster smoke');
+    checkValue('foster_commitment', 0);
+    checkValue('foster_permission', 0);
+    if (${JSON.stringify(mode === 'mobile')}) {
+      document.querySelector('[data-foster-submit]')?.scrollIntoView({ block: 'center' });
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    form.querySelector('[data-foster-submit]')?.click();
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-foster-success]') || document.querySelector('[data-foster-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    const payload = window.__capaFosterRequests[0] || null;
+    const successVisible = Boolean(document.querySelector('[data-foster-success]'));
+    const noteVisible = Boolean(document.querySelector('[data-foster-mailto-note]'));
+    const languageLinks = [...document.querySelectorAll('[data-playful-language-link]')].map((link) => ({ locale: link.getAttribute('data-locale'), href: link.getAttribute('href') }));
+    return {
+      ok: true,
+      title: document.title,
+      htmlLang: document.documentElement.lang,
+      successVisible,
+      noteVisible,
+      payload,
+      stepIndex: document.querySelector('[data-foster-step-index]')?.textContent?.trim() || '',
+      languageLinks,
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 2,
+      screenshot: ${JSON.stringify(screenshot)},
+      fieldsScreenshot: ${JSON.stringify(fieldsScreenshot)},
+      bottomScreenshot: '',
+    };
+  })()`);
+  if (mode === 'mobile') {
+    await evaluate(`document.querySelector('[data-foster-submit]')?.scrollIntoView({ block: 'center' })`);
+    await sleep(250);
+    bottomScreenshot = await capture(`foster-${locale}-${mode}-bottom`);
+    result.bottomScreenshot = bottomScreenshot;
+  }
+  if (!result.ok) throw new Error(`Foster form check failed for ${path}: ${result.reason}`);
+  if (!result.successVisible) throw new Error(`Foster success state missing for ${path}: ${JSON.stringify(result)}`);
+  if (result.noteVisible) throw new Error(`Foster fallback note appeared on mocked success for ${path}: ${JSON.stringify(result)}`);
+  if (!result.payload || result.payload.kind !== 'foster_home' || result.payload.source !== 'foster-home-form') throw new Error(`Foster payload missing for ${path}: ${JSON.stringify(result)}`);
+  if (!result.payload.fosterDetails || Object.keys(result.payload.fosterDetails).length < 10) throw new Error(`Foster details are incomplete for ${path}: ${JSON.stringify(result)}`);
+  if (result.payload.phone !== '') throw new Error(`Foster phone should be optional/empty for ${path}: ${JSON.stringify(result)}`);
+  if (locale === 'en' && !result.languageLinks.some((link) => link.locale === 'pt' && link.href.includes('/ajudar/formulario-familia-acolhimento'))) {
+    throw new Error(`Foster English page language link should point to PT foster form for ${path}: ${JSON.stringify(result)}`);
+  }
+  if (locale === 'pt' && !result.languageLinks.some((link) => link.locale === 'en' && link.href.includes('/en/help/foster-home-form'))) {
+    throw new Error(`Foster Portuguese page language link should point to EN foster form for ${path}: ${JSON.stringify(result)}`);
+  }
+  if (result.overflow) throw new Error(`Foster page overflows horizontally for ${path}: ${JSON.stringify(result)}`);
+  return result;
+}
+
+async function checkFosterFallback(path) {
+  await navigate(path, 1280, 900);
+  const result = await evaluate(`(async () => {
+    for (let i = 0; i < 80; i += 1) {
+      if (document.querySelector('[data-foster-home-form]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const form = document.querySelector('[data-foster-home-form]');
+    if (!form) return { ok: false, reason: 'missing foster form' };
+    const set = (name, value) => { const field = form.querySelector('[name="' + name + '"]'); if (field) field.value = value; };
+    const checkValue = (name, index = 0) => { const fields = [...form.querySelectorAll('[name="' + name + '"]')]; if (fields[index]) fields[index].checked = true; };
+    form.dataset.skipBackend = 'true';
+    form.dataset.skipMailLaunch = 'true';
+    set('foster_name', 'Fallback Foster');
+    set('foster_email', 'fallback-foster@example.com');
+    set('foster_area', 'Braga');
+    checkValue('contact_method', 0);
+    checkValue('home_type', 1);
+    checkValue('housing_status', 0);
+    checkValue('outdoor_space', 3);
+    checkValue('household_agreement', 0);
+    checkValue('foster_experience', 1);
+    checkValue('dog_experience', 1);
+    checkValue('care_comfort', 0);
+    checkValue('transport', 0);
+    set('availability_start', 'Immediately');
+    checkValue('duration', 1);
+    checkValue('hours_alone', 1);
+    checkValue('animal_preferences', 1);
+    checkValue('size_preferences', 1);
+    checkValue('foster_commitment', 0);
+    checkValue('foster_permission', 0);
+    form.requestSubmit();
+    for (let i = 0; i < 40; i += 1) {
+      if (document.querySelector('[data-foster-mailto-note]')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const mailto = document.querySelector('[data-foster-mailto]')?.getAttribute('href') || '';
+    return {
+      ok: true,
+      noteVisible: Boolean(document.querySelector('[data-foster-mailto-note]')),
+      mailto,
+    };
+  })()`);
+  if (!result.ok || !result.noteVisible || !result.mailto.startsWith('mailto:capa.geralpvl@gmail.com')) {
+    throw new Error(`Foster fallback failed for ${path}: ${JSON.stringify(result)}`);
+  }
+  return result;
+}
+
 try {
   browser = spawn(chromium, [
     '--headless=new',
@@ -524,6 +733,8 @@ try {
 
   const supplySectionEn = await checkSupplyDonationSection('/en/help/', '/en/help/supply-donation-form', 'en');
   const supplySectionPt = await checkSupplyDonationSection('/ajudar/', '/ajudar/formulario-donativos-em-especie', 'pt');
+  const fosterSectionEn = await checkFosterSection('/en/help/', '/en/help/foster-home-form', 'en');
+  const fosterSectionPt = await checkFosterSection('/ajudar/', '/ajudar/formulario-familia-acolhimento', 'pt');
 
   const heroPt = await checkHeroActions('/ajudar/', '/ajudar/formulario-voluntariado', 'hero-pt-donate', 'Doar', 'pt');
   const heroEn = await checkHeroActions('/en/help/', '/en/help/volunteer-form', 'hero-en-donate', 'Donate', 'en');
@@ -540,8 +751,12 @@ try {
   const supplyPtDesktop = await submitSupplyDonation('/ajudar/formulario-donativos-em-especie/', 'pt', 'desktop');
   const supplyEnMobile = await submitSupplyDonation('/en/help/supply-donation-form/', 'en', 'mobile');
   const supplyFallback = await checkSupplyFallback('/en/help/supply-donation-form/');
+  const fosterEnDesktop = await submitFosterHome('/en/help/foster-home-form/', 'en', 'desktop');
+  const fosterPtDesktop = await submitFosterHome('/ajudar/formulario-familia-acolhimento/', 'pt', 'desktop');
+  const fosterEnMobile = await submitFosterHome('/en/help/foster-home-form/', 'en', 'mobile');
+  const fosterFallback = await checkFosterFallback('/en/help/foster-home-form/');
 
-  console.log(JSON.stringify({ ok: true, baseUrl, helpEn, helpPt, supplySectionEn, supplySectionPt, heroPt, heroEn, heroPtMobile, heroEnMobile, siblingPt, siblingEn, formEnDesktop, formPtDesktop, formEnMobile, fallback, supplyEnDesktop, supplyPtDesktop, supplyEnMobile, supplyFallback }, null, 2));
+  console.log(JSON.stringify({ ok: true, baseUrl, helpEn, helpPt, supplySectionEn, supplySectionPt, fosterSectionEn, fosterSectionPt, heroPt, heroEn, heroPtMobile, heroEnMobile, siblingPt, siblingEn, formEnDesktop, formPtDesktop, formEnMobile, fallback, supplyEnDesktop, supplyPtDesktop, supplyEnMobile, supplyFallback, fosterEnDesktop, fosterPtDesktop, fosterEnMobile, fosterFallback }, null, 2));
 } finally {
   for (const { reject, method } of pending.values()) {
     reject(new Error(`${method}: browser verifier shutting down`));

@@ -30,7 +30,7 @@ type DogPayload = {
   is_adopted?: boolean;
 };
 
-const FORM_SUBMISSION_KINDS = ['sponsorship', 'mbway', 'visit', 'adoption_interest', 'volunteer', 'supply_donation'] as const;
+const FORM_SUBMISSION_KINDS = ['sponsorship', 'mbway', 'visit', 'adoption_interest', 'volunteer', 'supply_donation', 'foster_home'] as const;
 type FormSubmissionKind = typeof FORM_SUBMISSION_KINDS[number];
 
 type FormSubmissionPayload = {
@@ -49,6 +49,7 @@ type FormSubmissionPayload = {
   contributionMethod?: string;
   workTypes?: string[] | string;
   supplyTypes?: string[] | string;
+  fosterDetails?: Record<string, unknown>;
   message?: string;
   website?: string;
 };
@@ -69,8 +70,9 @@ type NormalizedFormSubmission = {
   contributionMethod: string;
   workTypes: string;
   supplyTypes: string;
+  fosterDetails: Record<string, string | string[]>;
   message: string;
-  payload: Record<string, string>;
+  payload: Record<string, unknown>;
 };
 
 const PORT = Number(process.env.PORT ?? 3314);
@@ -275,6 +277,33 @@ function cleanMultiSelectValues(value: unknown, maxItems = 12): string {
     .join(', ');
 }
 
+function cleanStructuredDetails(value: unknown, maxKeys = 40): Record<string, string | string[]> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+  const entries = Object.entries(value as Record<string, unknown>).slice(0, maxKeys);
+  const cleaned: Record<string, string | string[]> = {};
+
+  for (const [rawKey, rawValue] of entries) {
+    const key = cleanFormString(rawKey, 80);
+    if (!key) continue;
+
+    if (Array.isArray(rawValue)) {
+      const values = rawValue
+        .map((item) => cleanFormString(item, 180))
+        .filter(Boolean)
+        .slice(0, 20);
+      if (values.length > 0) cleaned[key] = values;
+      continue;
+    }
+
+    const scalar = typeof rawValue === 'string' || typeof rawValue === 'number' || typeof rawValue === 'boolean'
+      ? cleanFormString(String(rawValue), 500)
+      : '';
+    if (scalar) cleaned[key] = scalar;
+  }
+
+  return cleaned;
+}
+
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
@@ -301,6 +330,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     contributionMethod: cleanFormString(input.contributionMethod, 160),
     workTypes: cleanMultiSelectValues(input.workTypes),
     supplyTypes: cleanMultiSelectValues(input.supplyTypes),
+    fosterDetails: cleanStructuredDetails(input.fosterDetails),
     message: cleanMultiline(input.message, 3000),
     payload: {},
   };
@@ -321,6 +351,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     contributionMethod: normalized.contributionMethod,
     workTypes: normalized.workTypes,
     supplyTypes: normalized.supplyTypes,
+    fosterDetails: normalized.fosterDetails,
     message: normalized.message,
   };
 
@@ -352,6 +383,10 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     if (!normalized.supplyTypes) throw new Error('At least one supply donation type is required');
   }
 
+  if (normalized.kind === 'foster_home' && Object.keys(normalized.fosterDetails).length === 0) {
+    throw new Error('Foster home details are required');
+  }
+
   if (normalized.kind === 'adoption_interest' && !normalized.contextValue) {
     throw new Error('Dog name is required');
   }
@@ -365,7 +400,15 @@ function formSubject(submission: NormalizedFormSubmission): string {
   if (submission.kind === 'adoption_interest') return `Interesse em adoção — ${submission.contextValue}`;
   if (submission.kind === 'volunteer') return 'Novo pedido de voluntariado';
   if (submission.kind === 'supply_donation') return 'Novo pedido de donativo em espécie';
+  if (submission.kind === 'foster_home') return 'Novo pedido de família de acolhimento temporário';
   return `Pedido de visita — ${submission.contextValue || 'Abrigo CAPA Póvoa de Lanhoso'}`;
+}
+
+function formatStructuredDetails(details: Record<string, string | string[]>): string[] {
+  return Object.entries(details).map(([key, value]) => {
+    const rendered = Array.isArray(value) ? value.join(', ') : value;
+    return `${key}: ${rendered}`;
+  });
 }
 
 function formBody(submission: NormalizedFormSubmission): string {
@@ -377,6 +420,8 @@ function formBody(submission: NormalizedFormSubmission): string {
         ? 'Voluntariado'
         : submission.kind === 'supply_donation'
           ? 'Donativo em espécie'
+          : submission.kind === 'foster_home'
+            ? 'Família FAT'
         : 'Origem';
   const lines = [
     `Novo pedido recebido através do site CAPA.`,
@@ -389,6 +434,8 @@ function formBody(submission: NormalizedFormSubmission): string {
     submission.preferredTime ? `Dia/hora pretendidos: ${submission.preferredTime}` : '',
     submission.workTypes ? `Tipo(s) de voluntariado: ${submission.workTypes}` : '',
     submission.supplyTypes ? `Tipo(s) de donativo em espécie: ${submission.supplyTypes}` : '',
+    submission.kind === 'foster_home' ? 'Detalhes da família de acolhimento:' : '',
+    ...(submission.kind === 'foster_home' ? formatStructuredDetails(submission.fosterDetails) : []),
     submission.amount ? `Contributo mensal pretendido: ${submission.amount}` : '',
     submission.business ? `Empresa: ${submission.business}` : '',
     submission.contributionMethod ? `Forma preferida para contribuir: ${submission.contributionMethod}` : '',

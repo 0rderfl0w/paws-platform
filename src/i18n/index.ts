@@ -24,7 +24,7 @@ export function getLocaleFromUrl(url: URL): Locale {
 }
 
 /** Route mappings: PT path ↔ EN path */
-export const routeMap = {
+export const routeMap: Record<string, string> = {
   '/': '/en/',
   '/caes': '/en/dogs',
   '/cao': '/en/dog',
@@ -32,9 +32,10 @@ export const routeMap = {
   '/ajudar': '/en/help',
   '/ajudar/formulario-voluntariado': '/en/help/volunteer-form',
   '/ajudar/formulario-donativos-em-especie': '/en/help/supply-donation-form',
+  '/ajudar/formulario-familia-acolhimento': '/en/help/foster-home-form',
   '/sobre-nos': '/en/about',
   '/admin': '/en/admin',
-} as const satisfies Record<string, string>;
+};
 
 const reverseRouteMap: Record<string, string> = Object.fromEntries(
   Object.entries(routeMap).map(([pt, en]) => [en, pt])
