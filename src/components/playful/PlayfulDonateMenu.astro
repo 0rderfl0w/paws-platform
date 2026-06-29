@@ -8,6 +8,9 @@ interface Props {
   mode?: 'menu' | 'mbway-button' | 'card-menu';
   instanceId?: string;
   buttonLabel?: string;
+  menuButtonClass?: string;
+  menuPanelClass?: string;
+  rootClass?: string;
   cardClass?: string;
 }
 
@@ -17,6 +20,9 @@ const {
   mode = 'menu',
   instanceId = `donate-${locale}-${variant}`,
   buttonLabel,
+  menuButtonClass,
+  menuPanelClass,
+  rootClass = 'relative',
   cardClass = 'card-pillowy playful-focus block w-full rounded-playful border border-playful-line/70 bg-playful-cream p-7 text-center shadow-pillowy',
 } = Astro.props;
 
@@ -79,22 +85,24 @@ const menuId = `${instanceId}-menu`;
 const buttonId = `${instanceId}-button`;
 const dialogId = `${instanceId}-mbway-dialog`;
 
-const buttonClass = variant === 'desktop'
+const defaultButtonClass = variant === 'desktop'
   ? 'squishy playful-focus inline-flex items-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-sm font-extrabold text-white shadow-squish'
   : 'playful-focus flex w-full items-center justify-center gap-2 rounded-full bg-playful-orange px-5 py-3 text-center text-sm font-extrabold text-white shadow-squish';
+const buttonClass = menuButtonClass ?? defaultButtonClass;
 
-const panelClass = mode === 'card-menu'
+const defaultPanelClass = mode === 'card-menu'
   ? 'absolute bottom-full left-1/2 z-[80] mb-3 w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-[1.5rem] border border-playful-line bg-white/96 p-2 text-left shadow-pillowy-lg backdrop-blur-md'
   : variant === 'desktop'
     ? 'absolute right-0 top-full z-[80] mt-3 w-72 rounded-[1.5rem] border border-playful-line bg-white/96 p-2 text-left shadow-pillowy-lg backdrop-blur-md'
     : 'mt-3 w-full rounded-[1.5rem] border border-playful-line bg-white/92 p-2 text-left shadow-pillowy';
+const panelClass = menuPanelClass ?? defaultPanelClass;
 
 const itemClass = 'playful-focus flex w-full items-start gap-3 rounded-[1.1rem] px-4 py-3 text-left transition-colors hover:bg-playful-peach/70';
 const standaloneButtonLabel = buttonLabel ?? labels.submit;
 ---
 
 {mode === 'menu' || mode === 'card-menu' ? (
-  <div data-donate-menu={instanceId} class="relative">
+  <div data-donate-menu={instanceId} class={rootClass}>
     <button
       id={buttonId}
       data-donate-toggle
@@ -109,7 +117,7 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
         <slot />
       ) : (
         <>
-          <span>{labels.donate}</span>
+          <span>{buttonLabel ?? labels.donate}</span>
           <span aria-hidden="true">❤</span>
           <span data-donate-chevron aria-hidden="true" class="text-xs transition-transform">▾</span>
         </>
@@ -222,15 +230,33 @@ const standaloneButtonLabel = buttonLabel ?? labels.submit;
     donateChevron?.classList.toggle('rotate-180', isOpen);
   };
 
+  const closeSiblingDonateMenus = () => {
+    document.querySelectorAll('[data-donate-menu]').forEach((root) => {
+      if (root === donateRoot) return;
+      root.querySelector('[data-donate-panel]')?.classList.add('hidden');
+      root.querySelector('[data-donate-toggle]')?.setAttribute('aria-expanded', 'false');
+      root.querySelector('[data-donate-chevron]')?.classList.remove('rotate-180');
+    });
+  };
+
+  const scrollDonatePanelIntoView = () => {
+    if (!donatePanel) return;
+    window.requestAnimationFrame(() => {
+      const rect = donatePanel.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const isNarrow = window.matchMedia('(max-width: 639px)').matches;
+      if (isNarrow || rect.bottom > viewportHeight || rect.top < 0) {
+        donatePanel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+    });
+  };
+
   donateToggle?.addEventListener('click', (event) => {
     event.stopPropagation();
     const shouldOpen = donatePanel?.classList.contains('hidden') ?? true;
+    if (shouldOpen) closeSiblingDonateMenus();
     setDonateOpen(shouldOpen);
-    if (shouldOpen && variant === 'mobile') {
-      window.requestAnimationFrame(() => {
-        donatePanel?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-      });
-    }
+    if (shouldOpen) scrollDonatePanelIntoView();
   });
 
   donatePanel?.addEventListener('click', (event) => {

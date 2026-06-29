@@ -1,5 +1,9 @@
 # CHANGELOG — capapvl.pt
 
+## 2026-06-29
+- Help hero: changed the primary hero actions to `Voluntariado` / `Volunteer` links that open the new volunteer form pages and `Doar` / `Donate` dropdowns that reuse the site donation menu options.
+- Help volunteering: added bilingual volunteer scheduling form routes at `/en/help/volunteer-form` and `/ajudar/formulario-voluntariado`, linked them from both help pages, and extended the existing backend-backed form submission/email flow for volunteer requests with multi-select work types, required email, optional phone, and preferred time.
+
 ## 2026-06-22
 - Footer: changed the bottom credit to “Made with ❤️ by RichKapp”, with RichKapp underlined and opening `https://richkapp.com/websites` in a new tab.
 - Forms: replaced the native browser date-time picker in visit scheduling with a CAPA-controlled European `dd/mm/yyyy hh:mm` 24-hour field so Portuguese and English visitors do not see US `mm/dd/yyyy` formatting.

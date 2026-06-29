@@ -30,7 +30,7 @@ type DogPayload = {
   is_adopted?: boolean;
 };
 
-type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest';
+type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest' | 'volunteer';
 
 type FormSubmissionPayload = {
   kind?: string;
@@ -46,6 +46,7 @@ type FormSubmissionPayload = {
   amount?: string;
   business?: string;
   contributionMethod?: string;
+  workTypes?: string[] | string;
   message?: string;
   website?: string;
 };
@@ -64,6 +65,7 @@ type NormalizedFormSubmission = {
   amount: string;
   business: string;
   contributionMethod: string;
+  workTypes: string;
   message: string;
   payload: Record<string, string>;
 };
@@ -261,6 +263,15 @@ function cleanMultiline(value: unknown, maxLength = 3000): string {
   return value.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().slice(0, maxLength);
 }
 
+function cleanWorkTypes(value: unknown, maxItems = 12): string {
+  const rawItems = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
+  return rawItems
+    .map((item) => cleanFormString(item, 120))
+    .filter(Boolean)
+    .slice(0, maxItems)
+    .join(', ');
+}
+
 function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
@@ -269,7 +280,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
   if (cleanFormString(input.website, 200)) return 'bot';
 
   const kind = cleanFormString(input.kind, 40) as FormSubmissionKind;
-  if (!['sponsorship', 'mbway', 'visit', 'adoption_interest'].includes(kind)) throw new Error('Invalid form type');
+  if (!['sponsorship', 'mbway', 'visit', 'adoption_interest', 'volunteer'].includes(kind)) throw new Error('Invalid form type');
 
   const normalized: NormalizedFormSubmission = {
     kind,
@@ -285,6 +296,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     amount: cleanFormString(input.amount, 80),
     business: cleanFormString(input.business, 120),
     contributionMethod: cleanFormString(input.contributionMethod, 160),
+    workTypes: cleanWorkTypes(input.workTypes),
     message: cleanMultiline(input.message, 3000),
     payload: {},
   };
@@ -303,6 +315,7 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     amount: normalized.amount,
     business: normalized.business,
     contributionMethod: normalized.contributionMethod,
+    workTypes: normalized.workTypes,
     message: normalized.message,
   };
 
@@ -324,6 +337,11 @@ function normalizeFormSubmission(input: FormSubmissionPayload): NormalizedFormSu
     throw new Error('Preferred visit time is required');
   }
 
+  if (normalized.kind === 'volunteer') {
+    if (!normalized.preferredTime) throw new Error('Preferred volunteer time is required');
+    if (!normalized.workTypes) throw new Error('At least one volunteer work type is required');
+  }
+
   if (normalized.kind === 'adoption_interest' && !normalized.contextValue) {
     throw new Error('Dog name is required');
   }
@@ -335,6 +353,7 @@ function formSubject(submission: NormalizedFormSubmission): string {
   if (submission.kind === 'sponsorship') return 'Novo pedido de apadrinhamento mensal';
   if (submission.kind === 'mbway') return 'Pedido de número MB Way para donativo';
   if (submission.kind === 'adoption_interest') return `Interesse em adoção — ${submission.contextValue}`;
+  if (submission.kind === 'volunteer') return 'Novo pedido de voluntariado';
   return `Pedido de visita — ${submission.contextValue || 'Abrigo CAPA Póvoa de Lanhoso'}`;
 }
 
@@ -343,7 +362,9 @@ function formBody(submission: NormalizedFormSubmission): string {
     ? 'Cão'
     : submission.kind === 'visit'
       ? (submission.contextLabel || 'Visita')
-      : 'Origem';
+      : submission.kind === 'volunteer'
+        ? 'Voluntariado'
+        : 'Origem';
   const lines = [
     `Novo pedido recebido através do site CAPA.`,
     '',
@@ -353,6 +374,7 @@ function formBody(submission: NormalizedFormSubmission): string {
     `Email: ${submission.email || 'Não indicado'}`,
     `Telefone: ${submission.phone || 'Não indicado'}`,
     submission.preferredTime ? `Dia/hora pretendidos: ${submission.preferredTime}` : '',
+    submission.workTypes ? `Tipo(s) de voluntariado: ${submission.workTypes}` : '',
     submission.amount ? `Contributo mensal pretendido: ${submission.amount}` : '',
     submission.business ? `Empresa: ${submission.business}` : '',
     submission.contributionMethod ? `Forma preferida para contribuir: ${submission.contributionMethod}` : '',

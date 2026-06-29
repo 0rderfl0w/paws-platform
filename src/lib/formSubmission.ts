@@ -1,6 +1,6 @@
 const API_BASE_URL = (import.meta.env.PUBLIC_CAPA_API_URL || '').replace(/\/$/, '');
 
-export type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest';
+export type FormSubmissionKind = 'sponsorship' | 'mbway' | 'visit' | 'adoption_interest' | 'volunteer';
 
 export type FormSubmissionPayload = {
   kind: FormSubmissionKind;
@@ -16,6 +16,7 @@ export type FormSubmissionPayload = {
   amount?: string;
   business?: string;
   contributionMethod?: string;
+  workTypes?: string[] | string;
   message?: string;
   website?: string;
 };

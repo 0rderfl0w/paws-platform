@@ -137,7 +137,38 @@ try {
     throw new Error(`Expected MB Way dry-run submission to return 201/emailSent: ${JSON.stringify(mbway)}`);
   }
 
-  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
+  const volunteer = await post(baseUrl, {
+    kind: 'volunteer',
+    locale: 'en',
+    source: 'volunteer-form',
+    pageUrl: 'https://capapvl.org/en/help/volunteer-form',
+    contextLabel: 'Volunteer form',
+    contextValue: 'CAPA volunteer scheduling',
+    name: 'QA Volunteer',
+    email: 'qa-volunteer@example.com',
+    phone: '',
+    preferredTime: '09/07/2026 14:30',
+    workTypes: ['Dog walking', 'Shelter volunteering'],
+    message: 'Volunteer verifier',
+  });
+  if (volunteer.status !== 201 || !volunteer.body.ok || !volunteer.body.emailSent) {
+    throw new Error(`Expected volunteer dry-run submission to return 201/emailSent: ${JSON.stringify(volunteer)}`);
+  }
+
+  const volunteerMissingWork = await post(baseUrl, {
+    kind: 'volunteer',
+    locale: 'en',
+    source: 'verify-form-endpoint',
+    pageUrl: 'https://capapvl.org/en/help/volunteer-form',
+    name: 'QA Volunteer',
+    email: 'qa-volunteer@example.com',
+    preferredTime: '09/07/2026 14:30',
+  });
+  if (volunteerMissingWork.status !== 400 || !String(volunteerMissingWork.body.error || '').includes('At least one volunteer work type')) {
+    throw new Error(`Expected volunteer missing work type rejection: ${JSON.stringify(volunteerMissingWork)}`);
+  }
+
+  console.log(JSON.stringify({ ok: true, baseUrl, valid: valid.body, mbway: mbway.body, volunteer: volunteer.body, unknown: unknown.status, missing: missing.status, honeypot: honeypot.body }, null, 2));
 } finally {
   if (serverProcess) {
     serverProcess.kill('SIGTERM');

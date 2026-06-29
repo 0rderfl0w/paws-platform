@@ -30,6 +30,7 @@ const routeMap: Record<string, string> = {
   '/cao': '/en/dog',
   '/adocao': '/en/adopt',
   '/ajudar': '/en/help',
+  '/ajudar/formulario-voluntariado': '/en/help/volunteer-form',
   '/sobre-nos': '/en/about',
   '/admin': '/en/admin',
 };

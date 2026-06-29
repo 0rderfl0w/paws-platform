@@ -1,4 +1,6 @@
 ---
+import PlayfulDonateMenu from '../playful/PlayfulDonateMenu.astro';
+
 const heroTrust = ['Donativos em espécie', 'Voluntariado', 'Famílias FAT', 'Apoio financeiro'];
 ---
 
@@ -31,15 +33,20 @@ const heroTrust = ['Donativos em espécie', 'Voluntariado', 'Famílias FAT', 'Ap
         Descubra como pode contribuir para o nosso trabalho e juntar-se à nossa comunidade de defensores animais.
       </p>
 
-      <div data-reveal="left" data-reveal-delay="340" class="mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
-        <a href="mailto:capa.geralpvl@gmail.com" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-8 py-4 font-playful-display text-base font-extrabold text-white shadow-squish">
-          Fale Connosco
-          <span aria-hidden="true">❤</span>
+      <div data-reveal="left" data-reveal-delay="340" class="relative z-30 mt-8 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-start lg:justify-start">
+        <a data-hero-volunteer-link href="/ajudar/formulario-voluntariado" class="squishy playful-focus inline-flex w-full items-center justify-center gap-2 rounded-full bg-playful-orange px-8 py-4 font-playful-display text-base font-extrabold text-white shadow-squish sm:w-auto">
+          Voluntariado
+          <span aria-hidden="true">→</span>
         </a>
-        <a href="#donativos" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full border-2 border-playful-orange bg-white/80 px-8 py-4 font-playful-display text-base font-extrabold text-playful-orange-dark shadow-pillowy">
-          Ver formas de ajudar
-          <span aria-hidden="true">↓</span>
-        </a>
+        <PlayfulDonateMenu
+          locale="pt"
+          variant="desktop"
+          instanceId="hero-pt-donate"
+          buttonLabel="Doar"
+          rootClass="relative z-30 w-full sm:w-auto"
+          menuButtonClass="squishy playful-focus inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-playful-orange bg-white/80 px-8 py-4 font-playful-display text-base font-extrabold text-playful-orange-dark shadow-pillowy sm:w-auto"
+          menuPanelClass="mt-3 max-h-[min(20rem,calc(100svh-2rem))] w-full overflow-y-auto rounded-[1.5rem] border border-playful-line bg-white p-2 text-left shadow-pillowy-lg sm:absolute sm:left-0 sm:top-full sm:z-[80] sm:w-72 sm:max-h-none sm:overflow-visible"
+        />
       </div>
 
       <div data-reveal="pop" data-reveal-delay="430" class="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start">

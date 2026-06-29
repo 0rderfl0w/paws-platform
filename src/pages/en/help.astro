@@ -124,15 +124,20 @@ const paymentMethods = [
                 Find out how you can contribute to our work and join our community of animal advocates.
               </p>
 
-              <div data-reveal="left" data-reveal-delay="330" class="mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
-                <a href="mailto:capa.geralpvl@gmail.com" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-8 py-4 font-playful-display text-base font-extrabold text-white shadow-squish">
-                  Get in Touch
-                  <span aria-hidden="true">✉</span>
+              <div data-reveal="left" data-reveal-delay="330" class="relative z-30 mt-8 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-start lg:justify-start">
+                <a data-hero-volunteer-link href="/en/help/volunteer-form" class="squishy playful-focus inline-flex w-full items-center justify-center gap-2 rounded-full bg-playful-orange px-8 py-4 font-playful-display text-base font-extrabold text-white shadow-squish sm:w-auto">
+                  Volunteer
+                  <span aria-hidden="true">→</span>
                 </a>
-                <a href="#donations" class="squishy playful-focus inline-flex items-center justify-center gap-2 rounded-full border-2 border-playful-orange bg-white/85 px-8 py-4 font-playful-display text-base font-extrabold text-playful-orange-dark shadow-pillowy">
-                  See How to Help
-                  <span aria-hidden="true">↓</span>
-                </a>
+                <PlayfulDonateMenu
+                  locale="en"
+                  variant="desktop"
+                  instanceId="hero-en-donate"
+                  buttonLabel="Donate"
+                  rootClass="relative z-30 w-full sm:w-auto"
+                  menuButtonClass="squishy playful-focus inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-playful-orange bg-white/85 px-8 py-4 font-playful-display text-base font-extrabold text-playful-orange-dark shadow-pillowy sm:w-auto"
+                  menuPanelClass="mt-3 max-h-[min(20rem,calc(100svh-2rem))] w-full overflow-y-auto rounded-[1.5rem] border border-playful-line bg-white p-2 text-left shadow-pillowy-lg sm:absolute sm:left-0 sm:top-full sm:z-[80] sm:w-72 sm:max-h-none sm:overflow-visible"
+                />
               </div>
             </div>
 
@@ -210,6 +215,17 @@ const paymentMethods = [
                   <p class="text-sm font-medium leading-6 text-playful-muted">{description}</p>
                 </article>
               ))}
+            </div>
+
+            <div data-reveal="pop" class="relative z-10 mx-auto mt-12 max-w-3xl rounded-[2rem] border border-playful-orange/15 bg-playful-peach p-6 text-center shadow-pillowy sm:p-8">
+              <h3 class="font-playful-display text-2xl font-extrabold tracking-[-0.03em] text-playful-orange-dark">Want to schedule a time to help?</h3>
+              <p class="mx-auto mt-3 max-w-2xl text-base font-medium leading-7 text-playful-muted">
+                Fill in the volunteer form, choose the kinds of work you are willing to do, and CAPA will reply by email.
+              </p>
+              <a href="/en/help/volunteer-form" class="squishy playful-focus mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-playful-orange px-7 py-4 font-playful-display text-base font-extrabold text-white shadow-squish">
+                Volunteer form
+                <span aria-hidden="true">→</span>
+              </a>
             </div>
           </div>
         </section>
